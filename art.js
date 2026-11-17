@@ -67,11 +67,11 @@ function avatarSVG(o = {}) {
 
 // Kerri the lamb, the mascot, wearing a Maasai bead collar.
 function lambSVG(cls = '') {
-  const wool = [[30, 32], [50, 24], [70, 32], [24, 50], [76, 50], [36, 20], [64, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="14" fill="#fff8ee"/>`).join('');
-  return `<svg viewBox="0 0 100 100" class="lamb ${cls}" role="img" aria-label="Kerri the lamb">
-    <ellipse cx="18" cy="52" rx="12" ry="7" fill="#f7b6a6" transform="rotate(-25 18 52)"/><ellipse cx="82" cy="52" rx="12" ry="7" fill="#f7b6a6" transform="rotate(25 82 52)"/>
+  const wool = [[30, 32], [50, 24], [70, 32], [24, 50], [76, 50], [36, 20], [64, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="14" fill="#f3e2c7"/>`).join('');
+  return `<svg viewBox="0 0 100 100" class="lamb ${cls}" role="img" aria-label="Kerri the Maasai sheep">
+    <ellipse cx="18" cy="52" rx="12" ry="7" fill="#a85a2c" transform="rotate(-25 18 52)"/><ellipse cx="82" cy="52" rx="12" ry="7" fill="#a85a2c" transform="rotate(25 82 52)"/>
     ${wool}
-    <ellipse cx="50" cy="58" rx="26" ry="24" fill="#fde3cf"/>
+    <ellipse cx="50" cy="58" rx="26" ry="24" fill="#c9733f"/><ellipse cx="50" cy="66" rx="14" ry="11" fill="#e2a274"/>
     <circle cx="40" cy="55" r="4.5" fill="#2b1a12"/><circle cx="60" cy="55" r="4.5" fill="#2b1a12"/>
     <circle cx="41.5" cy="53.5" r="1.5" fill="#fff"/><circle cx="61.5" cy="53.5" r="1.5" fill="#fff"/>
     <ellipse cx="50" cy="66" rx="5" ry="3.5" fill="#e98a8a"/>
@@ -92,21 +92,21 @@ function sky(t = 'day') {
     `<path d="M0 260 q120 -40 250 -10 t300 -20 t250 10 v220 h-800z" fill="${t === 'night' ? '#3d4a3a' : '#c9b56a'}"/>` +
     `<path d="M0 300 q200 -30 400 0 t400 -10 v160 h-800z" fill="${t === 'night' ? '#2f3a2c' : '#d9c37a'}"/>`;
 }
-const acacia = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})" class="sway"><path d="M0 0 l-4 -70 M-2 -50 l-30 -30 M-3 -55 l26 -28" stroke="#5d4037" stroke-width="6" fill="none" stroke-linecap="round"/><ellipse cx="0" cy="-88" rx="80" ry="16" fill="#558b2f"/><ellipse cx="-20" cy="-96" rx="50" ry="10" fill="#689f38"/></g>`;
+const acacia = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})"><g class="sway"><path d="M0 0 l-4 -70 M-2 -50 l-30 -30 M-3 -55 l26 -28" stroke="#5d4037" stroke-width="6" fill="none" stroke-linecap="round"/><ellipse cx="0" cy="-88" rx="80" ry="16" fill="#558b2f"/><ellipse cx="-20" cy="-96" rx="50" ry="10" fill="#689f38"/></g></g>`;
 const hut = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-60 0 q0 -60 60 -62 q60 2 60 62z" fill="#8d6e63"/><path d="M-60 0 q0 -60 60 -62" stroke="#6d4c41" stroke-width="4" fill="none"/><path d="M-50 -20 h100 M-42 -38 h84" stroke="#a1887f" stroke-width="3"/><rect x="-12" y="-30" width="24" height="30" rx="10" fill="#3e2723"/></g>`;
 const boma = (x, y, w) => { let s = ''; for (let i = 0; i <= w; i += 14) s += `<path d="M${x + i} ${y} l${(i % 28) - 7} -34" stroke="#795548" stroke-width="4" stroke-linecap="round"/>`; return s; };
 function cow(x, y, s = 1, col = '#8d5524', flip = false, cls = '') {
-  return `<g transform="translate(${x} ${y}) scale(${flip ? -s : s} ${s})" class="${cls}">
+  return `<g class="${cls}"><g transform="translate(${x} ${y}) scale(${flip ? -s : s} ${s})">
     <rect x="-34" y="-46" width="60" height="30" rx="14" fill="${col}"/><path d="M-20 -46 q8 -14 16 0" fill="${col}"/>
     <rect x="-28" y="-20" width="7" height="22" fill="${col}"/><rect x="-14" y="-20" width="7" height="22" fill="${col}"/><rect x="6" y="-20" width="7" height="22" fill="${col}"/><rect x="18" y="-20" width="7" height="22" fill="${col}"/>
     <ellipse cx="34" cy="-46" rx="12" ry="14" fill="${col}"/><path d="M26 -58 q-6 -14 -14 -12 M42 -58 q6 -14 14 -12" stroke="#f5f0e1" stroke-width="4" fill="none" stroke-linecap="round"/>
     <circle cx="38" cy="-48" r="2" fill="#111"/><ellipse cx="38" cy="-36" rx="7" ry="4" fill="#d7a98c"/><path d="M-34 -36 q-12 6 -8 22" stroke="${col}" stroke-width="3" fill="none"/>
-  </g>`;
+  </g></g>`;
 }
 // Full-body person for scenes.
 function person(x, y, s = 1, o = {}) {
   const wrap = o.wrap || '#E53935', cols = o.collar || ['#E53935', '#fff', '#1E88E5'], child = o.child;
-  return `<g transform="translate(${x} ${y}) scale(${s})" class="${o.cls || 'bob'}">
+  return `<g transform="translate(${x} ${y}) scale(${s})"><g class="${o.cls || 'bob'}">
     <rect x="-12" y="-40" width="8" height="40" fill="${SKIN2}"/><rect x="4" y="-40" width="8" height="40" fill="${SKIN2}"/>
     <path d="M-26 -38 l8 -72 h36 l8 72z" fill="${wrap}"/><path d="M-22 -60 h44 M-20 -80 h40" stroke="rgba(0,0,0,.2)" stroke-width="3"/>
     <path d="M-18 -104 l-16 50 M18 -104 l16 50" stroke="${SKIN}" stroke-width="8" stroke-linecap="round"/>
@@ -114,7 +114,7 @@ function person(x, y, s = 1, o = {}) {
     ${collar(0, -104, 8, cols)}
     <circle cx="0" cy="-130" r="${child ? 20 : 18}" fill="${SKIN}"/><path d="M-${child ? 20 : 18} -134 a${child ? 20 : 18} ${child ? 20 : 18} 0 0 1 ${child ? 40 : 36} 0z" fill="${o.elder ? '#d9d4cc' : HAIR}"/>
     <circle cx="-6" cy="-129" r="2" fill="#111"/><circle cx="6" cy="-129" r="2" fill="#111"/><path d="M-5 -121 q5 4 10 0" stroke="#111" stroke-width="2" fill="none"/>
-  </g>`;
+  </g></g>`;
 }
 const miniBricks = cols => cols.map((c, i) => brickSVG(c, -20 + (i % 2) * 6, -i * 13, 10)).join('');
 const scene = (t, ...parts) => `<svg viewBox="0 0 800 450" class="scene" role="img">${sky(t)}${parts.join('')}</svg>`;
@@ -139,7 +139,7 @@ const STORIES = [
     pages: [
       { s: () => scene('day', boma(80, 390, 300), cow(250, 380, 1, '#8d5524'), person(560, 400, 1.2, LEMAYIAN)), en: 'Lemayian counts the cattle. One calf is missing!', sw: 'Lemayian anahesabu ng\'ombe. Ndama mmoja amepotea!' },
       { s: () => scene('day', acacia(400, 330, 1.4), person(200, 400, 1.1, LEMAYIAN)), en: 'Is the calf UNDER the acacia tree? No!', sw: 'Je, ndama yuko CHINI ya mti? Hapana!' },
-      { s: () => scene('day', hut(420, 340, 1.3), person(200, 400, 1.1, LEMAYIAN)), en: 'Is the calf BEHIND the manyatta? No!', sw: 'Je, ndama yuko NYUMA ya nyumba? Hapana!' },
+      { s: () => scene('day', hut(420, 340, 1.3), person(200, 400, 1.1, LEMAYIAN)), en: 'Is the calf BEHIND the enkaji? No!', sw: 'Je, ndama yuko NYUMA ya nyumba? Hapana!' },
       { s: () => scene('day', `<path d="M0 400 q200 -30 400 0 t400 0 v50 h-800z" fill="#4fc3f7"/>`, cow(520, 380, .7, '#eee', true, 'walk'), person(220, 400, 1.1, LEMAYIAN)), en: 'Is the calf BESIDE the river? Yes! There it is!', sw: 'Je, ndama yuko KANDO ya mto? Ndiyo! Yuko pale!' },
       { s: () => scene('sunset', boma(80, 390, 300), cow(250, 380, 1, '#8d5524'), cow(330, 390, .6, '#eee', true), person(560, 400, 1.2, LEMAYIAN)), en: 'The calf is home, BESIDE its mother. Now build a cow and a calf with your bricks!', sw: 'Ndama yuko nyumbani, KANDO ya mama yake.' },
     ] },
@@ -165,5 +165,6 @@ const TILE_ART = {
   cattle: () => `<svg viewBox="0 0 120 90">${cow(40, 80, .55, '#8d5524')}${cow(85, 84, .45, '#fff')}<text x="8" y="28" font-size="22" fill="#fff" font-weight="900">1 2 3</text></svg>`,
   beads: () => `<svg viewBox="0 0 120 90">${['#E53935', '#fff', '#1E88E5', '#E53935', '#fff'].map((c, i) => `<circle cx="${14 + i * 20}" cy="46" r="9" fill="${c}" stroke="#333"/>`).join('')}<text x="102" y="54" font-size="24" fill="#fff" font-weight="900">?</text></svg>`,
   colour: () => `<svg viewBox="0 0 120 90">${['r', 'g', 'b', 'p'].map((c, i) => brickSVG(c, 6 + (i % 2) * 58, 30 + Math.floor(i / 2) * 32, 12)).join('')}</svg>`,
+  code: () => `<svg viewBox="0 0 120 90">${[0,1,2].map(i=>`<rect x="${14+i*32}" y="52" width="26" height="26" rx="6" fill="#fff" opacity=".9"/><text x="${20+i*32}" y="71" font-size="16">${['⬆️','➡️','➡️'][i]}</text>`).join('')}${cow(40,44,.42,'#8d5524')}<text x="94" y="40" font-size="22">💧</text></svg>`,
   market: () => `<svg viewBox="0 0 120 90"><circle cx="40" cy="48" r="20" fill="#fdd835" stroke="#c49000" stroke-width="3"/><text x="33" y="56" font-size="20" font-weight="900" fill="#8a6500">5</text><circle cx="80" cy="52" r="16" fill="#cfd8dc" stroke="#78909c" stroke-width="3"/><text x="70" y="59" font-size="16" font-weight="900" fill="#455a64">10</text></svg>`,
 };

@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="games.css">
 </head>
 <body>
 <a class="skip" href="#view">Skip to content</a>
@@ -29,11 +30,13 @@
 </aside>
 <main>
   <div class="beadstrip" aria-hidden="true"></div>
+  <button id="sndBtn" class="snd-btn" aria-label="Sound on or off">🔊</button>
   <div id="view" tabindex="-1"></div>
   <footer class="foot">Enkaji means "home" in Maa. Six Bricks is a LEGO Foundation tool; learn more from <a href="https://www.carefored.co.za/" target="_blank" rel="noopener">Care for Education</a>. Built for facilitators and Mothers Who Teach in Sekenani, Maasai Mara.</footer>
 </main>
 <div id="toast" role="status" aria-live="polite"></div>
 <script src="data.js"></script>
+<script src="sound.js"></script>
 <script src="art.js"></script>
 <script src="games.js"></script>
 <script src="app.js"></script>

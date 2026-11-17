@@ -18,7 +18,7 @@ function streak() {
 function markDay() { if (!S.days.includes(today())) S.days.push(today()); if (streak() >= 3) badge('streak3'); }
 function star(n = 1, msg) {
   S.stars += n; markDay(); badge('first'); save();
-  toast(msg || `+${n} ⭐ Well done!`); confetti(); updateLamb();
+  toast(msg || `+${n} ⭐ Well done!`); confetti(); updateLamb(); SND.play('yes');
 }
 function badge(id) {
   if (S.badges.includes(id)) return;
@@ -42,15 +42,18 @@ function confetti() {
 
 // ---------- Voice: reads text aloud so mothers of any literacy level can follow ----------
 function speak(text, lang = 'en', onend) {
-  if (!('speechSynthesis' in window)) { onend && onend(); return; }
-  window.speechSynthesis?.cancel();
-  const u = new SpeechSynthesisUtterance(text), vs = speechSynthesis.getVoices();
-  const want = lang === 'sw' ? ['sw-KE', 'sw'] : ['en-KE', 'en-GB', 'en'];
-  u.voice = want.map(w => vs.find(v => v.lang.replace('_', '-').startsWith(w))).find(Boolean) || null;
-  u.lang = lang === 'sw' ? 'sw-KE' : 'en-KE'; u.rate = .9; u.pitch = 1.05;
-  if (onend) u.onend = onend;
+  if (!('speechSynthesis' in window) || !SND.on) { onend && onend(); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.voice = VOICE.pick(lang); // Kenyan voice first (en-KE / sw-KE), then the nearest available
+  u.lang = u.voice ? u.voice.lang : (lang === 'sw' ? 'sw-KE' : 'en-KE');
+  u.rate = .88; u.pitch = 1.05;
+  if (onend) { u.onend = onend; u.onerror = onend; }
   speechSynthesis.speak(u);
 }
+// Speak a Maa word: Mama's own recording if there is one, otherwise the Swahili voice.
+function sayMaa(k) { REC.play('maa-' + k).then(a => { if (!a && MAA[k]) speak(MAA[k].say, 'sw'); }); }
+document.addEventListener('click', e => { const b = e.target.closest('[data-maa]'); if (b) sayMaa(b.dataset.maa); });
 const listenBtn = (text, lang = 'en', label = '🔊 Listen') => `<button class="listen" data-say="${esc(text)}" data-lang="${lang}">${label}</button>`;
 document.addEventListener('click', e => { const b = e.target.closest('[data-say]'); if (b) speak(b.dataset.say, b.dataset.lang); });
 
@@ -61,6 +64,7 @@ const GAMES = [
   { id: 'beads', t: 'Bead Patterns', c: '#d81b60', bg: 'linear-gradient(135deg,#ec4899,#f9a8d4)', d: 'What comes next?' },
   { id: 'colour', t: 'Colour Hunt', c: '#0d9488', bg: 'linear-gradient(135deg,#14b8a6,#5eead4)', d: 'Find the colour' },
   { id: 'market', t: "Ruth's Market", c: '#1d4ed8', bg: 'linear-gradient(135deg,#3b82f6,#93c5fd)', d: 'Pay with shillings' },
+  { id: 'code', t: 'Code the Cow', c: '#15803d', bg: 'linear-gradient(135deg,#22c55e,#a3e635)', d: 'Arrow cards, find the water' },
 ];
 const tile = g => `<a class="tile" href="#/game/${g.id}"><div class="art" style="background:${g.bg}">${TILE_ART[g.id]()}</div><div class="tb"><h3>${g.t}</h3><span class="play" style="background:${g.c}">Play</span></div></a>`;
 const actCard = a => `<a class="card act" href="#/activity/${a.id}">${S.done[a.id] ? '<span class="done" title="Done">✅</span>' : ''}${buildSVG(a.demo, { u: 14 })}
@@ -88,7 +92,7 @@ V.home = () => {
   <div class="grid g5">${GAMES.map(tile).join('')}</div>
   <div class="grid g2" style="margin-top:16px">
     <div class="card goal"><h3>Today's Goal</h3><div class="row" style="justify-content:space-between"><span>Play 3 different games</span><b style="color:var(--pur)">${Math.min(n, 3)} / 3</b></div><div class="bar"><i style="width:${Math.min(n, 3) / 3 * 100}%"></i></div></div>
-    <div class="card keep">${lambSVG()}<div><h3>Keep Going!</h3><p style="margin:0">${n >= 3 ? 'Goal done! Kerri the lamb is proud of you!' : "You're doing amazing! Kerri the lamb is cheering."}</p></div></div>
+    <div class="card keep">${lambSVG()}<div><h3>Keep Going!</h3><p style="margin:0">${n >= 3 ? 'Goal done! Kerri the Maasai sheep is proud of you!' : "You're doing amazing! Kerri the Maasai sheep is cheering."}</p></div></div>
   </div>
   <div class="sec"><h2>🧱 Today's Brick Challenge</h2></div>
   <a class="card act" href="#/activity/${pick.id}" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:16px;align-items:center">${buildSVG(pick.demo, { u: 16, anim: true })}<div><span class="pill">${DOMAINS[pick.dom].icon} ${DOMAINS[pick.dom].t}</span><h2 style="margin-top:8px">${pick.t}</h2><p class="mute">${pick.steps[0]}</p><span class="btn">Let's play →</span></div></a>
@@ -205,7 +209,12 @@ V.mothers = () => {
   <div class="sec"><h2>Play while you work</h2></div>
   <div class="grid g3">${MOMENTS.map(m => `<div class="card"><div class="row" style="justify-content:space-between"><span style="font-size:2.2rem">${m.icon}</span>${listenBtn(m.t + '. ' + m.p)}</div><h3>${m.t}</h3><p class="mute" style="margin:0">${m.p}</p></div>`).join('')}</div>
   <div class="sec"><h2>Count in three languages</h2></div>
-  <div class="card"><div class="grid g5">${NUMBERS.map(n => `<button class="chip" style="padding:12px" data-say="${n.en}. ${n.sw}" data-lang="en"><b style="font-size:1.4rem">${n.n}</b><br>${n.maa}<br><span class="mute small">${n.sw} · ${n.en}</span></button>`).join('')}</div><p class="small mute" style="margin:10px 0 0">Maa spellings vary. Ask the mothers to teach the facilitator the right sounds.</p></div>
+  <div class="card"><div class="grid g5">${NUMBERS.map(n => `<button class="chip" style="padding:12px" data-maa="n${n.n}"><b style="font-size:1.4rem">${n.n}</b><br>${n.maa}<br><span class="mute small">${n.sw} · ${n.en}</span></button>`).join('')}</div><p class="small mute" style="margin:10px 0 0">Maa spellings vary. Ask the mothers to teach the facilitator the right sounds.</p></div>
+  <div class="sec" id="maa-words"><h2>🎙️ Mama's Voice: Maa words</h2><span class="pill">Used in the games</span></div>
+  <div class="card"><p>No phone can speak Maa yet, so the games use a Swahili voice for Maa words. <b>Mama, record each word in your own voice</b> and the games will play YOUR voice to the children. Recordings stay on this phone.</p>
+    <p class="small mute">✅ checked in Maa sources · ❔ please check with the mothers in Sekenani. Spellings vary (Purko, Keekonyokie).</p>
+    <div class="grid g3" data-words>${Object.entries(MAA).map(([k, m]) => `<div class="word-row"><div><b>${m.w}</b> ${m.c === 'H' ? '✅' : '❔'}<div class="small mute">${m.en} · ${m.sw}</div></div><div class="row" style="gap:6px"><button class="listen" data-maa="${k}" aria-label="Play ${m.w}">🔊</button><button class="listen rec ${REC.has('maa-' + k) ? 'has' : ''}" data-rec="${k}" aria-label="Record ${m.w}">🎙️</button></div></div>`).join('')}</div></div>
+  <div class="card" style="margin-top:12px"><h3>🇰🇪 Kenyan accent</h3><p class="small" style="margin:0" data-voice></p></div>
   <div class="sec"><h2>Words that help children grow</h2></div>
   <div class="card">${PHRASES.map(p => `<div class="phrase"><div>${p.maa ? `<b>${p.maa}</b> · ` : ''}<b>${p.sw}</b><div class="small mute">${p.en}${p.note ? ' · ' + p.note : ''}</div></div>${listenBtn(p.sw, 'sw')}</div>`).join('')}</div>
   <div class="sec"><h2>The Mama's Circle</h2><span class="pill">Monthly, under a tree</span></div>
@@ -217,7 +226,26 @@ V.mothers = () => {
   </div>`;
 };
 V.mothers.track = 'little';
-V.mothers.after = () => document.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { V.mothers.track = b.dataset.t; render(); });
+V.mothers.after = () => {
+  document.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { V.mothers.track = b.dataset.t; render(); });
+  const voiceNote = () => {
+    const l = VOICE.label(), ke = VOICE.kenyan('en') || VOICE.kenyan('sw'), v = $('[data-voice]'); if (!v) return;
+    v.innerHTML = `This phone speaks English with <b>${esc(l.en)}</b> and Swahili with <b>${esc(l.sw)}</b>. ` +
+      (ke ? '🎉 A Kenyan voice was found!' : 'No Kenyan voice on this phone yet. For a Kenyan accent, open the site in <b>Microsoft Edge</b> (it has Kenyan English and Swahili voices), or add <b>Swahili</b> in your phone\'s Text-to-speech settings.');
+  };
+  voiceNote(); setTimeout(voiceNote, 800);
+  document.querySelectorAll('[data-rec]').forEach(b => b.onclick = async () => {
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) return toast('This phone cannot record. Try Chrome.');
+    const k = b.dataset.rec;
+    b.textContent = '⏺️'; b.classList.add('recording'); toast(`Say "${MAA[k].w}" now...`);
+    try {
+      await REC.record('maa-' + k, 2500);
+      b.textContent = '🎙️'; b.classList.remove('recording'); b.classList.add('has');
+      toast(`✅ Saved! Ashe oleng, Mama.`); sayMaa(k);
+      if (Object.keys(MAA).filter(x => REC.has('maa-' + x)).length >= 3) badge('voice');
+    } catch { b.textContent = '🎙️'; b.classList.remove('recording'); toast('Microphone not allowed. Allow it in the browser to record.'); }
+  });
+};
 
 V.training = () => `<h1>Facilitator Training</h1>
   <p class="mute" style="max-width:720px">Six modules, one for each brick colour. Work through them in order over a 3 day training. Each ends with a practice, a reflection and a short quiz that earns a facilitator badge.</p>
@@ -284,3 +312,6 @@ function render() {
 window.addEventListener('hashchange', () => { render(); scrollTo(0, 0); $('#view').focus({ preventScroll: true }); });
 updateLamb();
 render();
+REC.ready.then(() => location.hash.includes('mothers') && render());
+const sndBtn = $('#sndBtn'), sndIcon = () => { sndBtn.textContent = SND.on ? '🔊' : '🔇'; };
+sndIcon(); sndBtn.onclick = () => { SND.toggle(); sndIcon(); toast(SND.on ? 'Sound on' : 'Sound off'); };
