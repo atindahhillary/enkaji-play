@@ -1,12 +1,14 @@
 // Content for Enkaji Play. Plain data so facilitators can edit it without touching app code.
 
+// The six bricks, in the order used in Sekenani training: red, orange, green, blue, sky blue, yellow.
+// Key 'p' is kept for sky blue so older saved demos still work.
 const BRICKS = [
   { k: 'r', name: 'Red', sw: 'Nyekundu', hex: '#E53935', idea: 'The red of a Maasai shuka' },
   { k: 'o', name: 'Orange', sw: 'Rangi ya chungwa', hex: '#FB8C00', idea: 'The sun rising over the Mara' },
-  { k: 'y', name: 'Yellow', sw: 'Njano', hex: '#FDD835', idea: 'Dry grass after the long rains end' },
   { k: 'g', name: 'Green', sw: 'Kijani', hex: '#43A047', idea: 'New grass for the cattle' },
-  { k: 'b', name: 'Blue', sw: 'Bluu', hex: '#1E88E5', idea: 'The sky and the Talek river' },
-  { k: 'p', name: 'Purple', sw: 'Zambarau', hex: '#8E24AA', idea: 'Beads on Mama\'s collar' },
+  { k: 'b', name: 'Blue', sw: 'Bluu', hex: '#1E88E5', idea: "The Talek river and Mama's blue beads" },
+  { k: 'p', name: 'Sky Blue', sw: 'Samawati', hex: '#29B6F6', idea: 'The wide sky over the Mara' },
+  { k: 'y', name: 'Yellow', sw: 'Njano', hex: '#FDD835', idea: 'Dry grass after the long rains end' },
 ];
 const BRICK = Object.fromEntries(BRICKS.map(b => [b.k, b]));
 
@@ -36,7 +38,7 @@ const PHRASES = [
 const DOMAINS = {
   num: { t: 'Numbers', icon: '🔢', c: '#1E88E5' },
   lit: { t: 'Language', icon: '🗣️', c: '#E53935' },
-  per: { t: 'Look & Remember', icon: '👀', c: '#8E24AA' },
+  per: { t: 'Look & Remember', icon: '👀', c: '#0277BD' },
   phy: { t: 'Body & Hands', icon: '🤸', c: '#FB8C00' },
   sel: { t: 'Feelings & Friends', icon: '💛', c: '#d4a106' },
   cre: { t: 'Make & Imagine', icon: '🎨', c: '#43A047' },
@@ -118,9 +120,9 @@ const ACTIVITIES = [
     demo: [['g',0,0],['r',8,0]] },
   { id: 'soil-layers', t: 'Soil Layers Tower', dom: 'num', age: 'starter', mins: 8, by: 'soil',
     mat: '6 bricks, a small hole dug in the shamba', local: 'Soil in a clear bottle with water, shaken and left to settle',
-    steps: ['Dig a small hole and look at the side. Are there different colours?', 'Green = topsoil where grass grows, orange = subsoil, purple = rock.', 'Build the layers in the right order.', 'Which layer do plants and worms love most?'],
+    steps: ['Dig a small hole and look at the side. Are there different colours?', 'Green = topsoil where grass grows, orange = subsoil, yellow = sandy rock.', 'Build the layers in the right order.', 'Which layer do plants and worms love most?'],
     ask: ['Why must we protect topsoil?', 'What happens when rain washes it away?'],
-    demo: [['p',2,0],['o',2,1],['g',2,2]] },
+    demo: [['y',2,0],['o',2,1],['g',2,2]] },
   { id: 'seed-maize', t: 'From Seed to Maize', dom: 'cre', age: 'both', mins: 6, by: 'agri',
     mat: '4 bricks, a maize seed', local: 'Draw the stages in the sand',
     steps: ['Show a real maize seed.', 'Yellow = seed, blue = rain, green = shoot, orange = maize cob.', 'Put the bricks in order of how maize grows.', 'Plant a real seed in a tin and watch each week.'],
@@ -298,7 +300,7 @@ const TEAM = [
   { k: 'soil', role: 'Soil Engineer', strand: 'Soil & Regeneration', blurb: 'Works with schools on soil projects and land regeneration. Helps children see the ground under their feet as alive.', acts: ['soil-layers', 'seed-maize'], av: { wrap: '#6d4c41', collar: ['#E53935','#fff','#1E88E5'] } },
   { k: 'it', role: 'IT Specialist', strand: 'Digital Thinking', blurb: 'Brings coding and digital skills. Children learn computer thinking without a computer: steps, orders and fixing bugs.', acts: ['code-cow', 'robot-mama', 'chai-algorithm'], av: { wrap: '#1E88E5', collar: ['#FDD835','#fff','#E53935'] } },
   { k: 'health', role: 'Healthcare Professional', strand: 'Health & Hygiene', blurb: 'Teaches healthy habits through play: handwashing, clean water, food and feelings.', acts: ['handwash', 'feelings'], av: { wrap: '#26a69a', collar: ['#E53935','#fff','#43A047'] } },
-  { k: 'schol', role: 'Scholarships Lead', strand: 'Dreams & Pathways', blurb: 'Supports learners to stay in school and reach further. Helps children and mothers picture the path to big dreams.', acts: ['dream-tower', 'build-name'], av: { wrap: '#8E24AA', collar: ['#FB8C00','#fff','#1E88E5'] } },
+  { k: 'schol', role: 'Scholarships Lead', strand: 'Dreams & Pathways', blurb: 'Supports learners to stay in school and reach further. Helps children and mothers picture the path to big dreams.', acts: ['dream-tower', 'build-name'], av: { wrap: '#0277BD', collar: ['#FB8C00','#fff','#E53935'] } },
   { k: 'agri', role: 'Agriculture Specialist', strand: 'Farm & Food', blurb: 'Connects learning to the shamba and the herd: seeds, seasons, rain and caring for animals.', acts: ['seed-maize', 'count-herd'], av: { wrap: '#43A047', collar: ['#E53935','#FDD835','#1E88E5'] } },
   { k: 'biz', role: 'Entrepreneur', name: 'Ruth', strand: 'Money & Market', blurb: 'Ruth runs her own business and shows children how a market stall works: prices, change, saving and fair trade.', acts: ['market', 'guess-check'], av: { wrap: '#E53935', collar: ['#1E88E5','#fff','#FDD835'] } },
 ];

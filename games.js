@@ -56,7 +56,7 @@ async function talk(parts) {
 
 // ---------- the stage every game shares ----------
 const HOSTS = {
-  koko: () => avatarSVG({ kind: 'elder', wrap: '#8E24AA', collar: ['#fff', '#E53935', '#43A047', '#FDD835'], bg: '#f3e5f5', label: 'Koko' }),
+  koko: () => avatarSVG({ kind: 'elder', wrap: '#0277BD', collar: ['#fff', '#E53935', '#43A047', '#FDD835'], bg: '#e1f5fe', label: 'Koko' }),
   mama: () => avatarSVG({ kind: 'mother', wrap: '#c62828', bg: '#ffe0cc', label: 'Mama' }),
   ruth: () => avatarSVG({ kind: 'mother', wrap: '#E53935', collar: ['#1E88E5', '#fff', '#FDD835'], bg: '#e3f2fd', label: 'Ruth' }),
   naserian: () => avatarSVG({ kind: 'girl', wrap: '#1E88E5', collar: ['#FDD835', '#fff', '#E53935'], bg: '#e8f5e9', label: 'Naserian' }),
@@ -137,12 +137,12 @@ const GAME_MOUNT = {
         [...el.querySelectorAll('.dtower .db')].forEach((b, i) => { b.style.animationDelay = (i % 6) * 50 + 'ms'; restart(b, 'hop'); });
         burstAt(el.querySelector('[data-m]')); SND.play('cheer'); st.kerri('happy');
         api.star(); api.played(); st.win(++wins); level++; if (level >= 4) api.badge('memory');
-        st.say('<b>Sidai oleng!</b> A perfect copy!', [{ maa: 'good' }, { en: 'A perfect copy!' }]);
+        st.say('Eeh! <b>Sidai oleng!</b> A perfect copy. Hongera!', [{ maa: 'good' }, { en: 'Eeh! A perfect copy. Hongera!' }]);
         nextBtn('Next tower →', () => show(true));
       } else {
         M.forEach((b, i) => { if (mine[i] !== target[i]) restart(b, 'wiggle'), b.classList.add('wrong'); });
         SND.play('no'); st.kerri('think');
-        st.say('Nearly! Look at the shaking bricks. <b>Jaribu tena</b>, you can!', [{ sw: 'Jaribu tena, unaweza!' }]);
+        st.say('Pole! Nearly there. Look at the shaking bricks. <b>Jaribu tena</b>, unaweza!', [{ en: 'Pole! Nearly there.' }, { sw: 'Jaribu tena, unaweza!' }]);
         nextBtn('Try the same tower', () => show(false));
       }
     }
@@ -185,7 +185,7 @@ const GAME_MOUNT = {
       if (!st.live()) return;
       const C = el.querySelector('[data-c]'), opts = shuffle([n, ...shuffle([n - 2, n - 1, n + 1, n + 2].filter(v => v >= 1 && v <= 10)).slice(0, 2)]);
       C.innerHTML = opts.map((o, i) => `<button class="pop" style="animation-delay:${i * 60}ms" data-n="${o}">${o}</button>`).join('');
-      st.say('So, how many cows came home?', [{ en: 'So, how many cows came home?' }]);
+      st.say('Sasa, how many cows have come home?', [{ en: 'Sasa, how many cows have come home?' }]);
       C.querySelectorAll('button').forEach(b => b.onclick = async () => {
         if (busy) return;
         if (+b.dataset.n !== n) { restart(b, 'wiggle'); SND.play('no'); st.say('Count again, touch each cow.', [{ sw: 'Hesabu tena.' }]); return; }
@@ -256,7 +256,7 @@ const GAME_MOUNT = {
           el.querySelectorAll('.cbead').forEach((x, i) => { x.style.animationDelay = i * 40 + 'ms'; restart(x, 'hop'); });
           burstAt(slot); SND.play('cheer'); st.kerri('happy'); st.win(++wins);
           api.star(1, '⭐ Beautiful beadwork!'); api.played(); api.bump('beads', 5, 'beads');
-          await st.say('<b>Sidai oleng!</b> The pattern goes round and round.', [{ maa: 'good' }]);
+          await st.say('<b>Sidai oleng!</b> Hongera! The pattern goes round and round.', [{ maa: 'good' }, { sw: 'Hongera!' }]);
           if (st.live() && mode === 'pattern') round();
         } else {
           restart(b, 'wiggle'); SND.play('no'); st.kerri('think'); busy = false;
@@ -356,11 +356,11 @@ const GAME_MOUNT = {
         flyTo(b, tray, { endScale: .5, dur: 450 }).then(() => { if (!st.live()) return; tray.insertAdjacentHTML('beforeend', `<span class="mini-coin ${v >= 10 ? 's' : ''} pop">${v}</span>`); });
         if (sum() > price) {
           busy = true; await wait(650); if (!st.live()) return;
-          st.say(`Too much! That is ${sum()}. Ruth gives your coin back.`, [{ en: 'Too much! Here is your coin back.' }]);
+          st.say(`Aii, that is too much! That is ${sum()}. Ruth gives your coin back.`, [{ en: 'Aii, that is too much! Here is your coin back.' }]);
           const back = tray.lastElementChild; paid.pop();
           if (back) { await flyTo(back, b, { endScale: 1 }); back.remove(); }
           SND.play('no'); update(); busy = false;
-        } else if (sum() === price) st.say('Exactly right! Now press <b>Pay Ruth</b>.', [{ en: 'Exactly right! Now press Pay Ruth.' }]);
+        } else if (sum() === price) st.say('Sawa sawa! Exactly right. Now press <b>Pay Ruth</b>.', [{ en: 'Sawa sawa! Exactly right. Now press Pay Ruth.' }]);
       });
       el.querySelector('[data-back]').onclick = () => { if (busy) return; paid = []; tray.innerHTML = ''; update(); SND.play('whoosh'); };
       el.querySelector('[data-pay]').onclick = async () => {
@@ -427,7 +427,7 @@ const GAME_MOUNT = {
         const [dx, dy] = DIR[prog[i]], nx = x + dx, ny = y + dy;
         if (nx < 0 || ny < 0 || nx >= n || ny >= n || trees.has(key(nx, ny))) {
           cards[i].classList.add('bug'); restart(cowEl, 'wiggle'); SND.play('no'); st.kerri('think');
-          st.say(`Oops, a <b>bug</b> at step ${i + 1}! ${trees.has(key(nx, ny)) ? 'A tree is in the way.' : 'That is outside the field.'} Fix the code and run again.`, [{ en: 'Oops, a bug! Fix the code and run again.' }]);
+          st.say(`Pole! A <b>bug</b> at step ${i + 1}! ${trees.has(key(nx, ny)) ? 'A tree is in the way.' : 'That is outside the field.'} Fix the code and run again.`, [{ en: 'Pole! A bug. Fix the code and run again.' }]);
           busy = false; return;
         }
         x = nx; y = ny; place(x, y); SND.play('tap'); await wait(450);

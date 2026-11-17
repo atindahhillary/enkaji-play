@@ -129,7 +129,7 @@
 
 /* Sound toggle + Maa words */
 .snd-btn { position: fixed; top: 18px; right: 18px; z-index: 30; width: 46px; height: 46px; border-radius: 50%; border: 0; background: #fff; box-shadow: var(--sh); font-size: 1.3rem; }
-.word-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 12px; background: #fbf8ff; border-radius: 14px; }
+.word-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 12px; background: #fdf6ec; border-radius: 14px; }
 .rec.has { background: #dcfce7; color: #166534; }
 .rec.recording { background: #fee2e2; animation: pulse .8s ease-in-out infinite; }
 

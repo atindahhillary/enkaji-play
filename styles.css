@@ -1,9 +1,9 @@
 :root {
   color-scheme: light;
-  --bg: #f6f2ff; --card: #fff; --ink: #2a1f3d; --mute: #6b6180; --line: #ece6f7;
-  --pur: #7c3aed; --pur2: #a855f7; --pink: #ec4899; --red: #c62828; --shuka: #d32f2f;
-  --r: #E53935; --o: #FB8C00; --y: #FDD835; --g: #43A047; --b: #1E88E5; --p: #8E24AA;
-  --rad: 22px; --sh: 0 6px 20px rgba(76, 29, 149, .08);
+  --bg: #fff8ef; --card: #fff; --ink: #2b1d16; --mute: #6d5d50; --line: #f0e3cf;
+  --pur: #1565C0; --pur2: #29B6F6; --pink: #E53935; --red: #c62828; --shuka: #d32f2f;
+  --r: #E53935; --o: #FB8C00; --y: #FDD835; --g: #43A047; --b: #1E88E5; --p: #29B6F6;
+  --rad: 22px; --sh: 0 6px 20px rgba(90, 45, 10, .09);
 }
 * { box-sizing: border-box; }
 body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--ink); display: flex; min-height: 100vh; }
@@ -16,12 +16,12 @@ button { font: inherit; cursor: pointer; }
 :focus-visible { outline: 3px solid var(--o); outline-offset: 2px; }
 
 /* Sidebar */
-.side { width: 108px; flex: none; background: linear-gradient(180deg, #8b5cf6, #6d28d9 70%, #5b21b6); color: #fff; display: flex; flex-direction: column; align-items: center; padding: 14px 8px; position: sticky; top: 0; height: 100vh; border-radius: 0 28px 28px 0; z-index: 5;
-  background-image: repeating-linear-gradient(90deg, transparent 0 96px, rgba(255,255,255,.0) 96px), linear-gradient(180deg, #8b5cf6, #6d28d9 70%, #5b21b6); }
+.side { width: 108px; flex: none; background: linear-gradient(180deg, #E53935, #c62828 70%, #8e1414); color: #fff; display: flex; flex-direction: column; align-items: center; padding: 14px 8px; position: sticky; top: 0; height: 100vh; border-radius: 0 28px 28px 0; z-index: 5;
+  background-image: repeating-linear-gradient(0deg, transparent 0 22px, rgba(0,0,0,.12) 22px 26px), repeating-linear-gradient(90deg, transparent 0 22px, rgba(0,0,0,.12) 22px 26px), linear-gradient(180deg, #E53935, #c62828 70%, #8e1414); }
 .logo { color: #fff; text-decoration: none; text-align: center; font-weight: 800; font-size: .8rem; line-height: 1.1; margin-bottom: 14px; }
 .logo b { font-size: 1.05rem; } .logo-star { display: block; font-size: 1.8rem; animation: spin 6s linear infinite; }
 #nav { display: flex; flex-direction: column; gap: 4px; width: 100%; }
-#nav a { color: #f3e8ff; text-decoration: none; font-size: .74rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 4px; border-radius: 16px; }
+#nav a { color: #fff3e0; text-decoration: none; font-size: .74rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 4px; border-radius: 16px; }
 #nav a i { font-style: normal; font-size: 1.35rem; }
 #nav a:hover { background: rgba(255,255,255,.12); }
 #nav a.on { background: #fff; color: var(--pur); box-shadow: 0 4px 12px rgba(0,0,0,.15); }
@@ -40,11 +40,11 @@ main { flex: 1; min-width: 0; padding: 0 28px 28px; }
 .sec { margin: 28px 0 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .sec h2 { margin: 0; } .sec a { font-weight: 700; text-decoration: none; }
 .mute { color: var(--mute); } .small { font-size: .85rem; }
-.pill { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: .75rem; font-weight: 700; background: #f1eaff; color: var(--pur); }
+.pill { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: .75rem; font-weight: 700; background: #e3f2fd; color: var(--pur); }
 
 /* Hero header like the design */
 .hello { border-radius: 26px; padding: 22px 26px; color: #fff; position: relative; overflow: hidden; display: flex; align-items: center; gap: 18px; min-height: 140px;
-  background: linear-gradient(110deg, #a855f7, #ec4899 55%, #fb923c); }
+  background: linear-gradient(110deg, #1565C0, #29B6F6 50%, #FB8C00); }
 .hello::after { content: ''; position: absolute; right: -30px; bottom: -40px; width: 300px; height: 120px; background: radial-gradient(ellipse at center, rgba(255,255,255,.35), transparent 70%); }
 .hello .tag { font-weight: 800; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; opacity: .95; }
 .hello .name { font-size: clamp(2rem, 6vw, 3rem); font-weight: 900; letter-spacing: -.03em; background: #fff; -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; }
@@ -73,7 +73,7 @@ main { flex: 1; min-width: 0; padding: 0 28px 28px; }
 .listen { border: 0; background: #fff3d6; color: #8a5a00; border-radius: 99px; padding: 6px 12px; font-weight: 800; font-size: .8rem; flex: none; }
 .listen:hover { background: #ffe5a3; }
 
-.goal .bar { height: 12px; background: #efe9fb; border-radius: 99px; overflow: hidden; margin-top: 10px; }
+.goal .bar { height: 12px; background: #f3e7d3; border-radius: 99px; overflow: hidden; margin-top: 10px; }
 .goal .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--pur2), var(--pink)); border-radius: 99px; transition: width .5s; }
 .keep { background: linear-gradient(120deg, #fff7e6, #ffe9f3); display: flex; align-items: center; gap: 12px; position: relative; overflow: hidden; }
 .keep .lamb { width: 90px; flex: none; }
@@ -96,10 +96,10 @@ main { flex: 1; min-width: 0; padding: 0 28px 28px; }
 .chip { border: 2px solid var(--line); background: #fff; border-radius: 99px; padding: 7px 14px; font-weight: 700; font-size: .85rem; color: var(--ink); }
 .chip.on { background: var(--pur); color: #fff; border-color: var(--pur); }
 .act { text-decoration: none; color: var(--ink); display: flex; flex-direction: column; gap: 8px; position: relative; }
-.act .build { max-height: 110px; background: #fbf8ff; border-radius: 14px; }
+.act .build { max-height: 110px; background: #fdf6ec; border-radius: 14px; }
 .act .done { position: absolute; top: 12px; right: 12px; font-size: 1.4rem; }
 .steps { list-style: none; padding: 0; margin: 0; counter-reset: s; display: grid; gap: 10px; }
-.steps li { counter-increment: s; display: flex; gap: 12px; align-items: flex-start; background: #fbf8ff; border-radius: 16px; padding: 12px; }
+.steps li { counter-increment: s; display: flex; gap: 12px; align-items: flex-start; background: #fdf6ec; border-radius: 16px; padding: 12px; }
 .steps li::before { content: counter(s); flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-weight: 900; color: #fff; background: var(--sc, var(--pur)); }
 .steps li span { flex: 1; padding-top: 6px; }
 .demo { background: linear-gradient(180deg, #fffaf0, #fff); border-radius: 20px; padding: 10px; text-align: center; }

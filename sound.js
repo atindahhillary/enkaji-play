@@ -105,8 +105,8 @@ const VOICE = (() => {
     return null;
   };
   return {
-    pick: lang => lang === 'sw' ? by(['sw-KE', 'sw-TZ', 'sw']) : by(['en-KE', 'en-NG', 'en-ZA', 'en-GB', 'en']),
-    kenyan: lang => { const v = VOICE.pick(lang); return !!v && /-KE$/i.test(v.lang.replace('_', '-')); },
+    pick: lang => lang === 'sw' ? by(['sw-KE', 'sw-TZ', 'sw']) : by(['en-KE', 'sw-KE', 'sw-TZ', 'sw', 'en-TZ', 'en-NG', 'en-ZA', 'en-GB', 'en']),
+    kenyan: lang => { const v = VOICE.pick(lang); return !!v && /(-KE|^sw)/i.test(v.lang.replace('_', '-')); },
     label() {
       const e = VOICE.pick('en'), s = VOICE.pick('sw');
       return { en: e ? e.name.replace(/Microsoft |Online |\(Natural\)| - .*$/g, '').trim() + ' (' + e.lang + ')' : 'none', sw: s ? s.name.replace(/Microsoft |Online |\(Natural\)| - .*$/g, '').trim() + ' (' + s.lang + ')' : 'none' };

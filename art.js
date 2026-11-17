@@ -123,14 +123,14 @@ const scene = (t, ...parts) => `<svg viewBox="0 0 800 450" class="scene" role="i
 const MAMA = { wrap: '#c62828', collar: ['#E53935', '#fff', '#1E88E5', '#FDD835'] };
 const NASERIAN = { wrap: '#1E88E5', collar: ['#FDD835', '#fff', '#E53935'], child: true };
 const LEMAYIAN = { wrap: '#E53935', collar: ['#1E88E5', '#fff'], child: true };
-const KOKO = { wrap: '#8E24AA', collar: ['#fff', '#E53935', '#43A047', '#FDD835'], elder: true };
+const KOKO = { wrap: '#0277BD', collar: ['#fff', '#E53935', '#43A047', '#FDD835'], elder: true };
 
 const STORIES = [
   { id: 'six-bricks', t: "Naserian's Six Bricks", age: 'little', act: 'count-herd', cover: '#E53935',
     pages: [
       { s: () => scene('dawn', hut(620, 330, 1.1), acacia(150, 320, 1.2), person(380, 400, 1.2, NASERIAN)), en: 'In Sekenani, the sun wakes up early. So does Naserian.', sw: 'Huko Sekenani, jua huamka mapema. Naserian pia.' },
-      { s: () => scene('day', hut(640, 330), person(300, 400, 1.3, MAMA), person(430, 400, 1.1, { ...NASERIAN, holding: miniBricks(['r', 'o', 'y', 'g', 'b', 'p']) })), en: 'Mama gives her a small beaded pouch. Inside are six bright bricks!', sw: 'Mama anampa mfuko mdogo wa shanga. Ndani kuna matofali sita!' },
-      { s: () => scene('day', `<g transform="translate(300 260)">${['r', 'o', 'y', 'g', 'b', 'p'].map((c, i) => brickSVG(c, i * 34, 60, 8)).join('')}</g>`, person(220, 400, 1.1, NASERIAN)), en: 'Red, orange, yellow, green, blue and purple. Six colours, like the beads on Mama\'s collar.', sw: 'Nyekundu, machungwa, njano, kijani, bluu na zambarau.' },
+      { s: () => scene('day', hut(640, 330), person(300, 400, 1.3, MAMA), person(430, 400, 1.1, { ...NASERIAN, holding: miniBricks(['r', 'o', 'g', 'b', 'p', 'y']) })), en: 'Mama gives her a small beaded pouch. Inside are six bright bricks!', sw: 'Mama anampa mfuko mdogo wa shanga. Ndani kuna matofali sita!' },
+      { s: () => scene('day', `<g transform="translate(300 260)">${['r', 'o', 'g', 'b', 'p', 'y'].map((c, i) => brickSVG(c, i * 34, 60, 8)).join('')}</g>`, person(220, 400, 1.1, NASERIAN)), en: 'Red, orange, green, blue, sky blue and yellow. Six colours, like the beads on Mama\'s collar.', sw: 'Nyekundu, rangi ya chungwa, kijani, bluu, samawati na njano.' },
       { s: () => scene('day', boma(460, 380, 260), `<g transform="translate(500 300)">${['r', 'o', 'y'].map((c, i) => brickSVG(c, i * 70, 40, 14)).join('')}</g>`, person(300, 400, 1.1, NASERIAN), person(170, 400, 1.2, KOKO)), en: '"These are my cows," says Naserian. Koko laughs. "Then count them into the boma!"', sw: '"Hawa ni ng\'ombe wangu," anasema Naserian. Koko anacheka.' },
       { s: () => scene('sunset', cow(480, 380, 1, '#8d5524'), cow(600, 390, .9, '#eee', false, 'walk'), cow(360, 395, .8, '#3e2723'), person(180, 400, 1.1, NASERIAN)), en: 'Nabo, aare, uni! One, two, three! Moja, mbili, tatu! All the cows are home.', sw: 'Moja, mbili, tatu! Ng\'ombe wote wamefika nyumbani.' },
       { s: () => scene('night', hut(560, 330, 1.1), person(300, 400, 1.2, MAMA), person(400, 400, 1, NASERIAN)), en: 'Tonight, Naserian will teach her baby brother. Can you count your bricks too?', sw: 'Leo usiku, Naserian atamfundisha mdogo wake. Wewe pia unaweza kuhesabu?' },
@@ -143,7 +143,7 @@ const STORIES = [
       { s: () => scene('day', `<path d="M0 400 q200 -30 400 0 t400 0 v50 h-800z" fill="#4fc3f7"/>`, cow(520, 380, .7, '#eee', true, 'walk'), person(220, 400, 1.1, LEMAYIAN)), en: 'Is the calf BESIDE the river? Yes! There it is!', sw: 'Je, ndama yuko KANDO ya mto? Ndiyo! Yuko pale!' },
       { s: () => scene('sunset', boma(80, 390, 300), cow(250, 380, 1, '#8d5524'), cow(330, 390, .6, '#eee', true), person(560, 400, 1.2, LEMAYIAN)), en: 'The calf is home, BESIDE its mother. Now build a cow and a calf with your bricks!', sw: 'Ndama yuko nyumbani, KANDO ya mama yake.' },
     ] },
-  { id: 'mama-beads', t: "Mama's Beautiful Beads", age: 'both', act: 'bead-pattern', cover: '#8E24AA',
+  { id: 'mama-beads', t: "Mama's Beautiful Beads", age: 'both', act: 'bead-pattern', cover: '#29B6F6',
     pages: [
       { s: () => scene('day', acacia(620, 330, 1.2), person(300, 400, 1.3, MAMA)), en: 'Under the acacia tree, Mama makes a collar of beads.', sw: 'Chini ya mti, Mama anatengeneza mkufu wa shanga.' },
       { s: () => scene('day', `<g transform="translate(220 220)">${['#E53935', '#fff', '#E53935', '#fff', '#E53935', '#fff'].map((c, i) => `<circle cx="${i * 60}" cy="0" r="22" fill="${c}" stroke="#333" stroke-width="2"/>`).join('')}</g>`), en: 'Red, white, red, white, red, white. A pattern goes round and round.', sw: 'Nyekundu, nyeupe, nyekundu, nyeupe. Mpangilio unaendelea.' },
@@ -153,7 +153,7 @@ const STORIES = [
   { id: 'little-seed', t: 'The Little Maize Seed', age: 'both', act: 'seed-maize', cover: '#43A047',
     pages: [
       { s: () => scene('day', person(300, 400, 1.2, KOKO), person(420, 400, 1, LEMAYIAN), `<circle cx="470" cy="330" r="6" fill="#fdd835"/>`), en: 'Koko gives Lemayian a tiny yellow seed. "Plant it in good soil," she says.', sw: 'Koko anampa Lemayian mbegu ndogo ya njano.' },
-      { s: () => scene('day', `<rect x="250" y="360" width="300" height="20" fill="#5d4037"/><rect x="250" y="380" width="300" height="20" fill="#a1887f"/><rect x="250" y="400" width="300" height="50" fill="#8E24AA" opacity=".5"/>`, person(160, 400, 1, LEMAYIAN)), en: 'Dark topsoil on top, full of life. That is where seeds love to grow.', sw: 'Udongo wa juu una rutuba. Hapo ndipo mbegu hupenda kuota.' },
+      { s: () => scene('day', `<rect x="250" y="360" width="300" height="20" fill="#5d4037"/><rect x="250" y="380" width="300" height="20" fill="#a1887f"/><rect x="250" y="400" width="300" height="50" fill="#9e9e9e" opacity=".7"/>`, person(160, 400, 1, LEMAYIAN)), en: 'Dark topsoil on top, full of life. That is where seeds love to grow.', sw: 'Udongo wa juu una rutuba. Hapo ndipo mbegu hupenda kuota.' },
       { s: () => scene('day', `<g class="rain">${Array.from({ length: 30 }, (_, i) => `<path d="M${(i * 37) % 800} ${(i * 53) % 200} l-6 18" stroke="#4fc3f7" stroke-width="3"/>`).join('')}</g>`, `<path d="M400 380 v-40 q-20 -10 -30 -30 M400 350 q20 -10 30 -30" stroke="#43A047" stroke-width="6" fill="none"/>`), en: 'The rain comes. A green shoot pushes up!', sw: 'Mvua inanyesha. Chipukizi kijani kinatokea!' },
       { s: () => scene('sunset', `<g transform="translate(400 400)"><path d="M0 0 v-150" stroke="#2e7d32" stroke-width="8"/><path d="M0 -60 q-50 -20 -70 -60 M0 -90 q50 -20 70 -60" stroke="#43A047" stroke-width="8" fill="none"/><ellipse cx="14" cy="-110" rx="12" ry="30" fill="#fb8c00"/></g>`, person(220, 400, 1, LEMAYIAN), person(600, 400, 1.2, KOKO)), en: 'Now it is tall maize with a big cob! Seed, shoot, rain, maize. Build it with your bricks!', sw: 'Sasa ni mahindi marefu! Mbegu, chipukizi, mvua, mahindi.' },
     ] },

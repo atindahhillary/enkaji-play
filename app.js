@@ -59,9 +59,9 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-say]
 
 // ---------- Shared bits ----------
 const GAMES = [
-  { id: 'copy', t: 'Copy the Model', c: '#7c3aed', bg: 'linear-gradient(135deg,#8b5cf6,#c084fc)', d: 'Look, remember, build' },
+  { id: 'copy', t: 'Copy the Model', c: '#0277BD', bg: 'linear-gradient(135deg,#29B6F6,#81D4FA)', d: 'Look, remember, build' },
   { id: 'cattle', t: 'Count the Cattle', c: '#e65100', bg: 'linear-gradient(135deg,#fb8c00,#ffca28)', d: 'Count in Maa, Swahili, English' },
-  { id: 'beads', t: 'Bead Patterns', c: '#d81b60', bg: 'linear-gradient(135deg,#ec4899,#f9a8d4)', d: 'What comes next?' },
+  { id: 'beads', t: 'Bead Patterns', c: '#c62828', bg: 'linear-gradient(135deg,#E53935,#FF8A65)', d: 'What comes next?' },
   { id: 'colour', t: 'Colour Hunt', c: '#0d9488', bg: 'linear-gradient(135deg,#14b8a6,#5eead4)', d: 'Find the colour' },
   { id: 'market', t: "Ruth's Market", c: '#1d4ed8', bg: 'linear-gradient(135deg,#3b82f6,#93c5fd)', d: 'Pay with shillings' },
   { id: 'code', t: 'Code the Cow', c: '#15803d', bg: 'linear-gradient(135deg,#22c55e,#a3e635)', d: 'Arrow cards, find the water' },
@@ -82,7 +82,7 @@ V.home = () => {
   <section class="hello"><div style="flex:1"><div class="tag">Supa! Hello, little explorer!</div>
     <div class="row"><span class="name">${esc(S.name)}</span><button class="editname" id="editName" aria-label="Change name">✏️</button></div>
     <div style="opacity:.95;font-weight:600">Six bricks. Endless ideas. Learning at home in Sekenani.</div></div>
-    ${avatarSVG({ kind: 'girl', wrap: '#1E88E5', collar: ['#FDD835', '#fff', '#E53935', '#43A047'], bg: '#ffe0f0' })}<div class="hero-band"></div></section>
+    ${avatarSVG({ kind: 'girl', wrap: '#1E88E5', collar: ['#FDD835', '#fff', '#E53935', '#43A047'], bg: '#fff3e0' })}<div class="hero-band"></div></section>
   <div class="stats">
     <div class="card stat"><span class="ic">⭐</span><div><span>Stars</span><b>${S.stars}</b></div></div>
     <div class="card stat"><span class="ic">🔥</span><div><span>Day Streak</span><b>${streak()}</b></div></div>
@@ -99,7 +99,7 @@ V.home = () => {
   <div class="sec"><h2>Where do you want to go?</h2></div>
   <div class="grid g2">
     <a class="card entry" href="#/mothers">${avatarSVG({ kind: 'mother', wrap: '#c62828', bg: '#ffe9d6' })}<div><h3>Mothers Who Teach</h3><p class="mute small" style="margin:0">Picture and voice guides for Mama. No reading needed.</p></div></a>
-    <a class="card entry" href="#/training">${avatarSVG({ kind: 'man', wrap: '#7c3aed', bg: '#ede4ff' })}<div><h3>Facilitator Training</h3><p class="mute small" style="margin:0">Six modules, one for each brick colour, with quizzes.</p></div></a>
+    <a class="card entry" href="#/training">${avatarSVG({ kind: 'man', wrap: '#1565C0', bg: '#e3f2fd' })}<div><h3>Facilitator Training</h3><p class="mute small" style="margin:0">Six modules, one for each brick colour, with quizzes.</p></div></a>
     <a class="card entry" href="#/stories"><span class="em">📖</span><div><h3>Mara Stories</h3><p class="mute small" style="margin:0">Animated, read-aloud stories with a brick challenge.</p></div></a>
     <a class="card entry" href="#/bricks"><span class="em">🧱</span><div><h3>What is Six Bricks?</h3><p class="mute small" style="margin:0">The six colours, the rules and the Home Play Circle.</p></div></a>
   </div>`;
@@ -231,7 +231,7 @@ V.mothers.after = () => {
   const voiceNote = () => {
     const l = VOICE.label(), ke = VOICE.kenyan('en') || VOICE.kenyan('sw'), v = $('[data-voice]'); if (!v) return;
     v.innerHTML = `This phone speaks English with <b>${esc(l.en)}</b> and Swahili with <b>${esc(l.sw)}</b>. ` +
-      (ke ? '🎉 A Kenyan voice was found!' : 'No Kenyan voice on this phone yet. For a Kenyan accent, open the site in <b>Microsoft Edge</b> (it has Kenyan English and Swahili voices), or add <b>Swahili</b> in your phone\'s Text-to-speech settings.');
+      (ke ? '🎉 A Kenyan voice was found! English is read in an East African accent.' : 'No Kenyan voice on this phone yet. For a Kenyan accent, open the site in <b>Microsoft Edge</b> (it has Kenyan English and Swahili voices), or add <b>Swahili</b> in your phone\'s Text-to-speech settings.');
   };
   voiceNote(); setTimeout(voiceNote, 800);
   document.querySelectorAll('[data-rec]').forEach(b => b.onclick = async () => {
