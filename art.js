@@ -65,8 +65,14 @@ function avatarSVG(o = {}) {
   </svg>`;
 }
 
-// Kerri the lamb, the mascot, wearing a Maasai bead collar.
-function lambSVG(cls = '') {
+// 3D-rendered images, made by tools/studio.html from models.js (re-run it after changing a model).
+const AV = (key, label, bg = '#fff3e0') => `<img class="avatar av3d" src="assets/av-${key}.webp" alt="${label}" style="background:${bg}" decoding="async">`;
+const COW_IMG = { '#8d5524': 'brown', '#f2efe6': 'white', '#2b1d16': 'black', '#c1592c': 'red', '#9e9e9e': 'grey' };
+const cowImg = (col, alt = '') => `<img class="cow3d" src="assets/cow-${COW_IMG[col] || 'brown'}.webp" alt="${alt}" decoding="async" draggable="false">`;
+// Kerri the Maasai sheep, the mascot, as a 3D render.
+function lambSVG(cls = '') { return `<img class="lamb ${cls}" src="assets/kerri.webp" alt="Kerri the Maasai sheep" decoding="async">`; }
+// Flat-drawn Kerri, kept for reference.
+function lambFlat(cls = '') {
   const wool = [[30, 32], [50, 24], [70, 32], [24, 50], [76, 50], [36, 20], [64, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="14" fill="#f3e2c7"/>`).join('');
   return `<svg viewBox="0 0 100 100" class="lamb ${cls}" role="img" aria-label="Kerri the Maasai sheep">
     <ellipse cx="18" cy="52" rx="12" ry="7" fill="#a85a2c" transform="rotate(-25 18 52)"/><ellipse cx="82" cy="52" rx="12" ry="7" fill="#a85a2c" transform="rotate(25 82 52)"/>
@@ -162,9 +168,9 @@ const STORIES = [
 // Game tile art.
 const TILE_ART = {
   copy: () => `<svg viewBox="0 0 120 90">${brickSVG('r', 20, 60, 12)}${brickSVG('y', 32, 44, 12)}${brickSVG('b', 20, 28, 12)}<text x="92" y="58" font-size="36" fill="#fff" font-weight="900">?</text></svg>`,
-  cattle: () => `<svg viewBox="0 0 120 90">${cow(40, 80, .55, '#8d5524')}${cow(85, 84, .45, '#fff')}<text x="8" y="28" font-size="22" fill="#fff" font-weight="900">1 2 3</text></svg>`,
+  cattle: () => `<div class="tile-3d"><span class="tile-num">1 2 3</span>${cowImg('#8d5524')}${cowImg('#f2efe6')}</div>`,
   beads: () => `<svg viewBox="0 0 120 90">${['#E53935', '#fff', '#1E88E5', '#E53935', '#fff'].map((c, i) => `<circle cx="${14 + i * 20}" cy="46" r="9" fill="${c}" stroke="#333"/>`).join('')}<text x="102" y="54" font-size="24" fill="#fff" font-weight="900">?</text></svg>`,
   colour: () => `<svg viewBox="0 0 120 90">${['r', 'g', 'b', 'p'].map((c, i) => brickSVG(c, 6 + (i % 2) * 58, 30 + Math.floor(i / 2) * 32, 12)).join('')}</svg>`,
-  code: () => `<svg viewBox="0 0 120 90">${[0,1,2].map(i=>`<rect x="${14+i*32}" y="52" width="26" height="26" rx="6" fill="#fff" opacity=".9"/><text x="${20+i*32}" y="71" font-size="16">${['⬆️','➡️','➡️'][i]}</text>`).join('')}${cow(40,44,.42,'#8d5524')}<text x="94" y="40" font-size="22">💧</text></svg>`,
+  code: () => `<svg viewBox="0 0 120 90">${[0,1,2].map(i=>`<rect x="${14+i*32}" y="52" width="26" height="26" rx="6" fill="#fff" opacity=".9"/><text x="${20+i*32}" y="71" font-size="16">${['⬆️','➡️','➡️'][i]}</text>`).join('')}<text x="94" y="40" font-size="22">💧</text><image href="assets/cow-brown.webp" x="20" y="0" width="56" height="56"/></svg>`,
   market: () => `<svg viewBox="0 0 120 90"><circle cx="40" cy="48" r="20" fill="#fdd835" stroke="#c49000" stroke-width="3"/><text x="33" y="56" font-size="20" font-weight="900" fill="#8a6500">5</text><circle cx="80" cy="52" r="16" fill="#cfd8dc" stroke="#78909c" stroke-width="3"/><text x="70" y="59" font-size="16" font-weight="900" fill="#455a64">10</text></svg>`,
 };

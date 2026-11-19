@@ -73,7 +73,7 @@ const pill = (c, text) => `<span class="pill tint" style="--pc:${c};background:$
 const actCard = a => `<a class="card act" href="#/activity/${a.id}">${S.done[a.id] ? '<span class="done" title="Done">✅</span>' : ''}${buildSVG(a.demo, { u: 14 })}
   <div class="row">${pill(DOMAINS[a.dom].c, DOMAINS[a.dom].icon + ' ' + DOMAINS[a.dom].t)}<span class="pill">${a.mins} min</span></div>
   <h3>${a.t}</h3><p class="small mute" style="margin:0">${AGES[a.age]}</p></a>`;
-const storyCover = s => s.pages[0].s();
+const storyCover = s => `<img src="assets/cover-${s.id}.webp" alt="" decoding="async">`;
 function updateLamb() { $('#sideLamb').innerHTML = lambSVG('bounce'); }
 
 // ---------- Views ----------
@@ -87,14 +87,14 @@ V.home = () => {
   return `
   <section class="who"><h2>Who is using the phone?</h2>
     <div class="roles">
-      ${role('child', '#/games', avatarSVG({ kind: 'girl', wrap: '#1E88E5', collar: ['#FDD835', '#fff', '#E53935'], bg: '#e1f5fe' }), 'A child', 'A child wants to play. Go to the games.')}
-      ${role('mama', '#/mothers', avatarSVG({ kind: 'mother', wrap: '#c62828', bg: '#ffe9d6' }), 'Mama', 'Mama. Picture and voice guides for teaching at home.')}
-      ${role('leader', '#/training', avatarSVG({ kind: 'man', wrap: '#1565C0', bg: '#e3f2fd' }), 'Facilitator', 'Facilitator training sessions.')}
+      ${role('child', '#/games', AV('girl', 'A child', '#e1f5fe'), 'A child', 'A child wants to play. Go to the games.')}
+      ${role('mama', '#/mothers', AV('mama', 'Mama', '#ffe9d6'), 'Mama', 'Mama. Picture and voice guides for teaching at home.')}
+      ${role('leader', '#/training', AV('man', 'Facilitator', '#e3f2fd'), 'Facilitator', 'Facilitator training sessions.')}
     </div></section>
   <section class="hello"><div style="flex:1"><div class="tag">Supa! Takwenya!</div>
     <div class="name">Let's play and learn</div>
     <div style="font-weight:600">Six bricks. Endless ideas. Learning at home in Sekenani.</div></div>
-    ${avatarSVG({ kind: 'girl', wrap: '#1E88E5', collar: ['#FDD835', '#fff', '#E53935', '#43A047'], bg: '#fff3e0' })}<div class="hero-band"></div></section>
+    ${AV('girl', 'Naserian', '#fff3e0')}<div class="hero-band"></div></section>
   <div class="stats">
     <a class="card stat" href="#/progress" style="--c:var(--y)"><span class="ic">⭐</span><div><span>Stars</span><b>${S.stars}</b></div></a>
     <a class="card stat" href="#/progress" style="--c:var(--o)"><span class="ic">🔥</span><div><span>Day Streak</span><b>${streak()}</b></div></a>
@@ -180,22 +180,31 @@ V.game.after = id => GAME_MOUNT[id]($('#game'), { star, badge, bump, speak, play
 
 V.stories = () => `<h1>Mara Stories</h1><p class="mute">Animated stories that read themselves aloud in English, with Swahili lines. Each ends with a brick challenge.</p>
   <div class="grid g3">${STORIES.map(s => `<a class="tile" href="#/story/${s.id}"><div class="cover" aria-hidden="true">${storyCover(s)}</div><div class="tb"><h3>${s.t}</h3><span class="play" style="background:${s.cover}">▶ Watch</span></div></a>`).join('')}</div>`;
+// The 3D player (three.js, about 170 KB gzipped) loads only on story pages.
+let S3D;
+const load3D = () => S3D || (S3D = import('./story3d.js').then(m => (m.supported() ? m : null)).catch(() => null));
 V.story = id => {
   const s = STORIES.find(x => x.id === id); if (!s) return V.notfound();
   return `<a href="#/stories" class="mute">← All stories</a><h1 style="margin-top:10px">${s.t}</h1>
-  <div class="story-stage" id="stage"></div>
+  <div class="story-stage" id="stage"><div class="s3d" id="s3d"></div><div class="cap" id="cap" aria-live="polite"></div></div>
   <div class="ctl"><button class="btn alt" id="prev" aria-label="Previous page">◀</button><button class="btn" id="playS">▶ Play story</button><button class="btn alt" id="next" aria-label="Next page">▶</button><button class="listen" id="sayW">🔊 Swahili</button></div>
   <div class="ctl"><div class="dots" id="dots"></div></div>`;
 };
 V.story.after = id => {
-  const s = STORIES.find(x => x.id === id); let i = 0, auto = false;
+  const s = STORIES.find(x => x.id === id); let i = 0, auto = false, player = null;
+  load3D().then(m => { if (!m || !$('#s3d')) return; $('#s3d').innerHTML = ''; player = m.createPlayer($('#s3d')); show(); });
   const show = () => {
-    const p = s.pages[i];
+    const p = s.pages[i], box = $('#s3d'), cap = $('#cap'); if (!box) return;
+    box.style.display = i === s.pages.length ? 'none' : '';
     if (i === s.pages.length) {
-      $('#stage').innerHTML = `<div class="cap" style="border-radius:24px;text-align:center"><div style="font-size:3rem">🧱</div><h2>Brick challenge!</h2><p>Now build the story with your bricks.</p><a class="btn" href="#/activity/${s.act}">${ACT[s.act].t} →</a></div>`;
+      cap.innerHTML = `<div style="text-align:center"><div style="font-size:3rem">🧱</div><h2>Brick challenge!</h2><p>Now build the story with your bricks.</p><a class="btn" href="#/activity/${s.act}">${ACT[s.act].t} →</a></div>`;
       if (!S.count['story-' + id]) { S.count['story-' + id] = 1; badge('story'); star(2, '⭐⭐ You finished the story!'); }
       auto = false; $('#playS').textContent = '↺ Again';
-    } else { $('#stage').innerHTML = p.s() + `<div class="cap" aria-live="polite"><p class="en">${p.en}</p><p class="sw">${p.sw}</p></div>`; $('#stage svg')?.setAttribute('aria-label', p.en); }
+    } else {
+      if (player) player.show(id, i); else box.innerHTML = p.s();
+      box.setAttribute('role', 'img'); box.setAttribute('aria-label', p.en);
+      cap.innerHTML = `<p class="en">${p.en}</p><p class="sw">${p.sw}</p>`;
+    }
     $('#dots').innerHTML = s.pages.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('');
   };
   const go = d => { i = Math.max(0, Math.min(s.pages.length, i + d)); show(); };
@@ -209,7 +218,7 @@ V.story.after = id => {
 
 V.mothers = () => {
   const t = V.mothers.track, list = ACTIVITIES.filter(a => a.age === t || a.age === 'both').slice(0, 9);
-  return `<section class="mama-hero">${avatarSVG({ kind: 'mother', wrap: '#b71c1c', bg: '#ffd8b0', collar: ['#E53935', '#fff', '#1E88E5', '#FDD835', '#43A047'] })}
+  return `<section class="mama-hero">${AV('mama', 'Mama', '#ffd8b0')}
     <div><div style="font-weight:800;letter-spacing:.06em">TAKWENYA, MAMA! · IKO!</div><h1>Mothers Who Teach</h1>
     <p style="font-size:1.1rem;max-width:560px">You are your child's first and best teacher. You already teach beadwork, songs, cooking and respect. Six bricks add a little play to the day you already have.</p>
     ${listenBtn('Takwenya Mama! You are your child\'s first and best teacher. You do not need to read to teach. Look at the pictures, press the listen button, and play together for five minutes every day.', 'en', '🔊 Listen, Mama')} ${listenBtn('Habari Mama! Wewe ni mwalimu wa kwanza wa mtoto wako. Huhitaji kusoma ili kufundisha. Angalia picha, bonyeza kitufe cha kusikiliza, na mcheze pamoja dakika tano kila siku.', 'sw', '🔊 Sikiliza kwa Kiswahili')}</div></section>
@@ -301,7 +310,7 @@ V.module.after = id => {
 };
 
 V.team = () => `<h1>The Facilitator Team</h1><p class="mute" style="max-width:720px">Each facilitator brings a strand from their own work. Together they cover the whole child: soil, digital, health, dreams, food and money.</p>
-  <div class="grid g2 team">${TEAM.map(t => `<div class="card"><div class="row">${avatarSVG({ kind: t.name ? 'mother' : 'man', wrap: t.av.wrap, collar: t.av.collar, bg: t.av.wrap + '33', label: t.role })}<div><h2 style="margin:0">${t.name ? t.name + ', ' : ''}${t.role}</h2><span class="pill">${t.strand}</span></div></div>
+  <div class="grid g2 team">${TEAM.map(t => `<div class="card"><div class="row">${AV(t.k === 'biz' ? 'ruth' : t.k, t.role, t.av.wrap + '33')}<div><h2 style="margin:0">${t.name ? t.name + ', ' : ''}${t.role}</h2><span class="pill">${t.strand}</span></div></div>
     <p style="margin-top:12px">${t.blurb}</p><b class="small">Signature activities</b><div class="row" style="margin-top:6px">${t.acts.map(a => `<a class="chip" href="#/activity/${a}">${ACT[a].t}</a>`).join('')}</div></div>`).join('')}</div>
   <div class="card" style="margin-top:16px"><h3>How the team works with mothers</h3><p style="margin:0">Each facilitator adopts a cluster of homes in Sekenani. They visit once a month, lead the Mama's Circle in turns, and bring their strand to the local schools so children carry the games home.</p></div>`;
 

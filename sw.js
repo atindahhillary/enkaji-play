@@ -1,7 +1,7 @@
 // Offline support: the Mara has weak signal, so cache the whole site after the first visit.
 // Bump VERSION on every deploy that changes files, so phones pick up the new copy.
-const VERSION = 'enkaji-v4';
-const FILES = ['./', 'index.html', 'styles.css', 'games.css', 'data.js', 'sound.js', 'art.js', 'games.js', 'app.js', 'manifest.webmanifest', 'icon.svg'];
+const VERSION = 'enkaji-v5';
+const FILES = ['./', 'index.html', 'styles.css', 'games.css', 'data.js', 'sound.js', 'art.js', 'games.js', 'app.js', 'manifest.webmanifest', 'icon.svg', 'models.js', 'story3d.js', 'vendor/three.module.min.js', 'assets/av-agri.webp','assets/av-boy.webp','assets/av-girl.webp','assets/av-health.webp','assets/av-it.webp','assets/av-koko.webp','assets/av-mama.webp','assets/av-man.webp','assets/av-ruth.webp','assets/av-schol.webp','assets/av-soil.webp','assets/cover-little-seed.webp','assets/cover-lost-calf.webp','assets/cover-mama-beads.webp','assets/cover-six-bricks.webp','assets/cow-black.webp','assets/cow-brown.webp','assets/cow-grey.webp','assets/cow-red.webp','assets/cow-spotted.webp','assets/cow-white.webp','assets/goat.webp','assets/kerri.webp'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));

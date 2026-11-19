@@ -241,6 +241,19 @@ main { flex: 1; min-width: 0; padding: 0 28px 28px; }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
+/* 3D renders */
+img.avatar { border-radius: 50%; object-fit: cover; aspect-ratio: 1; display: block; }
+img.lamb { display: block; width: 100%; height: auto; }
+.side-lamb img.lamb { width: 76px; }
+.keep img.lamb { width: 96px; flex: none; }
+.tile-3d { position: relative; width: 100%; height: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.tile-3d img { width: 48%; margin: 0 -6%; }
+.tile-num { position: absolute; left: 10px; top: 8px; font-weight: 900; font-size: 1.3rem; color: #fff; text-shadow: 0 2px 0 rgba(0,0,0,.25); }
+.cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.s3d { background: #e8d9b5; aspect-ratio: 16 / 9; }
+.s3d canvas, .s3d > svg { display: block; width: 100%; height: auto; }
+#stage .cap { border-radius: 0 0 24px 24px; }
+
 /* Phones: five big tabs; Brick Play, Team and Progress are reached from Home */
 @media (max-width: 760px) {
   #nav { display: grid; grid-template-columns: repeat(5, 1fr); overflow: visible; }

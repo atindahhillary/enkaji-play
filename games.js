@@ -56,10 +56,10 @@ async function talk(parts) {
 
 // ---------- the stage every game shares ----------
 const HOSTS = {
-  koko: () => avatarSVG({ kind: 'elder', wrap: '#0277BD', collar: ['#fff', '#E53935', '#43A047', '#FDD835'], bg: '#e1f5fe', label: 'Koko' }),
-  mama: () => avatarSVG({ kind: 'mother', wrap: '#c62828', bg: '#ffe0cc', label: 'Mama' }),
-  ruth: () => avatarSVG({ kind: 'mother', wrap: '#E53935', collar: ['#1E88E5', '#fff', '#FDD835'], bg: '#e3f2fd', label: 'Ruth' }),
-  naserian: () => avatarSVG({ kind: 'girl', wrap: '#1E88E5', collar: ['#FDD835', '#fff', '#E53935'], bg: '#e8f5e9', label: 'Naserian' }),
+  koko: () => AV('koko', 'Koko', '#e1f5fe'),
+  mama: () => AV('mama', 'Mama', '#ffe0cc'),
+  ruth: () => AV('ruth', 'Ruth', '#e3f2fd'),
+  naserian: () => AV('girl', 'Naserian', '#e8f5e9'),
 };
 function stage(el, host, scene, name) {
   el.innerHTML = `<div class="stage ${scene}">
@@ -86,7 +86,7 @@ function stage(el, host, scene, name) {
   return st;
 }
 const brickEl = (k, cls = '') => `<div class="db ${cls}" style="--c:${BRICK[k].hex}" data-k="${k}"></div>`;
-const cowSVG = col => `<svg viewBox="-52 -76 104 82">${cow(0, 0, 1, col)}</svg>`;
+const cowSVG = col => cowImg(col);
 const COATS = [
   { c: '#8d5524', en: 'brown', sw: 'kahawia' }, { c: '#f2efe6', en: 'white', sw: 'mweupe', maa: 'white' },
   { c: '#2b1d16', en: 'black', sw: 'mweusi', maa: 'black' }, { c: '#c1592c', en: 'red', sw: 'mwekundu', maa: 'red' },
