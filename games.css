@@ -77,9 +77,9 @@
 .herd { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 6px; position: relative; z-index: 1; padding-bottom: 20px; }
 .herd.mini { padding: 0; } .herd.mini span { width: 54px; }
 .cowb { position: relative; width: 124px; background: none; border: 0; padding: 0; transform-origin: bottom center; }
-.cowb.walking img { animation: legs .25s ease-in-out infinite; }
-.cowb img, .cow-pick img, .herd.mini img, .cow-tok img { width: 100%; display: block; pointer-events: none; }
-.cow-tok img { width: 115%; }
+.cowb.walking svg { animation: legs .25s ease-in-out infinite; }
+.cowb svg, .cow-pick svg, .herd.mini svg, .cow-tok svg { width: 100%; display: block; pointer-events: none; }
+.cow-tok svg { width: 115%; }
 .cowb .num { position: absolute; top: -6px; left: 50%; margin-left: -14px; background: var(--brand); color: #fff; border-radius: 99px; min-width: 28px; font-weight: 900; padding: 2px 6px; opacity: 0; }
 .cowb.counted .num { opacity: 1; animation: popIn .3s var(--back); }
 .cow-pick { width: 110px; background: rgba(255,255,255,.7) !important; }

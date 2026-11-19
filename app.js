@@ -41,9 +41,21 @@ function confetti() {
 }
 
 // ---------- Voice: reads text aloud so mothers of any literacy level can follow ----------
+// How Maa words and names sound when an English voice reads them. Taken from the audio of
+// Ole Koin's "Learn Maasai: greetings" (he says Maasai short, "Supa" like "super", "Iko" like "eh-ko").
+// Spellings on screen stay correct; only the spoken text changes.
+const PRON = [
+  [/\bMaasai\b/g, 'Masai'], [/\bMaa\b/g, 'Mah'], [/\bSupa\b/g, 'Soopa'], [/\bEntasupai\b/g, 'Entasoopai'],
+  [/\bTakwenya\b/g, 'Ta-kwenya'], [/\bIko\b/g, 'Eh-ko'], [/\bIpa\b/g, 'Ee-pa'], [/\bSidai oleng\b/gi, 'Sidai oh-leng'],
+  [/\bNabo, are, uni\b/gi, 'Naabo, aareh, oonee'], [/\bAshe oleng\b/gi, 'Asheh oh-leng'], [/\bTadua\b/g, 'Tadoo-a'],
+  [/\bNaserian\b/g, 'Nasseri-an'], [/\bLemayian\b/g, 'Lemai-yan'], [/\bSekenani\b/g, 'Seh-keh-nani'], [/\bTalek\b/g, 'Tah-lek'],
+  [/\benkaji\b/gi, 'en-kahji'], [/\benkang\b/gi, 'en-kang'], [/\bshuka\b/gi, 'shooka'], [/\bboma\b/gi, 'bohma'], [/\bKerri\b/g, 'Kerry'],
+  [/\bisaen\b/gi, 'ee-saen'], [/\benkare\b/gi, 'en-kahreh'], [/\binkishu\b/gi, 'in-keeshoo'],
+];
 function speak(text, lang = 'en', onend) {
   if (!('speechSynthesis' in window) || !SND.on) { onend && onend(); return; }
   window.speechSynthesis.cancel();
+  if (lang === 'en') text = PRON.reduce((t, [re, say]) => t.replace(re, say), text);
   const u = new SpeechSynthesisUtterance(text);
   u.voice = VOICE.pick(lang); // Kenyan voice first (en-KE / sw-KE), then the nearest available
   u.lang = u.voice ? u.voice.lang : (lang === 'sw' ? 'sw-KE' : 'en-KE');
@@ -180,38 +192,39 @@ V.game.after = id => GAME_MOUNT[id]($('#game'), { star, badge, bump, speak, play
 
 V.stories = () => `<h1>Mara Stories</h1><p class="mute">Animated stories that read themselves aloud in English, with Swahili lines. Each ends with a brick challenge.</p>
   <div class="grid g3">${STORIES.map(s => `<a class="tile" href="#/story/${s.id}"><div class="cover" aria-hidden="true">${storyCover(s)}</div><div class="tb"><h3>${s.t}</h3><span class="play" style="background:${s.cover}">▶ Watch</span></div></a>`).join('')}</div>`;
-// The 3D player (three.js, about 170 KB gzipped) loads only on story pages.
-let S3D;
-const load3D = () => S3D || (S3D = import('./story3d.js').then(m => (m.supported() ? m : null)).catch(() => null));
+// Explainer-style story player: the scene builds up piece by piece, the narrator reads,
+// a subtitle bar shows the words (like the reference video), soft music plays underneath.
 V.story = id => {
   const s = STORIES.find(x => x.id === id); if (!s) return V.notfound();
   return `<a href="#/stories" class="mute">← All stories</a><h1 style="margin-top:10px">${s.t}</h1>
-  <div class="story-stage" id="stage"><div class="s3d" id="s3d"></div><div class="cap" id="cap" aria-live="polite"></div></div>
-  <div class="ctl"><button class="btn alt" id="prev" aria-label="Previous page">◀</button><button class="btn" id="playS">▶ Play story</button><button class="btn alt" id="next" aria-label="Next page">▶</button><button class="listen" id="sayW">🔊 Swahili</button></div>
+  <div class="story-stage" id="stage"><div class="sbox" id="sbox"></div><div class="subs" id="subs" aria-hidden="true"></div><div class="cap" id="cap" aria-live="polite"></div></div>
+  <div class="ctl"><button class="btn alt" id="prev" aria-label="Previous page">◀</button><button class="btn" id="playS">▶ Play story</button><button class="btn alt" id="next" aria-label="Next page">▶</button><button class="listen" id="sayW">🔊 Swahili</button><button class="listen" id="musicB" aria-pressed="true">🎵 Music</button></div>
   <div class="ctl"><div class="dots" id="dots"></div></div>`;
 };
 V.story.after = id => {
-  const s = STORIES.find(x => x.id === id); let i = 0, auto = false, player = null;
-  load3D().then(m => { if (!m || !$('#s3d')) return; $('#s3d').innerHTML = ''; player = m.createPlayer($('#s3d')); show(); });
+  const s = STORIES.find(x => x.id === id); let i = 0, auto = false, music = true;
   const show = () => {
-    const p = s.pages[i], box = $('#s3d'), cap = $('#cap'); if (!box) return;
-    box.style.display = i === s.pages.length ? 'none' : '';
+    const p = s.pages[i], box = $('#sbox'), cap = $('#cap'), subs = $('#subs'); if (!box) return;
+    box.style.display = subs.style.display = i === s.pages.length ? 'none' : '';
     if (i === s.pages.length) {
       cap.innerHTML = `<div style="text-align:center"><div style="font-size:3rem">🧱</div><h2>Brick challenge!</h2><p>Now build the story with your bricks.</p><a class="btn" href="#/activity/${s.act}">${ACT[s.act].t} →</a></div>`;
       if (!S.count['story-' + id]) { S.count['story-' + id] = 1; badge('story'); star(2, '⭐⭐ You finished the story!'); }
-      auto = false; $('#playS').textContent = '↺ Again';
+      auto = false; $('#playS').textContent = '↺ Again'; SND.music(false);
     } else {
-      if (player) player.show(id, i); else box.innerHTML = p.s();
-      box.setAttribute('role', 'img'); box.setAttribute('aria-label', p.en);
-      cap.innerHTML = `<p class="en">${p.en}</p><p class="sw">${p.sw}</p>`;
+      box.innerHTML = p.s(); box.setAttribute('role', 'img'); box.setAttribute('aria-label', p.en);
+      subs.textContent = p.en; subs.classList.remove('on'); void subs.offsetWidth; subs.classList.add('on');
+      cap.innerHTML = `<p class="sw">${p.sw}</p>`;
     }
     $('#dots').innerHTML = s.pages.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('');
   };
   const go = d => { i = Math.max(0, Math.min(s.pages.length, i + d)); show(); };
-  const step = () => { if (!auto || i >= s.pages.length) return; speak(s.pages[i].en, 'en', () => setTimeout(() => { if (auto) { go(1); step(); } }, 700)); };
-  $('#prev').onclick = () => { auto = false; window.speechSynthesis?.cancel(); go(-1); };
-  $('#next').onclick = () => { auto = false; window.speechSynthesis?.cancel(); go(1); };
-  $('#playS').onclick = () => { if (i >= s.pages.length) i = 0; auto = !auto; $('#playS').textContent = auto ? '⏸ Pause' : '▶ Play story'; show(); auto ? step() : window.speechSynthesis?.cancel(); };
+  // Let the scene draw itself in, then narrate, hold a beat, turn the page.
+  const step = () => { if (!auto || i >= s.pages.length) return; const page = i; setTimeout(() => { if (!auto || page !== i) return; speak(s.pages[i].en, 'en', () => setTimeout(() => { if (auto && page === i) { go(1); step(); } }, 1200)); }, 1300); };
+  const stop = () => { auto = false; window.speechSynthesis?.cancel(); SND.music(false); $('#playS').textContent = '▶ Play story'; };
+  $('#prev').onclick = () => { stop(); go(-1); };
+  $('#next').onclick = () => { stop(); go(1); };
+  $('#musicB').onclick = e => { music = !music; e.currentTarget.setAttribute('aria-pressed', music); e.currentTarget.textContent = music ? '🎵 Music' : '🔇 Music'; SND.music(music && auto); };
+  $('#playS').onclick = () => { if (auto) return stop(); if (i >= s.pages.length) i = 0; auto = true; $('#playS').textContent = '⏸ Pause'; SND.music(music); show(); step(); };
   $('#sayW').onclick = () => { const p = s.pages[i]; if (p) speak(p.sw, 'sw'); };
   show();
 };
@@ -236,6 +249,8 @@ V.mothers = () => {
     <p class="small mute">✅ checked in Maa sources · ❔ please check with the mothers in Sekenani. Spellings vary (Purko, Keekonyokie).</p>
     <div class="grid g3" data-words>${Object.entries(MAA).map(([k, m]) => `<div class="word-row"><div><b>${m.w}</b> ${m.c === 'H' ? '✅' : '❔'}<div class="small mute">${m.en} · ${m.sw}</div></div><div class="row" style="gap:6px"><button class="listen" data-maa="${k}" aria-label="Play ${m.w}">🔊</button><button class="listen rec ${REC.has('maa-' + k) ? 'has' : ''}" data-rec="${k}" aria-label="Record ${m.w}">🎙️</button></div></div>`).join('')}</div></div>
   <div class="card" style="margin-top:12px"><h3>🇰🇪 Kenyan accent</h3><p class="small" style="margin:0" data-voice></p></div>
+  <div class="sec"><h2>How we greet in Maa</h2>${listenBtn(GREET_WAYS.map(g => g.t + '. ' + g.p).join(' '), 'en', '🔊')}</div>
+  <div class="grid g2">${GREET_WAYS.map(g => `<div class="card"><div class="row" style="justify-content:space-between"><span style="font-size:2rem">${g.icon}</span>${listenBtn(g.t + '. ' + g.p)}</div><h3>${g.t}</h3><p class="mute" style="margin:0">${g.p}</p></div>`).join('')}</div>
   <div class="sec"><h2>Words that help children grow</h2></div>
   <div class="card">${PHRASES.map(p => `<div class="phrase"><div>${p.maa ? `<b>${p.maa}</b> · ` : ''}<b>${p.sw}</b><div class="small mute">${p.en}${p.note ? ' · ' + p.note : ''}</div></div>${listenBtn(p.sw, 'sw')}</div>`).join('')}</div>`;
 };
@@ -332,7 +347,7 @@ V.notfound = () => `<h1>Page not found</h1><a class="btn" href="#/home">Go home<
 
 // ---------- Router ----------
 function render() {
-  window.speechSynthesis?.cancel();
+  window.speechSynthesis?.cancel(); SND.music(false);
   const [, r = 'home', arg] = (location.hash || '#/home').split('/');
   const view = V[r] && r !== 'notfound' ? V[r] : V.notfound;
   $('#view').innerHTML = view(arg);

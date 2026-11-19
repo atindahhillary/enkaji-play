@@ -46,10 +46,37 @@ const SND = (() => {
     drum: () => { tone(110, 0, .25, { vol: .14, slide: -50 }); noise(0, .08, { vol: .03, freq: 600 }); },
     whoosh: () => { noise(0, .3, { vol: .03, freq: 900, q: .7 }); },
   };
+  // Story music bed: soft kalimba-like plucks in D major pentatonic at 96 bpm, a low drum pulse
+  // and a light shaker. Layers enter one per bar (no startling jump), and the bed ducks while
+  // anyone is speaking so the narrator always sits on top.
+  let bed = null;
+  function music(on) {
+    if (!on) { if (bed) { clearInterval(bed.iv); const a = ctx(); if (a) bed.g.gain.setTargetAtTime(0, a.currentTime, .3); bed = null; } return; }
+    const a = ctx(); if (!a || bed || !SND_ON()) return;
+    const g = a.createGain(); g.gain.value = 0; g.connect(a.destination); g.gain.setTargetAtTime(1, a.currentTime, 1.2);
+    const pluck = (f, t, v) => { const o = a.createOscillator(), o2 = a.createOscillator(), e = a.createGain(); o.type = 'sine'; o2.type = 'triangle'; o.frequency.value = f; o2.frequency.value = f * 2; e.gain.setValueAtTime(0, t); e.gain.linearRampToValueAtTime(v, t + .005); e.gain.exponentialRampToValueAtTime(.0001, t + .9); o.connect(e); o2.connect(e); e.connect(g); o.start(t); o2.start(t); o.stop(t + 1); o2.stop(t + 1); };
+    const D = [293.7, 329.6, 370, 440, 493.9, 587.3, 659.3];
+    const melody = [0, 2, 4, 2, 5, 4, 2, 1, 0, 2, 3, 4, 6, 5, 4, 2]; // two bars of eighths, resolves home
+    const bass = [146.8, 146.8, 110, 123.5]; // D D A B, one per bar
+    const eighth = 60 / 96 / 2; let n = 0, next = a.currentTime + .1;
+    bed = { g, iv: setInterval(() => {
+      const duck = window.speechSynthesis && speechSynthesis.speaking ? .35 : 1;
+      g.gain.setTargetAtTime(duck, a.currentTime, .25);
+      while (next < a.currentTime + .25) {
+        const bar = Math.floor(n / 8);
+        pluck(D[melody[n % 16]], next, .035);
+        if (bar >= 1 && n % 8 === 0) { const o = a.createOscillator(), e = a.createGain(); o.frequency.value = bass[bar % 4]; e.gain.setValueAtTime(0, next); e.gain.linearRampToValueAtTime(.06, next + .02); e.gain.exponentialRampToValueAtTime(.0001, next + 1.6); o.connect(e).connect(g); o.start(next); o.stop(next + 1.7); }
+        if (bar >= 2 && n % 2 === 1) { const len = a.sampleRate * .05, b = a.createBuffer(1, len, a.sampleRate), d = b.getChannelData(0); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len); const src = a.createBufferSource(), f = a.createBiquadFilter(), e = a.createGain(); src.buffer = b; f.type = 'highpass'; f.frequency.value = 5000; e.gain.value = .012; src.connect(f).connect(e).connect(g); src.start(next); }
+        n++; next += eighth;
+      }
+    }, 80) };
+  }
+  const SND_ON = () => on;
   return {
+    music: v => { try { music(v); } catch {} },
     play: k => { try { fx[k] && fx[k](); } catch {} },
     get on() { return on; },
-    toggle() { on = !on; try { localStorage.setItem('enkaji-sound', on ? 'on' : 'off'); } catch {} if (!on) window.speechSynthesis?.cancel(); return on; },
+    toggle() { on = !on; try { localStorage.setItem('enkaji-sound', on ? 'on' : 'off'); } catch {} if (!on) { window.speechSynthesis?.cancel(); music(false); } return on; },
   };
 })();
 

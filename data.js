@@ -22,8 +22,9 @@ const NUMBERS = [
 ];
 
 const PHRASES = [
-  { maa: 'Takwenya!', sw: 'Habari mama!', en: 'Hello (to a woman)!', note: 'Reply: Iko' },
-  { maa: 'Supa!', sw: 'Hujambo!', en: 'Hello!', note: 'Reply: Ipa' },
+  { maa: 'Takwenya!', sw: 'Habari mama!', en: 'Hello (to a woman)!', note: 'Reply: Iko, said "eh-ko"' },
+  { maa: 'Supa!', sw: 'Hujambo!', en: 'Hello (to one person)!', note: 'Said like "super". Reply: Ipa' },
+  { maa: 'Entasupai!', sw: 'Hamjambo!', en: 'Hello (to a group)!', note: 'Reply: Ipa' },
   { maa: 'Ashe oleng', sw: 'Asante sana', en: 'Thank you very much' },
   { maa: 'Sidai oleng!', sw: 'Vizuri sana!', en: 'Very good!' },
   { maa: 'Tadua!', sw: 'Ona!', en: 'Look!' },
@@ -33,6 +34,14 @@ const PHRASES = [
   { sw: 'Niambie ulichojenga', en: 'Tell me what you built' },
   { sw: 'Tujaribu tena', en: "Let's try again" },
   { sw: 'Hongera!', en: 'Well done!' },
+];
+
+// How people greet each other in Maa (from Ole Koin, "Learn Maasai: greetings").
+const GREET_WAYS = [
+  { icon: '🤝', t: 'Men greet men', p: 'With a handshake and "Supa!". The reply is "Ipa".' },
+  { icon: '🙇🏾', t: 'Children greet an elder', p: 'The child bows the head. The elder touches it and greets the child. The child answers "Ee".' },
+  { icon: '👩🏾', t: 'Greeting a woman', p: 'Say "Takwenya!". She answers "Iko".' },
+  { icon: '👥', t: 'Greeting a group', p: 'Say "Entasupai!" to many people at once.' },
 ];
 
 const DOMAINS = {
@@ -354,6 +363,9 @@ const MAA = {
   come: { w: 'Wou!', say: 'wou', en: 'come', sw: 'njoo', c: 'M' },
   thanks: { w: 'Ashe oleng', say: 'ashe oleng', en: 'thank you very much', sw: 'asante sana', c: 'H' },
   hello: { w: 'Takwenya', say: 'takwenya', en: 'hello (to a woman)', sw: 'habari mama', c: 'H' },
+  iko: { w: 'Iko', say: 'eko', en: 'reply to Takwenya', sw: 'salama', c: 'H' },
+  supa: { w: 'Supa', say: 'supa', en: 'hello (to one person)', sw: 'hujambo', c: 'H' },
+  supaAll: { w: 'Entasupai', say: 'entasupai', en: 'hello (to a group)', sw: 'hamjambo', c: 'M' },
   bye: { w: 'Sere', say: 'sere', en: 'goodbye', sw: 'kwaheri', c: 'M' },
 };
 NUMBERS.forEach(n => { MAA['n' + n.n] = { w: n.maa, say: n.maa.toLowerCase().replace("'", ''), en: n.en.toLowerCase(), sw: n.sw.toLowerCase(), c: 'H' }; });
