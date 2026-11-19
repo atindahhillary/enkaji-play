@@ -353,6 +353,12 @@ const MAA = {
   milk: { w: 'Kule', say: 'kule', en: 'milk', sw: 'maziwa', c: 'H' },
   beads: { w: 'Isaen', say: 'isaen', en: 'beads', sw: 'shanga', c: 'M' },
   red: { w: 'Nanyokie', say: 'nanyokie', en: 'red', sw: 'nyekundu', c: 'M' },
+  // Colours Sanau recorded. w = null until the Maa spelling is confirmed; the sound is Sanau's.
+  orange: { w: null, say: 'orange', en: 'orange', sw: 'rangi ya chungwa', c: 'S' },
+  green: { w: null, say: 'kijani', en: 'green', sw: 'kijani', c: 'S' },
+  blue: { w: null, say: 'bluu', en: 'blue', sw: 'bluu', c: 'S' },
+  sky: { w: null, say: 'samawati', en: 'light blue', sw: 'samawati', c: 'S' },
+  yellow: { w: null, say: 'njano', en: 'yellow', sw: 'njano', c: 'S' },
   white: { w: 'Naibor', say: 'naibor', en: 'white', sw: 'nyeupe', c: 'H' },
   black: { w: 'Narok', say: 'narok', en: 'black', sw: 'nyeusi', c: 'H' },
   good: { w: 'Sidai oleng!', say: 'sidai oleng', en: 'very good', sw: 'vizuri sana', c: 'M' },
@@ -370,3 +376,8 @@ const MAA = {
   bye: { w: 'Sere', say: 'sere', en: 'goodbye', sw: 'kwaheri', c: 'M' },
 };
 NUMBERS.forEach(n => { MAA['n' + n.n] = { w: n.maa, say: n.maa.toLowerCase().replace("'", ''), en: n.en.toLowerCase(), sw: n.sw.toLowerCase(), c: 'H' }; });
+
+// Real Maa pronunciations recorded by Sanau: voice/<key>.mp3 for each MAA key below.
+const SANAU = new Set(['n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'cow', 'goat', 'sheep', 'red', 'orange', 'green', 'blue', 'sky', 'yellow']);
+// Brick colour -> MAA key, so every colour can be heard in Maa.
+const BRICK_MAA = { r: 'red', o: 'orange', g: 'green', b: 'blue', p: 'sky', y: 'yellow' };

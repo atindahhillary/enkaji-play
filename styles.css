@@ -308,3 +308,4 @@ img.lamb { display: block; width: 100%; height: auto; }
 .cow-svg { display: block; width: 100%; height: auto; }
 svg.avatar { border-radius: 50%; display: block; aspect-ratio: 1; }
 .side-lamb .lamb { width: 76px; } .keep .lamb { width: 96px; flex: none; } .empty .lamb { width: 96px; margin: 0 auto 6px; }
+.bk-wrap { display: flex; flex-direction: column; gap: 6px; } .bk-wrap .bk { flex: 1; } .bk-wrap .listen { align-self: stretch; }

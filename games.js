@@ -48,7 +48,7 @@ async function talk(parts) {
       const done = () => { clearTimeout(t); res(); };
       if (p.maa) {
         const m = MAA[p.maa];
-        REC.play('maa-' + p.maa).then(a => { if (a) { a.onended = done; a.onerror = done; } else speak(m.say, 'sw', done); });
+        REC.play('maa-' + p.maa).then(a => a || playSanau(p.maa)).then(a => { if (a) { a.onended = done; a.onerror = done; } else speak(m.say, 'sw', done); });
       } else speak(p.sw || p.en, p.sw ? 'sw' : 'en', done);
     });
   }
@@ -291,7 +291,7 @@ const GAME_MOUNT = {
   colour(el, api) {
     const st = stage(el, 'mama', 's-market', 'Yeyo (Mama)');
     const EXTRA = [{ k: 'w', name: 'White', sw: 'Nyeupe', hex: '#f5f5f5', maa: 'white' }, { k: 'k', name: 'Black', sw: 'Nyeusi', hex: '#222', maa: 'black' }];
-    const ALL = [...BRICKS.map(b => ({ ...b, maa: b.k === 'r' ? 'red' : null })), ...EXTRA];
+    const ALL = [...BRICKS.map(b => ({ ...b, maa: BRICK_MAA[b.k] })), ...EXTRA];
     let lang = 'en', found = 0, busy = false, last;
     function round() {
       busy = false; st.kerri('think');
@@ -299,7 +299,7 @@ const GAME_MOUNT = {
       const n = lang === 'maa' ? 3 : found < 4 ? 3 : found < 8 ? 4 : 6;
       const target = pickNew(pool, last); last = target;
       const show = shuffle([target, ...shuffle(ALL.filter(c => c !== target)).slice(0, n - 1)]);
-      const word = lang === 'en' ? target.name : lang === 'sw' ? target.sw : MAA[target.maa].w;
+      const word = lang === 'en' ? target.name : lang === 'sw' ? target.sw : (MAA[target.maa].w || '🔊');
       st.hud(found < 4 ? 1 : found < 8 ? 2 : 3);
       st.arena.innerHTML = `<div class="chips center">${[['en', 'English'], ['sw', 'Kiswahili'], ['maa', 'Maa']].map(([k, t]) => `<button class="chip ${lang === k ? 'on' : ''}" data-l="${k}">${t}</button>`).join('')}</div>
         <div class="line"><div class="rope"></div>${show.map((c, i) => `<button class="cloth" style="--cc:${c.hex};animation-delay:${-i * .7}s" data-k="${c.k}" aria-label="${c.name} shuka">${c.k === 'k' || c.k === 'w' ? '' : ''}</button>`).join('')}</div>
@@ -320,7 +320,7 @@ const GAME_MOUNT = {
         await flyTo(b, el.querySelector('[data-basket]')); if (!st.live()) return;
         b.style.visibility = 'hidden'; restart(el.querySelector('[data-basket]'), 'squash'); SND.play('cheer'); st.kerri('happy'); st.win(++found);
         api.star(1, `⭐ ${target.name} · ${target.sw}`); api.played(); api.bump('colour', 6, 'colour');
-        await st.say(`<b>${target.name}</b> · ${target.sw}${target.maa ? ' · ' + MAA[target.maa].w : ''}. Asante!`, [{ sw: 'Asante sana!' }]);
+        await st.say(`<b>${target.name}</b> · ${target.sw}${target.maa && MAA[target.maa].w ? ' · ' + MAA[target.maa].w : ''}. Asante!`, [{ sw: 'Asante sana!' }]);
         if (st.live()) round();
       });
     }

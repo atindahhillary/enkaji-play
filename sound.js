@@ -118,6 +118,13 @@ const REC = (() => {
   };
 })();
 
+// Play Sanau's recorded clip for a Maa word, if there is one. Resolves to the Audio, or false.
+function playSanau(k) {
+  if (typeof SANAU === 'undefined' || !SANAU.has(k) || !SND.on) return Promise.resolve(false);
+  const a = new Audio(`voice/${k}.mp3`);
+  return a.play().then(() => a, () => false);
+}
+
 // ---------- Kenyan voices ----------
 // Edge and some Android phones ship Kenyan voices (en-KE, sw-KE). Maa has no voice anywhere,
 // so Maa words are spoken by the Swahili voice using a Swahili-style respelling (see MAA in data.js).

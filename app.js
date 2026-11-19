@@ -64,7 +64,7 @@ function speak(text, lang = 'en', onend) {
   speechSynthesis.speak(u);
 }
 // Speak a Maa word: Mama's own recording if there is one, otherwise the Swahili voice.
-function sayMaa(k) { REC.play('maa-' + k).then(a => { if (!a && MAA[k]) speak(MAA[k].say, 'sw'); }); }
+function sayMaa(k) { REC.play('maa-' + k).then(a => a || playSanau(k)).then(a => { if (!a && MAA[k]) speak(MAA[k].say, 'sw'); }); }
 document.addEventListener('click', e => { const b = e.target.closest('[data-maa]'); if (b) sayMaa(b.dataset.maa); });
 const listenBtn = (text, lang = 'en', label = '🔊 Listen') => `<button class="listen" data-say="${esc(text)}" data-lang="${lang}">${label}</button>`;
 document.addEventListener('click', e => { const b = e.target.closest('[data-say]'); if (b) speak(b.dataset.say, b.dataset.lang); });
@@ -138,7 +138,7 @@ V.bricks = () => `
   <h1>What is Six Bricks?</h1>
   <p class="mute" style="max-width:720px">Six Bricks is a set of six different coloured DUPLO bricks, a LEGO Foundation tool developed by Hands on Technologies and spread across Africa by <a href="https://www.carefored.co.za/" target="_blank" rel="noopener">Care for Education</a>. Their big idea: children learn through <b>construction, not instruction</b>. A few minutes a day builds memory, movement, language, numbers and self-control.</p>
   <div class="sec"><h2>The six colours</h2><span class="mute small">Tap to hear</span></div>
-  <div class="bricks6">${BRICKS.map(b => `<button class="bk ${b.k}" style="background:${b.hex}" data-say="${b.name}. ${b.sw}" data-lang="en">${b.name}<small>${b.sw}</small><small>${b.idea}</small></button>`).join('')}</div>
+  <div class="bricks6">${BRICKS.map(b => `<div class="bk-wrap"><button class="bk ${b.k}" style="background:${b.hex}" data-say="${b.name}. ${b.sw}" data-lang="en">${b.name}<small>${b.sw}</small><small>${b.idea}</small></button><button class="listen" data-maa="${BRICK_MAA[b.k]}" aria-label="${b.name} in Maa">🔊 Maa</button></div>`).join('')}</div>
   <div class="sec"><h2>The Home Play Circle</h2></div>
   <div class="grid g3">
     <div class="card"><h3>1. Greet 👋 <span class="mute small">1 min</span></h3><p>Say "Takwenya!" or "Supa!". Hold the six bricks. Name the colours together.</p></div>
@@ -251,11 +251,11 @@ V.mothers = () => {
   <div class="chips"><button class="chip big-chip ${t === 'little' ? 'on' : ''}" data-t="little">👶🏾 Little One, 3-5 years (PP1-PP2)</button><button class="chip big-chip ${t === 'starter' ? 'on' : ''}" data-t="starter">🎒 School Starter, 6-8 years (Grade 1-3)</button></div>
   <div class="grid g3">${list.map(actCard).join('')}</div>
   <div class="sec"><h2>Count in three languages</h2></div>
-  <div class="card"><div class="grid g5">${NUMBERS.map(n => `<button class="chip" style="padding:12px" data-maa="n${n.n}"><b style="font-size:1.4rem">${n.n}</b><br>${n.maa}<br><span class="mute small">${n.sw} · ${n.en}</span></button>`).join('')}</div><p class="small mute" style="margin:10px 0 0">Maa spellings vary. Ask the mothers to teach the facilitator the right sounds.</p></div>
+  <div class="card"><div class="grid g5">${NUMBERS.map(n => `<button class="chip" style="padding:12px" data-maa="n${n.n}"><b style="font-size:1.4rem">${n.n}</b><br>${n.maa}<br><span class="mute small">${n.sw} · ${n.en}</span></button>`).join('')}</div><p class="small mute" style="margin:10px 0 0">Tap a number to hear Sanau count in Maa. Spellings vary, so check them with the mothers.</p></div>
   <div class="sec" id="maa-words"><h2>🎙️ Mama's Voice: Maa words</h2><span class="pill">Used in the games</span></div>
   <div class="card"><p>No phone can speak Maa yet, so the games use a Swahili voice for Maa words. <b>Mama, record each word in your own voice</b> and the games will play YOUR voice to the children. Recordings stay on this phone.</p>
-    <p class="small mute">✅ checked in Maa sources · ❔ please check with the mothers in Sekenani. Spellings vary (Purko, Keekonyokie).</p>
-    <div class="grid g3" data-words>${Object.entries(MAA).map(([k, m]) => `<div class="word-row"><div><b>${m.w}</b> ${m.c === 'H' ? '✅' : '❔'}<div class="small mute">${m.en} · ${m.sw}</div></div><div class="row" style="gap:6px"><button class="listen" data-maa="${k}" aria-label="Play ${m.w}">🔊</button><button class="listen rec ${REC.has('maa-' + k) ? 'has' : ''}" data-rec="${k}" aria-label="Record ${m.w}">🎙️</button></div></div>`).join('')}</div></div>
+    <p class="small mute">🎙️ recorded by Sanau, a Maa speaker · ✅ checked in Maa sources · ❔ please check with the mothers in Sekenani. Spellings vary (Purko, Keekonyokie).</p>
+    <div class="grid g3" data-words>${Object.entries(MAA).map(([k, m]) => `<div class="word-row"><div><b>${m.w || '🔊 ' + m.en}</b> ${SANAU.has(k) ? '🎙️' : ''}${m.c === 'H' ? '✅' : m.c === 'S' ? '' : '❔'}<div class="small mute">${m.en} · ${m.sw}</div></div><div class="row" style="gap:6px"><button class="listen" data-maa="${k}" aria-label="Play ${m.w}">🔊</button><button class="listen rec ${REC.has('maa-' + k) ? 'has' : ''}" data-rec="${k}" aria-label="Record ${m.w}">🎙️</button></div></div>`).join('')}</div></div>
   <div class="card" style="margin-top:12px"><h3>🇰🇪 Kenyan accent</h3><p class="small" style="margin:0" data-voice></p></div>
   <div class="sec"><h2>How we greet in Maa</h2>${listenBtn(GREET_WAYS.map(g => g.t + '. ' + g.p).join(' '), 'en', '🔊')}</div>
   <div class="grid g2">${GREET_WAYS.map(g => `<div class="card"><div class="row" style="justify-content:space-between"><span style="font-size:2rem">${g.icon}</span>${listenBtn(g.t + '. ' + g.p)}</div><h3>${g.t}</h3><p class="mute" style="margin:0">${g.p}</p></div>`).join('')}</div>

@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Sanau's clips: check</title>
+<style>body{font-family:Inter,system-ui,sans-serif;background:#fff8ef;color:#2b1d16;max-width:640px;margin:auto;padding:20px}.row{display:flex;gap:10px;align-items:center;background:#fff;border:1px solid #f0e3cf;border-radius:14px;padding:8px 12px;margin:8px 0}button{font:inherit;border:0;border-radius:99px;padding:10px 16px;font-weight:800;background:#fff3d6;cursor:pointer}b{flex:1}</style></head>
+<body><h1>Sanau's word clips: quick check</h1><p>Each word now has its own clip on the site. Listen once to make sure each one says the right word. Check <b>seven</b> and <b>eight</b> especially; they were cut from one longer clip.</p>
+<div id="l"></div>
+<script>
+const W=[['n1','One'],['n2','Two'],['n3','Three'],['n4','Four'],['n5','Five'],['n6','Six'],['n7','Seven'],['n8','Eight'],['n9','Nine'],['n10','Ten'],['cow','Cow'],['goat','Goat'],['sheep','Sheep'],['red','Red'],['orange','Orange'],['green','Green'],['blue','Blue'],['sky','Light blue'],['yellow','Yellow']];
+document.getElementById('l').innerHTML=W.map(([k,t])=>`<div class="row"><b>${t}</b><button onclick="new Audio('${k}.mp3').play()">▶ Play</button></div>`).join('');
+</script></body></html>
