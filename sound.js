@@ -43,6 +43,7 @@ const SND = (() => {
     yes: () => { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * .08, .3, { type: 'triangle', vol: .08 })); },
     no: () => { tone(330, 0, .16, { type: 'triangle', vol: .06 }); tone(262, .14, .22, { type: 'triangle', vol: .06 }); },
     cheer: () => { [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * .06, .5, { type: 'triangle', vol: .06 })); noise(.1, .5, { vol: .025, freq: 3000, q: .5 }); },
+    drumHi: () => { tone(300, 0, .16, { vol: .12, slide: -80 }); noise(0, .05, { vol: .03, freq: 2200 }); },
     drum: () => { tone(110, 0, .25, { vol: .14, slide: -50 }); noise(0, .08, { vol: .03, freq: 600 }); },
     whoosh: () => { noise(0, .3, { vol: .03, freq: 900, q: .7 }); },
   };

@@ -142,3 +142,33 @@
 
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* ===== Mama and child games ===== */
+.tray-row { position: relative; height: 130px; display: flex; align-items: flex-end; justify-content: center; }
+.mama-tray { position: absolute; bottom: 4px; width: 200px; height: 26px; border-radius: 50%; background: #a1887f; border: 3px solid #2a1a12; }
+.drop-zone { position: relative; z-index: 1; min-height: 80px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 14px; }
+.falling { width: 74px; animation: dropIn .6s var(--back) backwards; }
+.falling svg { width: 100%; display: block; }
+.baskets { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+.basket-b { position: relative; width: 130px; background: none; border: 0; padding: 0; transform-origin: bottom center; }
+.basket-b svg { width: 100%; display: block; }
+.bcount { position: absolute; top: -6px; right: 6px; min-width: 32px; padding: 2px 8px; border-radius: 99px; background: #fff; border: 3px solid #2a1a12; font-weight: 900; }
+.milk-scene { display: flex; align-items: flex-end; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 12px; }
+.cow-btn { position: relative; width: 220px; background: none; border: 0; padding: 0; transform-origin: bottom center; }
+.cow-btn svg { width: 100%; display: block; }
+.milk-drop { position: absolute; left: 62%; top: 62%; width: 16px; height: 22px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: #fff; border: 2px solid #2a1a12; }
+.cups { display: grid; grid-template-columns: repeat(5, 48px); gap: 10px; }
+.cup { position: relative; width: 48px; height: 60px; padding: 0; background: #fff; border: 3px solid #2a1a12; border-top-width: 2px; border-radius: 4px 4px 12px 12px; overflow: hidden; transform-origin: bottom center; }
+.cup i { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: #fffdf2; border-top: 3px solid #e0e0e0; transition: height .35s var(--back); }
+.cup.full i { height: 85%; background: repeating-linear-gradient(0deg, #fffdf5 0 6px, #fff7e0 6px 8px); }
+.big-cups { grid-template-columns: repeat(2, 110px); gap: 40px; justify-content: center; margin: 20px auto; }
+.big-cups .cup { width: 110px; height: 150px; }
+.full-auto i { background: #fffdf5 !important; }
+.drums { display: flex; gap: 28px; justify-content: center; align-items: flex-end; margin: 10px 0; }
+.drum-b { background: none; border: 0; padding: 0; transform-origin: bottom center; }
+.drum-b svg { width: 100%; display: block; }
+.drum-b.big { width: 170px; } .drum-b.small { width: 120px; }
+.beats { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
+.beats i { width: 18px; height: 18px; border-radius: 50%; border: 3px solid #2a1a12; background: #fff; }
+.beats i.on { background: #FDD835; animation: popIn .25s var(--back); }
+@media (max-width: 760px) { .cups { grid-template-columns: repeat(5, 40px); gap: 8px; } .cup { width: 40px; height: 52px; } .cow-btn { width: 170px; } .basket-b { width: 100px; } .drum-b.big { width: 130px; } .drum-b.small { width: 95px; } }

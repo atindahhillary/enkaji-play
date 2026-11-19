@@ -78,6 +78,10 @@ const GAMES = [
   { id: 'colour', t: 'Colour Hunt', k: 'y', c: '#6B5200', d: 'Find the colour' },
   { id: 'market', t: "Ruth's Market", k: 'b', c: '#0D47A1', d: 'Pay with shillings' },
   { id: 'code', t: 'Code the Cow', k: 'g', c: '#1B5E20', d: 'Arrow cards, find the water' },
+  // Mama and child games, shown on the Mama page
+  { id: 'harvest', t: 'Sort the Harvest', k: 'g', c: '#1B5E20', d: 'Beans, maize, stones', mama: true },
+  { id: 'milk', t: 'Milking Time', k: 'sky', c: '#01579B', d: 'Fill the cups, then stop', mama: true },
+  { id: 'drum', t: 'Drum Echo', k: 'r', c: '#B71C1C', d: 'Listen and play it back', mama: true },
 ];
 const tile = g => `<a class="tile" href="#/game/${g.id}"><div class="art" style="background:var(--${g.k})">${TILE_ART[g.id]()}</div><div class="tb"><h3>${g.t}</h3><span class="play" style="background:${g.c}">Play</span></div></a>`;
 const dot = k => `<span class="dot" style="--c:var(--${k})" aria-hidden="true"></span>`;
@@ -113,7 +117,7 @@ V.home = () => {
     <a class="card stat" href="#/progress" style="--c:var(--r)"><span class="ic">🛡️</span><div><span>Badges</span><b>${S.badges.length}</b></div></a>
   </div>
   <div class="sec"><h2>${dot('o')}Games</h2><a href="#/games">View all →</a></div>
-  <div class="grid g5">${GAMES.map(tile).join('')}</div>
+  <div class="grid g5">${GAMES.filter(g => !g.mama).map(tile).join('')}</div>
   <div class="grid g2" style="margin-top:16px">
     <div class="card goal"><h3>Today's Goal</h3><div class="row" style="justify-content:space-between"><span>${g1 ? '✅' : '⬜'} 1 game &nbsp; ${g2 ? '✅' : '⬜'} 1 brick challenge</span><b style="color:var(--brand)">${gn} / 2</b></div><div class="bar"><i style="width:${gn * 50}%"></i></div></div>
     <div class="card keep">${lambSVG()}<div><h3>Keep Going!</h3><p style="margin:0">${gn >= 2 ? 'Goal done! Kerri the Maasai sheep is proud of you!' : 'Play one game, then play with real bricks. Kerri is cheering!'}</p></div></div>
@@ -182,7 +186,8 @@ V.activity.after = id => {
   $('#didIt').onclick = () => { S.done[id] = (S.done[id] || 0) + 1; S.doneOn = S.doneOn || {}; S.doneOn[today()] = (S.doneOn[today()] || 0) + 1; save(); star(1, '⭐ Great playing together!'); if (Object.keys(S.done).length >= 5) badge('mama'); render(); };
 };
 
-V.games = () => `<h1>Games</h1><p class="mute">Short games for children 3-8. Every win earns a star. Sound on for voices!</p><div class="grid g5">${GAMES.map(tile).join('')}</div>
+V.games = () => `<h1>Games</h1><p class="mute">Short games for children 3-8. Every win earns a star. Sound on for voices!</p><div class="grid g5">${GAMES.filter(g => !g.mama).map(tile).join('')}</div>
+  <div class="sec"><h2>🤱🏾 Play with Mama</h2></div><div class="grid g5">${GAMES.filter(g => g.mama).map(tile).join('')}</div>
   <div class="card" style="margin-top:18px"><h3>For grown-ups</h3><p class="mute" style="margin:0">Screens are a treat, not the teacher. After each game, play the same idea with real bricks, stones or beads.</p></div>`;
 V.game = id => {
   const g = GAMES.find(x => x.id === id); if (!g) return V.notfound();
@@ -237,6 +242,9 @@ V.mothers = () => {
     ${listenBtn('Takwenya Mama! You are your child\'s first and best teacher. You do not need to read to teach. Look at the pictures, press the listen button, and play together for five minutes every day.', 'en', '🔊 Listen, Mama')} ${listenBtn('Habari Mama! Wewe ni mwalimu wa kwanza wa mtoto wako. Huhitaji kusoma ili kufundisha. Angalia picha, bonyeza kitufe cha kusikiliza, na mcheze pamoja dakika tano kila siku.', 'sw', '🔊 Sikiliza kwa Kiswahili')}</div></section>
   <div class="sec"><h2>How to use this</h2></div>
   <div class="how4"><div><span>👀</span>Look at the picture</div><div><span>🔊</span>Press Listen</div><div><span>🧱</span>Play 5 minutes</div><div><span>🤗</span>Praise the trying</div></div>
+  <div class="sec"><h2>🤱🏾 Play together on the phone</h2>${listenBtn('Play together on the phone. Sit with your child. Sort the harvest, milk the cow, and play the drum. Then play the same game with real beans, cups and a tin drum.', 'en', '🔊')}</div>
+  <p class="mute" style="margin-top:-6px">Sit with your child. Every game speaks, so no reading is needed. Then play the same game with real beans, cups and a tin drum.</p>
+  <div class="grid g5">${GAMES.filter(g => g.mama).map(tile).join('')}</div>
   <div class="sec"><h2>Play while you work</h2></div>
   <div class="grid g3">${MOMENTS.map(m => `<div class="card"><div class="row" style="justify-content:space-between"><span style="font-size:2.2rem">${m.icon}</span>${listenBtn(m.t + '. ' + m.p)}</div><h3>${m.t}</h3><p class="mute" style="margin:0">${m.p}</p></div>`).join('')}</div>
   <div class="sec"><h2>Choose your child</h2>${listenBtn('Choose your child. Little One is three to five years. School Starter is six to eight years.', 'en', '🔊')}</div>

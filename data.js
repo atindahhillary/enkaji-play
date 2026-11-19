@@ -332,6 +332,7 @@ const BADGES = [
   { id: 'market', t: 'Market Star', icon: '🪙', how: 'Pay right 4 times at Ruth\'s stall' },
   { id: 'story', t: 'Story Keeper', icon: '📖', how: 'Finish a story' },
   { id: 'voice', t: "Mama's Voice", icon: '🎙️', how: 'Record 3 Maa words' },
+  { id: 'together', t: 'Play Together', icon: '🤱🏾', how: 'Win 5 Mama and child games' },
   { id: 'coder', t: 'Little Coder', icon: '🤖', how: 'Code the cow to water 3 times' },
   { id: 'mama', t: 'Mama Champion', icon: '👩🏾', how: 'Do 5 home activities' },
   { id: 'streak3', t: '3 Day Fire', icon: '🔥', how: 'Play 3 days in a row' },

@@ -257,6 +257,9 @@ const STORIES = [
     ] },
 ];
 
+// Inside of an <svg> string, to nest drawings in another svg.
+const svgInner = svg => svg.slice(svg.indexOf('>') + 1, svg.lastIndexOf('</svg>'));
+
 // Game tile art.
 const TILE_ART = {
   copy: () => `<svg viewBox="0 0 120 90">${brickSVG('r', 20, 60, 12)}${brickSVG('y', 32, 44, 12)}${brickSVG('b', 20, 28, 12)}<text x="92" y="58" font-size="36" fill="#fff" font-weight="900" stroke="${INK}" stroke-width="2" paint-order="stroke">?</text></svg>`,
@@ -264,5 +267,8 @@ const TILE_ART = {
   beads: () => `<svg viewBox="0 0 120 90">${['#E53935', '#fff', '#1E88E5', '#E53935', '#fff'].map((c, i) => `<circle cx="${14 + i * 20}" cy="46" r="9" fill="${c}" stroke="${INK}" stroke-width="2"/>`).join('')}<text x="102" y="54" font-size="24" fill="#fff" font-weight="900" stroke="${INK}" stroke-width="2" paint-order="stroke">?</text></svg>`,
   colour: () => `<svg viewBox="0 0 120 90">${['r', 'g', 'b', 'p'].map((c, i) => brickSVG(c, 6 + (i % 2) * 58, 30 + Math.floor(i / 2) * 32, 12)).join('')}</svg>`,
   code: () => `<svg viewBox="0 0 120 90">${[0, 1, 2].map(i => `<rect x="${14 + i * 32}" y="56" width="26" height="26" rx="6" fill="#fff" stroke="${INK}" stroke-width="2"/><text x="${20 + i * 32}" y="75" font-size="16">${['⬆️', '➡️', '➡️'][i]}</text>`).join('')}${cow(46, 50, .3, '#8d5524')}<text x="94" y="40" font-size="22">💧</text></svg>`,
+  harvest: () => `<svg viewBox="0 0 120 90"><g transform="translate(30 54)">${HARVEST.bean.svg.replace('<svg', '<svg x="-20" y="-14" width="40" height="28"')}</g><g transform="translate(62 48)">${HARVEST.maize.svg.replace('<svg', '<svg x="-14" y="-24" width="28" height="48"')}</g><g transform="translate(94 56)">${HARVEST.stone.svg.replace('<svg', '<svg x="-18" y="-13" width="36" height="26"')}</g></svg>`,
+  milk: () => `<svg viewBox="0 0 120 90">${[0, 1, 2].map(i => `<g transform="translate(${22 + i * 38} 30)"><path d="M-12 0 L-10 40 L10 40 L12 0Z" fill="#fff" stroke="${INK}" stroke-width="3"/>${i < 2 ? `<path d="M-11 10 L-10 40 L10 40 L11 10Z" fill="#fffdf5"/><path d="M-11 10 H11" stroke="#bdbdbd" stroke-width="2"/>` : ''}</g>`).join('')}<text x="8" y="22" font-size="18" font-weight="900" fill="#fff" stroke="${INK}" stroke-width="2.5" paint-order="stroke">1 2 3</text></svg>`,
+  drum: () => `<svg viewBox="0 0 120 90"><g transform="translate(38 50) scale(.5)">${svgInner(drumSVG('L'))}</g><g transform="translate(86 56) scale(.38)">${svgInner(drumSVG('H'))}</g></svg>`,
   market: () => `<svg viewBox="0 0 120 90"><circle cx="40" cy="48" r="20" fill="#fdd835" stroke="${INK}" stroke-width="3"/><text x="33" y="56" font-size="20" font-weight="900" fill="#8a6500">5</text><circle cx="80" cy="52" r="16" fill="#cfd8dc" stroke="${INK}" stroke-width="3"/><text x="70" y="59" font-size="16" font-weight="900" fill="#455a64">10</text></svg>`,
 };

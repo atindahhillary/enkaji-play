@@ -1,6 +1,6 @@
 // Offline support: the Mara has weak signal, so cache the whole site after the first visit.
 // Bump VERSION on every deploy that changes files, so phones pick up the new copy.
-const VERSION = 'enkaji-v6';
+const VERSION = 'enkaji-v7';
 const FILES = ['./', 'index.html', 'styles.css', 'games.css', 'data.js', 'sound.js', 'art.js', 'games.js', 'app.js', 'manifest.webmanifest', 'icon.svg'];
 
 self.addEventListener('install', e => {

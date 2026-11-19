@@ -446,4 +446,164 @@ const GAME_MOUNT = {
     }
     round();
   },
+  // ===== Mama and child games (voice first, no reading needed) =====
+
+  // ---------- 7. Sort the Harvest: tap the right basket for each thing on Mama's tray ----------
+  harvest(el, api) {
+    const st = stage(el, 'mama', 's-shade', 'Yeyo (Mama)');
+    let level = 1, wins = 0, busy = true;
+    function round() {
+      busy = true;
+      const kinds = level < 2 ? ['bean', 'maize'] : ['bean', 'maize', 'stone'];
+      const items = shuffle(Array.from({ length: 4 + level * 2 }, (_, i) => kinds[i % kinds.length]));
+      const counts = Object.fromEntries(kinds.map(k => [k, 0]));
+      st.hud(level); st.kerri('think');
+      st.arena.innerHTML = `<div class="tray-row"><div class="mama-tray"></div><div class="drop-zone" data-zone></div></div>
+        <div class="baskets">${kinds.map(k => `<button class="basket-b" data-k="${k}" aria-label="${HARVEST[k].t} basket">${basketSVG(k)}<span class="bcount">0</span></button>`).join('')}</div>
+        <p class="small mute center">Left on the tray: <b data-left>${items.length}</b></p>`;
+      st.say('Help Mama sort the harvest! Put each one in its own basket.', [{ en: 'Help Mama sort the harvest! Put each one in its own basket.' }]);
+      const zone = el.querySelector('[data-zone]');
+      let idx = 0;
+      const next = () => {
+        if (!st.live()) return;
+        if (idx >= items.length) return done();
+        zone.innerHTML = `<div class="falling" data-k="${items[idx]}">${HARVEST[items[idx]].svg}</div>`;
+        SND.play('whoosh'); busy = false;
+      };
+      el.querySelectorAll('.basket-b').forEach(b => b.onclick = async () => {
+        const item = zone.firstElementChild; if (busy || !item) return;
+        const k = item.dataset.k;
+        if (b.dataset.k !== k) { restart(b, 'wiggle'); SND.play('no'); talk([{ en: `That is ${HARVEST[k].t}. Find the ${HARVEST[k].t} basket.` }]); return; }
+        busy = true; await flyTo(item, b, { endScale: .35 }); if (!st.live()) return;
+        item.remove(); counts[k]++; b.querySelector('.bcount').textContent = counts[k];
+        restart(b, 'squash'); SND.play('pop'); talk([{ maa: 'n' + counts[k] }]);
+        el.querySelector('[data-left]').textContent = items.length - ++idx;
+        setTimeout(next, 450);
+      });
+      setTimeout(next, 900);
+      async function done() {
+        busy = true; st.kerri('happy'); SND.play('cheer'); burstAt(el.querySelector('.baskets')); st.win(++wins);
+        el.querySelectorAll('.basket-b').forEach((b, i) => { b.style.animationDelay = i * 80 + 'ms'; restart(b, 'hop'); });
+        api.star(1, '⭐ The harvest is sorted!'); api.played(); api.bump('together', 5, 'together');
+        const said = kinds.map(k => `${counts[k]} ${HARVEST[k].t}`).join(', ');
+        level = Math.min(3, 1 + Math.floor(wins / 2));
+        await st.say(`<b>Sidai oleng!</b> ${said}. Now count them again with Mama!`, [{ maa: 'good' }, { en: said + '. Now count them again with Mama!' }]);
+        if (st.live()) { el.querySelector('[data-zone]').innerHTML = '<button class="btn big pop" data-more>More harvest →</button>'; el.querySelector('[data-more]').onclick = round; }
+      }
+    }
+    round();
+  },
+
+  // ---------- 8. Milking Time: fill exactly the cups Mama asks for, then STOP ----------
+  milk(el, api) {
+    const st = stage(el, 'mama', 's-home', 'Yeyo (Mama)');
+    let wins = 0, busy = false, rounds = 0;
+    const cupsHTML = (n, fills = []) => Array.from({ length: n }, (_, i) => `<button class="cup" data-i="${i}" aria-label="cup ${i + 1}"><i style="height:${fills[i] || 0}%"></i></button>`).join('');
+    function round() {
+      rounds++; busy = false; st.kerri('think');
+      if (wins >= 2 && rounds % 3 === 0) return compare();
+      const max = wins < 3 ? 5 : 10, n = rnd(1, max), total = max;
+      st.hud(max === 5 ? 1 : 2);
+      st.arena.innerHTML = `<div class="milk-scene"><button class="cow-btn" data-cow aria-label="Milk the cow">${cowImg('#f2efe6', 'cow')}</button><div class="cups">${cupsHTML(total)}</div></div>
+        <div class="row center"><button class="btn big" data-done>✋ Stop! Done</button></div>`;
+      st.say(`Mama needs <b>${n}</b> ${n === 1 ? 'cup' : 'cups'} of <b>kule</b> (milk). Tap the cow to fill each cup, then press <b>Stop</b>.`, [{ en: `Mama needs ${n} ${n === 1 ? 'cup' : 'cups'} of milk. Tap the cow to fill each cup. Then press stop.` }, { maa: 'milk' }]);
+      let filled = 0;
+      const cups = [...el.querySelectorAll('.cup')], cowB = el.querySelector('[data-cow]');
+      cowB.onclick = async () => {
+        if (busy || filled >= total) return;
+        restart(cowB, 'nod'); SND.play('pop');
+        const drop = document.createElement('span'); drop.className = 'milk-drop'; cowB.appendChild(drop);
+        await flyTo(drop, cups[filled], { dur: 380, lift: 30, endScale: .6 }); drop.remove(); if (!st.live()) return;
+        cups[filled].classList.add('full'); filled++;
+        const w = NUMBERS[filled - 1]; st.say(`<b>${w.maa}</b> · ${w.sw} · ${w.en}`, [{ maa: 'n' + filled }]);
+      };
+      // Tap the last full cup to pour it back.
+      cups.forEach((c, i) => c.onclick = () => { if (busy || i !== filled - 1) return; c.classList.remove('full'); filled--; SND.play('whoosh'); });
+      el.querySelector('[data-done]').onclick = async () => {
+        if (busy) return;
+        if (filled === n) {
+          busy = true; cups.slice(0, n).forEach((c, i) => { c.style.animationDelay = i * 60 + 'ms'; restart(c, 'hop'); });
+          SND.play('moo'); st.kerri('happy'); burstAt(el.querySelector('.cups')); st.win(++wins);
+          api.star(1, `⭐ ${n} cups, exactly!`); api.played(); api.bump('together', 5, 'together');
+          await st.say(`<b>Sidai oleng!</b> ${n} ${n === 1 ? 'cup' : 'cups'}, exactly what Mama needed. You stopped at the right time!`, [{ maa: 'good' }, { en: `${n}, exactly! You stopped at the right time!` }]);
+          if (st.live()) round();
+        } else if (filled < n) { restart(el.querySelector('[data-done]'), 'wiggle'); SND.play('no'); st.say(`Not yet! Mama needs <b>${n}</b>. We have ${filled}. Fill ${n - filled} more.`, [{ en: `Not yet. We need ${n - filled} more.` }]); }
+        else { cups.slice(n, filled).forEach(c => restart(c, 'wiggle')); SND.play('no'); st.say(`Too many! Mama asked for <b>${n}</b>. Tap the last cup to pour milk back.`, [{ en: `Too many! Mama asked for ${n}. Pour some back.` }]); }
+      };
+    }
+    // Comparing: which cup has more (or less) milk?
+    function compare() {
+      st.hud('More/Less', '');
+      const a = rnd(20, 90); let b = rnd(20, 90); while (Math.abs(a - b) < 25) b = rnd(15, 95);
+      const ask = wins >= 5 && Math.random() < .5 ? 'LESS' : 'MORE', want = ask === 'MORE' ? (a > b ? 0 : 1) : (a < b ? 0 : 1);
+      st.arena.innerHTML = `<div class="cups big-cups">${cupsHTML(2, [a, b])}</div>`;
+      st.say(`Which cup has <b>${ask.toLowerCase()}</b> milk?`, [{ en: `Which cup has ${ask.toLowerCase()} milk?` }]);
+      el.querySelectorAll('.cup').forEach(c => { c.classList.add('full-auto'); c.onclick = async () => {
+        if (busy) return;
+        if (+c.dataset.i !== want) { restart(c, 'wiggle'); SND.play('no'); talk([{ en: 'Look again. Compare the milk.' }]); return; }
+        busy = true; restart(c, 'hop'); SND.play('cheer'); st.kerri('happy'); burstAt(c); st.win(++wins);
+        api.star(1, `⭐ That cup has ${ask.toLowerCase()}!`); api.played(); api.bump('together', 5, 'together');
+        await st.say(`Yes! That cup has <b>${ask.toLowerCase()}</b> milk.`, [{ en: `Yes! That cup has ${ask.toLowerCase()} milk.` }]);
+        if (st.live()) round();
+      }; });
+    }
+    round();
+  },
+
+  // ---------- 9. Drum Echo: listen to Mama's drum, play it back (no reading at all) ----------
+  drum(el, api) {
+    const st = stage(el, 'mama', 's-dusk', 'Yeyo (Mama)');
+    let len = 2, wins = 0, busy = true, seq = [], input = [];
+    const hit = k => { const d = el.querySelector(`[data-d="${k}"]`); if (!d) return; restart(d, 'squash'); SND.play(k === 'L' ? 'drum' : 'drumHi'); };
+    async function playSeq() {
+      busy = true; st.kerri('think');
+      st.say('Listen to Mama’s drum...', [{ en: 'Listen to Mama’s drum.' }]);
+      await wait(1500);
+      for (const k of seq) { if (!st.live()) return; hit(k); await wait(650); }
+      if (!st.live()) return;
+      input = []; busy = false;
+      st.say('Your turn! Play it back. <b>Big drum</b> or <b>small drum</b>?', [{ en: 'Your turn! Play it back.' }]);
+    }
+    function round() {
+      st.hud(len - 1);
+      seq = Array.from({ length: len }, () => Math.random() < .5 ? 'L' : 'H');
+      st.arena.innerHTML = `<div class="drums">${['L', 'H'].map(k => `<button class="drum-b ${k === 'L' ? 'big' : 'small'}" data-d="${k}" aria-label="${k === 'L' ? 'Big drum' : 'Small drum'}">${drumSVG(k)}</button>`).join('')}</div>
+        <div class="row center"><button class="btn alt" data-again>🔁 Hear it again</button></div><div class="beats" data-beats>${seq.map(() => '<i></i>').join('')}</div>`;
+      el.querySelector('[data-again]').onclick = () => { if (!busy) playSeq(); };
+      el.querySelectorAll('.drum-b').forEach(d => d.onclick = async () => {
+        if (busy) { hit(d.dataset.d); return; } // free play while Mama is playing is fine, it just does not count
+        hit(d.dataset.d); input.push(d.dataset.d);
+        const dots = el.querySelectorAll('[data-beats] i'); dots[input.length - 1]?.classList.add('on');
+        if (input[input.length - 1] !== seq[input.length - 1]) {
+          busy = true; SND.play('no'); st.kerri('think');
+          await st.say('Almost! Listen again carefully.', [{ en: 'Almost! Listen again carefully.' }]);
+          dots.forEach(x => x.classList.remove('on'));
+          if (st.live()) playSeq(); return;
+        }
+        if (input.length === seq.length) {
+          busy = true; SND.play('cheer'); st.kerri('happy'); burstAt(el.querySelector('.drums')); st.win(++wins);
+          api.star(1, '⭐ Perfect echo!'); api.played(); api.bump('together', 5, 'together');
+          len = Math.min(6, len + 1);
+          await st.say('<b>Sidai oleng!</b> You played it just like Mama!', [{ maa: 'good' }, { en: 'You played it just like Mama!' }]);
+          if (st.live()) round();
+        }
+      });
+      playSeq();
+    }
+    round();
+  },
 };
+
+// ---------- Art for the Mama games (same outlined explainer style) ----------
+const HARVEST = {
+  bean: { t: 'beans', svg: `<svg viewBox="-24 -16 48 32"><ellipse rx="18" ry="11" fill="#8d3b2a" stroke="${INK}" stroke-width="3"/><path d="M-7 -4 q7 5 14 0" stroke="#d08b72" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>` },
+  maize: { t: 'maize', svg: `<svg viewBox="-20 -32 40 64"><path d="M2 26 q-22 -6 -16 -40" fill="#66bb6a" stroke="${INK}" stroke-width="2.5"/><ellipse rx="11" ry="25" fill="#FDD835" stroke="${INK}" stroke-width="3"/>${[-14, -6, 2, 10].map(y => `<path d="M-7 ${y} h14" stroke="#e0a800" stroke-width="2"/>`).join('')}</svg>` },
+  stone: { t: 'stones', svg: `<svg viewBox="-22 -16 44 32"><path d="M-18 5 Q-19 -11 -2 -12 Q17 -13 18 2 Q17 12 0 12 Q-17 12 -18 5Z" fill="#9e9e9e" stroke="${INK}" stroke-width="3"/><path d="M-6 -4 l6 2" stroke="#bdbdbd" stroke-width="3" stroke-linecap="round"/></svg>` },
+};
+const basketSVG = k => `<svg viewBox="-55 -50 110 90" aria-hidden="true"><path d="M-48 -18 L48 -18 L37 32 L-37 32Z" fill="#c8a165" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
+  ${[-6, 6, 18].map(y => `<path d="M${-46 + (y + 18) * .2} ${y} H${46 - (y + 18) * .2}" stroke="#9c7a45" stroke-width="3"/>`).join('')}
+  <ellipse cx="0" cy="-18" rx="48" ry="8" fill="#a8844f" stroke="${INK}" stroke-width="3"/><g transform="translate(0 6) scale(.9)">${HARVEST[k].svg.replace('<svg', '<svg x="-22" y="-18" width="44" height="36"')}</g></svg>`;
+const drumSVG = k => `<svg viewBox="-60 -70 120 140" aria-hidden="true"><path d="M-44 -40 L-34 56 L34 56 L44 -40Z" fill="${k === 'L' ? '#8d4a26' : '#c62828'}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M-40 -30 L-26 50 M-20 -30 L-10 50 M0 -30 L6 50 M20 -30 L20 50 M40 -30 L32 50" stroke="#f3e2c7" stroke-width="2.5" opacity=".8"/>
+  <ellipse cx="0" cy="-40" rx="44" ry="12" fill="#f3e2c7" stroke="${INK}" stroke-width="3"/><ellipse cx="0" cy="56" rx="34" ry="8" fill="rgba(0,0,0,.18)"/></svg>`;
+
