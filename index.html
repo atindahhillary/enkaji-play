@@ -8,6 +8,9 @@
 <meta name="theme-color" content="#c62828">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='10' y='40' width='80' height='45' rx='8' fill='%23E53935'/><rect x='18' y='28' width='16' height='14' rx='3' fill='%23E53935'/><rect x='42' y='28' width='16' height='14' rx='3' fill='%23E53935'/><rect x='66' y='28' width='16' height='14' rx='3' fill='%23E53935'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="games.css">
@@ -20,17 +23,17 @@
     <a href="#/home" data-r="home"><i>🏠</i>Home</a>
     <a href="#/games" data-r="games"><i>🎮</i>Games</a>
     <a href="#/stories" data-r="stories"><i>📖</i>Stories</a>
-    <a href="#/activities" data-r="activities"><i>🧱</i>Activities</a>
-    <a href="#/mothers" data-r="mothers"><i>👩🏾</i>Mothers</a>
+    <a href="#/activities" data-r="activities" class="m-hide"><i>🧱</i>Brick Play</a>
+    <a href="#/mothers" data-r="mothers"><i>👩🏾</i>Mama</a>
     <a href="#/training" data-r="training"><i>🎓</i>Training</a>
-    <a href="#/team" data-r="team"><i>🤝</i>Team</a>
-    <a href="#/progress" data-r="progress"><i>🏅</i>Progress</a>
+    <a href="#/team" data-r="team" class="m-hide"><i>🤝</i>Team</a>
+    <a href="#/progress" data-r="progress" class="m-hide"><i>🏅</i>Progress</a>
   </nav>
   <div class="side-lamb" id="sideLamb"></div>
 </aside>
 <main>
   <div class="beadstrip" aria-hidden="true"></div>
-  <button id="sndBtn" class="snd-btn" aria-label="Sound on or off">🔊</button>
+  <button id="sndBtn" class="snd-btn" aria-label="Sound">🔊</button>
   <div id="view" tabindex="-1"></div>
   <footer class="foot">Enkaji means "home" in Maa. Six Bricks is a LEGO Foundation tool; learn more from <a href="https://www.carefored.co.za/" target="_blank" rel="noopener">Care for Education</a>. Built for facilitators and Mothers Who Teach in Sekenani, Maasai Mara.</footer>
 </main>

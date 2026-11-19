@@ -326,7 +326,7 @@ const BADGES = [
   { id: 'coder', t: 'Little Coder', icon: '🤖', how: 'Code the cow to water 3 times' },
   { id: 'mama', t: 'Mama Champion', icon: '👩🏾', how: 'Do 5 home activities' },
   { id: 'streak3', t: '3 Day Fire', icon: '🔥', how: 'Play 3 days in a row' },
-  ...MODULES.map(m => ({ id: 'mod' + m.id, t: 'Facilitator: ' + m.t, icon: '🎓', how: 'Pass the Module ' + m.id + ' quiz', fac: true })),
+  ...MODULES.map(m => ({ id: 'mod' + m.id, t: 'Facilitator: ' + m.t, icon: '🎓', how: 'Pass the Session ' + m.id + ' quiz', fac: true })),
 ];
 
 // Maa words used in games. 'say' is a Swahili-style respelling the sw-KE voice can pronounce.

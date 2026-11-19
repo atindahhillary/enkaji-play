@@ -1,0 +1,11 @@
+{
+  "name": "Enkaji Play: Six Bricks in the Mara",
+  "short_name": "Enkaji Play",
+  "description": "Learning through play with Six Bricks for facilitators and Mothers Who Teach in Sekenani.",
+  "start_url": "./#/home",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff8ef",
+  "theme_color": "#c62828",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

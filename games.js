@@ -228,6 +228,7 @@ const GAME_MOUNT = {
   beads(el, api) {
     const st = stage(el, 'mama', 's-shade', 'Yeyo (Mama)');
     const C = ['#E53935', '#ffffff', '#1E88E5', '#FDD835', '#43A047', '#FB8C00'];
+    const NAME = { '#E53935': 'red', '#ffffff': 'white', '#1E88E5': 'blue', '#FDD835': 'yellow', '#43A047': 'green', '#FB8C00': 'orange' };
     const KINDS = ['AB', 'AB', 'AAB', 'ABB', 'ABC', 'ABC'];
     let wins = 0, busy = false, mode = 'pattern';
     const pos = (i, n) => { const t = Math.PI * (i + .5) / n; return `left:${50 - 44 * Math.cos(t)}%;top:${8 + 72 * Math.sin(t)}%`; };
@@ -243,7 +244,7 @@ const GAME_MOUNT = {
       const opts = shuffle([...new Set([ans, ...shuffle(C)])].slice(0, 3)); if (!opts.includes(ans)) opts[0] = ans;
       st.arena.innerHTML = head() + `<div class="collar"><svg viewBox="0 0 100 100" preserveAspectRatio="none" class="string"><path d="M6 8 Q50 150 94 8" fill="none" stroke="#6d4c41" stroke-width=".8"/></svg>
         ${seq.map((c, i) => `<span class="cbead ${i === gap ? 'q' : 'drop-in'}" style="${pos(i, n)};${i === gap ? '' : `background:${c};animation-delay:${i * 45}ms`}" data-i="${i}">${i === gap ? '?' : ''}</span>`).join('')}</div>
-        <p class="center small mute">Mama's bowl of <b>isaen</b> (beads):</p><div class="bowl">${opts.map(c => `<button class="bbead" style="background:${c}" data-c="${c}" aria-label="bead"></button>`).join('')}</div>`;
+        <p class="center small mute">Mama's bowl of <b>isaen</b> (beads):</p><div class="bowl">${opts.map(c => `<button class="bbead" style="background:${c}" data-c="${c}" aria-label="${NAME[c]} bead"></button>`).join('')}</div>`;
       bindHead();
       seq.forEach((_, i) => i < 6 && setTimeout(() => st.live() && SND.play('clink'), i * 90));
       st.say('I am making a collar for the ceremony. Which bead comes next?', [{ en: 'Which bead comes next?' }]);
@@ -267,7 +268,7 @@ const GAME_MOUNT = {
     function free() {
       const beads = []; st.hud('Free', ''); st.kerri('happy');
       st.arena.innerHTML = head() + `<div class="collar" data-col><svg viewBox="0 0 100 100" preserveAspectRatio="none" class="string"><path d="M6 8 Q50 150 94 8" fill="none" stroke="#6d4c41" stroke-width=".8"/></svg></div>
-        <div class="bowl">${C.map(c => `<button class="bbead" style="background:${c}" data-c="${c}" aria-label="bead"></button>`).join('')}</div>`;
+        <div class="bowl">${C.map(c => `<button class="bbead" style="background:${c}" data-c="${c}" aria-label="${NAME[c]} bead"></button>`).join('')}</div>`;
       bindHead();
       st.say('Make your own collar. Every collar is beautiful!', [{ en: 'Make your own collar. Every collar is beautiful!' }]);
       const N = 13, col = el.querySelector('[data-col]');
@@ -301,7 +302,7 @@ const GAME_MOUNT = {
       const word = lang === 'en' ? target.name : lang === 'sw' ? target.sw : MAA[target.maa].w;
       st.hud(found < 4 ? 1 : found < 8 ? 2 : 3);
       st.arena.innerHTML = `<div class="chips center">${[['en', 'English'], ['sw', 'Kiswahili'], ['maa', 'Maa']].map(([k, t]) => `<button class="chip ${lang === k ? 'on' : ''}" data-l="${k}">${t}</button>`).join('')}</div>
-        <div class="line"><div class="rope"></div>${show.map((c, i) => `<button class="cloth" style="--cc:${c.hex};animation-delay:${-i * .7}s" data-k="${c.k}" aria-label="cloth">${c.k === 'k' || c.k === 'w' ? '' : ''}</button>`).join('')}</div>
+        <div class="line"><div class="rope"></div>${show.map((c, i) => `<button class="cloth" style="--cc:${c.hex};animation-delay:${-i * .7}s" data-k="${c.k}" aria-label="${c.name} shuka">${c.k === 'k' || c.k === 'w' ? '' : ''}</button>`).join('')}</div>
         <div class="basket" data-basket aria-hidden="true">🧺</div>`;
       el.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { lang = b.dataset.l; round(); });
       const ask = lang === 'en' ? [{ en: 'Please find the ' + word + ' shuka' }] : lang === 'sw' ? [{ sw: 'Tafadhali tafuta shuka ' + word.toLowerCase() }] : [{ maa: target.maa }];
@@ -338,7 +339,7 @@ const GAME_MOUNT = {
       const item = pickNew(big ? [...L1, ...L2] : L1, last); last = item;
       const [icon, name, price] = item; let paid = [];
       st.hud(big ? 2 : 1);
-      st.arena.innerHTML = `<div class="stall"><div class="awning"></div><div class="goods"><span class="item float">${icon}</span><span class="tag">KSh ${price}</span></div><div class="tray" data-tray></div></div>
+      st.arena.innerHTML = `<div class="stall"><div class="awning"></div><div class="goods"><span class="item float">${icon}</span><span class="price-tag">KSh ${price}</span></div><div class="tray" data-tray></div></div>
         <h3 class="center">You gave: <span data-sum>0</span> / ${price} shillings</h3>
         <div class="coins">${coins.map(c => `<button class="coin ${c >= 10 ? 's' : ''}" data-c="${c}" aria-label="${c} shillings">${c}<small>KSh</small></button>`).join('')}</div>
         <div class="row center"><button class="btn alt" data-back>Take back coins</button><button class="btn" data-pay>Pay Ruth</button></div><div class="basket small-basket" data-basket aria-hidden="true">🧺</div>`;
@@ -347,7 +348,7 @@ const GAME_MOUNT = {
       const sum = () => paid.reduce((a, b) => a + b, 0);
       const update = () => {
         const s = sum(); sumEl.textContent = s; restart(sumEl, 'pop');
-        sumEl.style.color = s > price ? 'var(--r)' : s === price ? 'var(--g)' : 'var(--pur)';
+        sumEl.style.color = s > price ? 'var(--r)' : s === price ? 'var(--g)' : 'var(--brand)';
         st.kerri(s === price ? 'happy' : 'think');
       };
       el.querySelectorAll('[data-c]').forEach(b => b.onclick = async () => {
