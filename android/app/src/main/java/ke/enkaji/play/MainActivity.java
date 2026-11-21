@@ -106,22 +106,58 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public boolean speak(String text, String lang, String id) {
             if (!ttsReady) return false;
-            Locale want = "sw".equals(lang) ? new Locale("sw", "KE") : new Locale("en", "KE");
-            int r = tts.setLanguage(want);
-            if (r == TextToSpeech.LANG_MISSING_DATA || r == TextToSpeech.LANG_NOT_SUPPORTED) {
-                tts.setLanguage("sw".equals(lang) ? new Locale("sw") : Locale.UK);
-            }
+            android.speech.tts.Voice v = bestVoice(lang);
+            if (v != null) tts.setVoice(v); else tts.setLanguage(new Locale("en", "KE"));
             tts.setSpeechRate(0.9f);
             return tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, id) == TextToSpeech.SUCCESS;
         }
         @JavascriptInterface public void stop() { if (tts != null) tts.stop(); }
         @JavascriptInterface public boolean speaking() { return tts != null && tts.isSpeaking(); }
         @JavascriptInterface public String voice(String lang) {
-            if (!ttsReady) return "none";
-            Locale l = "sw".equals(lang) ? new Locale("sw", "KE") : new Locale("en", "KE");
-            int a = tts.isLanguageAvailable(l);
-            return (a >= TextToSpeech.LANG_COUNTRY_AVAILABLE ? "Kenyan " : "") + ("sw".equals(lang) ? "Swahili" : "English") + " (phone voice)";
+            android.speech.tts.Voice v = ttsReady ? bestVoice(lang) : null;
+            if (v == null) return "none";
+            Locale l = v.getLocale();
+            return l.getDisplayLanguage(Locale.ENGLISH) + (l.getCountry().isEmpty() ? "" : " (" + l.getDisplayCountry(Locale.ENGLISH) + ")");
         }
+        /** True when the phone has a Kenyan English or Swahili voice. */
+        @JavascriptInterface public boolean kenyan() {
+            android.speech.tts.Voice v = ttsReady ? bestVoice("en") : null;
+            return v != null && ("KE".equals(v.getLocale().getCountry()) || "sw".equals(v.getLocale().getLanguage()));
+        }
+        /** Opens the phone's text-to-speech settings so a Swahili or Kenyan voice can be added. */
+        @JavascriptInterface public void openVoiceSettings() {
+            runOnUiThread(() -> {
+                try { startActivity(new android.content.Intent("com.android.settings.TTS_SETTINGS")); }
+                catch (Exception e) {
+                    try { startActivity(new android.content.Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)); } catch (Exception ignored) { }
+                }
+            });
+        }
+    }
+
+    /**
+     * Kenyan accent first. English: Kenyan English, then Swahili (an East African accent reading English),
+     * then any English. Swahili: Kenyan Swahili, then any Swahili. Voices that work offline win ties.
+     */
+    private android.speech.tts.Voice bestVoice(String lang) {
+        java.util.Set<android.speech.tts.Voice> all;
+        try { all = tts.getVoices(); } catch (Exception e) { return null; }
+        if (all == null) return null;
+        String[][] order = "sw".equals(lang)
+                ? new String[][]{{"sw", "KE"}, {"sw", ""}}
+                : new String[][]{{"en", "KE"}, {"sw", "KE"}, {"sw", ""}, {"en", "TZ"}, {"en", "NG"}, {"en", "ZA"}, {"en", "GB"}, {"en", ""}};
+        for (String[] want : order) {
+            android.speech.tts.Voice best = null;
+            for (android.speech.tts.Voice v : all) {
+                Locale l = v.getLocale();
+                if (!want[0].equals(l.getLanguage())) continue;
+                if (!want[1].isEmpty() && !want[1].equals(l.getCountry())) continue;
+                if (v.getFeatures() != null && v.getFeatures().contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED)) continue;
+                if (best == null || (best.isNetworkConnectionRequired() && !v.isNetworkConnectionRequired()) || v.getQuality() > best.getQuality()) best = v;
+            }
+            if (best != null) return best;
+        }
+        return null;
     }
 
     @Override

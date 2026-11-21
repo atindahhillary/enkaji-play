@@ -171,6 +171,7 @@ V.welcome = () => {
   ];
   const peek = ['cattle', 'milk', 'copy'].map(id => GAMES.find(g => g.id === id));
   return `<div class="landing">
+  ${voiceTip()}
   <section class="l-hero">
     <div class="l-copy">
       <div class="l-tag">SUPA! TAKWENYA! · MAASAI MARA</div>
@@ -280,12 +281,35 @@ function animateImpact() {
   io.observe(sec);
 }
 
+// ---------- Kenyan accent tip: shown when this device has no Kenyan / East African voice ----------
+function hasKenyanVoice() { return window.EnkajiApp ? EnkajiApp.kenyan() : (VOICE.kenyan('en') || VOICE.kenyan('sw')); }
+function voiceTip() {
+  const action = window.EnkajiApp
+    ? '<button class="btn" data-vt-fix>Add a Kenyan voice</button>'
+    : '<a class="btn" href="#/mothers" data-vt-how>How to fix</a>';
+  return `<div class="voice-tip" data-voicetip hidden><span>🇰🇪</span><div><b>Hear it in a Kenyan accent.</b> This device has no Kenyan voice yet.</div>${action}<button class="vt-x" data-vt-x aria-label="Hide">✕</button></div>`;
+}
+// One click handler for the tip's buttons (no inline handlers).
+document.addEventListener('click', e => {
+  if (e.target.closest('[data-vt-fix]')) window.EnkajiApp && EnkajiApp.openVoiceSettings();
+  if (e.target.closest('[data-vt-how]')) setTimeout(() => document.querySelector('[data-voice]')?.scrollIntoView({ block: 'center' }), 400);
+  const x = e.target.closest('[data-vt-x]');
+  if (x) { try { localStorage.setItem('enkaji-vt', '1'); } catch {} x.parentElement.hidden = true; }
+});
+function showVoiceTip() {
+  const t = document.querySelector('[data-voicetip]'); if (!t) return;
+  let hidden = false; try { hidden = localStorage.getItem('enkaji-vt') === '1'; } catch {}
+  const check = () => { t.hidden = hidden || hasKenyanVoice(); };
+  check(); setTimeout(check, 900); // browser voices load a moment after the page
+}
+
 V.home = () => {
   const d = today(), pick = ACTIVITIES[new Date().getDate() % ACTIVITIES.length];
   // Goal: one screen game AND one real brick activity a day (screens are a treat, bricks are the teacher).
   const g1 = (S.played[d] || []).length > 0, g2 = (S.doneOn || {})[d] > 0, gn = g1 + g2;
   const role = (r, href, av, t, say) => `<a class="card role ${S.role === r ? 'on' : ''}" href="${href}" data-role="${r}">${av}<b>${t}</b>${listenBtn(say, 'en', '🔊')}</a>`;
   return `
+  ${voiceTip()}
   <section class="who"><h2>Who is using the phone?</h2>
     <div class="roles">
       ${role('child', '#/games', AV('girl', 'A child', '#e1f5fe'), 'A child', 'A child wants to play. Go to the games.')}
@@ -469,7 +493,13 @@ V.mothers.after = () => {
   document.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { V.mothers.track = b.dataset.t; render(); });
   const voiceNote = () => {
     const v = $('[data-voice]'); if (!v) return;
-    if (window.EnkajiApp) { v.innerHTML = `The app speaks with this phone's voices: <b>${esc(EnkajiApp.voice('en'))}</b> and <b>${esc(EnkajiApp.voice('sw'))}</b>. To add Swahili, open the phone's Settings, then Text-to-speech.`; return; }
+    if (window.EnkajiApp) {
+      const ke = EnkajiApp.kenyan();
+      v.innerHTML = `This phone reads English with <b>${esc(EnkajiApp.voice('en'))}</b> and Swahili with <b>${esc(EnkajiApp.voice('sw'))}</b>. ` +
+        (ke ? '🎉 A Kenyan / East African voice is in use.' : 'No Kenyan voice yet, so the accent is not Kenyan. Tap below, choose <b>Google Speech Services</b>, then <b>Install voice data</b> and add <b>Swahili</b> (or English, Kenya).') +
+        (ke ? '' : '<br><button class="btn" style="margin-top:10px" onclick="EnkajiApp.openVoiceSettings()">🇰🇪 Add a Kenyan voice</button>');
+      return;
+    }
     const l = VOICE.label(), ke = VOICE.kenyan('en') || VOICE.kenyan('sw');
     v.innerHTML = `This phone speaks English with <b>${esc(l.en)}</b> and Swahili with <b>${esc(l.sw)}</b>. ` +
       (ke ? '🎉 A Kenyan voice was found! English is read in an East African accent.' : 'No Kenyan voice on this phone yet. For a Kenyan accent, open the site in <b>Microsoft Edge</b> (it has Kenyan English and Swahili voices), or add <b>Swahili</b> in your phone\'s Text-to-speech settings.');
@@ -568,7 +598,7 @@ function render() {
   $('#view').innerHTML = view(arg);
   view.after && view.after(arg);
   if (typeof syncInstall === 'function') syncInstall();
-  animateImpact();
+  animateImpact(); showVoiceTip();
   const navKey = { welcome: 'home', activity: 'activities', game: 'games', story: 'stories', module: 'training', cards: 'training', bricks: 'home' }[r] || r;
   document.querySelectorAll('#nav a').forEach(a => { const on = a.dataset.r === navKey; a.classList.toggle('on', on); on ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'); });
 }

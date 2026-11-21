@@ -382,3 +382,9 @@ svg.avatar { border-radius: 50%; display: block; aspect-ratio: 1; }
 @media (max-width: 900px) { .impact-grid { grid-template-columns: 1fr; } }
 .age-bar i.legal em { bottom: auto; top: 24px; }
 .age-bar { margin-bottom: 40px; }
+
+/* Kenyan accent tip */
+.voice-tip { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #fff8e1; border: 2px solid #2a1a12; border-radius: 16px; padding: 10px 14px; margin-bottom: 14px; }
+.voice-tip > span { font-size: 1.6rem; } .voice-tip > div { flex: 1; min-width: 180px; }
+.voice-tip[hidden] { display: none; }
+.vt-x { border: 0; background: none; font-size: 1.1rem; min-width: 44px; min-height: 44px; }
