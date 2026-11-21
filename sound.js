@@ -118,8 +118,33 @@ const REC = (() => {
   };
 })();
 
+// Sanau's recorded script lines: look up a line by its exact text.
+let LINE_BY_TEXT = null, lineAudio = null;
+function lineKey(text) {
+  if (typeof VOICE_SCRIPT === 'undefined' || typeof SANAU_LINES === 'undefined' || !SANAU_LINES.size) return null;
+  if (!LINE_BY_TEXT) {
+    LINE_BY_TEXT = {};
+    VOICE_SCRIPT.forEach(p => p.lines.forEach(([k, t]) => { LINE_BY_TEXT[t] = k; }));
+    if (typeof STORIES !== 'undefined') STORIES.forEach(s => s.pages.forEach((p, i) => { LINE_BY_TEXT[p.en] = STORY_LINE_KEY(s.id, i, 'en'); LINE_BY_TEXT[p.sw] = STORY_LINE_KEY(s.id, i, 'sw'); }));
+  }
+  const k = LINE_BY_TEXT[text];
+  return k && SANAU_LINES.has(k) ? k : null;
+}
+// Plays Sanau's clip for this text if recorded. Returns true if it is playing.
+function playLine(text, onend, retry) {
+  const k = lineKey(text); if (!k || !SND.on) return false;
+  stopSpeech();
+  const a = lineAudio = new Audio(`voice/${k}.mp3`);
+  let done = false; const fin = () => { if (!done) { done = true; onend && onend(); } };
+  // A missing or broken clip falls back to the phone voice (and is not tried again).
+  const fail = () => { if (done) return; done = true; SANAU_LINES.delete(k); retry ? retry() : onend && onend(); };
+  a.onended = fin; a.onerror = fail; a.play().catch(fail);
+  return true;
+}
+
 // Stop any speech: the browser's, or Android's when running inside the app.
-function stopSpeech() { try { window.speechSynthesis && speechSynthesis.cancel(); } catch {} try { window.EnkajiApp && EnkajiApp.stop(); } catch {} }
+function stopSpeech() {
+  try { if (lineAudio) { lineAudio.onended = lineAudio.onerror = null; lineAudio.pause(); lineAudio = null; } } catch {} try { window.speechSynthesis && speechSynthesis.cancel(); } catch {} try { window.EnkajiApp && EnkajiApp.stop(); } catch {} }
 
 // Play Sanau's recorded clip for a Maa word, if there is one. Resolves to the Audio, or false.
 function playSanau(k) {

@@ -102,6 +102,7 @@ const PRON = [
 ];
 function speak(text, lang = 'en', onend) {
   if (!SND.on) { onend && onend(); return; }
+  if (playLine(text, onend, () => speak(text, lang, onend))) return; // Sanau's real voice, when this line is recorded
   if (lang === 'en') text = PRON.reduce((t, [re, say]) => t.replace(re, say), text);
   if (window.EnkajiApp) { // Android app: native TextToSpeech (Android WebView has no Web Speech API)
     const id = 'u' + (++speak.n); speak.cb[id] = onend;

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recording script for Sanau</title>
+<style>
+  body { font-family: Inter, system-ui, sans-serif; color: #2b1d16; background: #fff8ef; max-width: 760px; margin: auto; padding: 22px; line-height: 1.5; }
+  h1 { font-size: 1.7rem; margin: 0 0 6px; } h2 { margin: 26px 0 8px; font-size: 1.2rem; color: #B71C1C; }
+  .how { background: #fff; border: 2px solid #2b1d16; border-radius: 16px; padding: 14px 18px; }
+  ol { padding-left: 2.2em; } li { padding: 7px 0; border-bottom: 1px dashed #e7d9c4; font-size: 1.12rem; }
+  li small { color: #8a7a6a; font-size: .8rem; margin-left: 8px; }
+  .tag { display: inline-block; font-size: .72rem; font-weight: 800; padding: 1px 7px; border-radius: 6px; background: #e3f2fd; margin-left: 8px; vertical-align: 2px; }
+  @media print { body { background: #fff; } .how { border-width: 1px; } li { break-inside: avoid; } }
+</style></head>
+<body>
+<h1>Recording script for Sanau</h1>
+<p>Enkaji Play speaks to children and mothers in the Maasai Mara. These lines will be played in <b>your voice</b> instead of a computer voice, so children hear a real Kenyan accent.</p>
+<div class="how"><b>How to record (about 10 minutes)</b>
+  <ol style="margin:6px 0 0">
+    <li>Find a quiet place, with no radio, animals or wind. Indoors is best.</li>
+    <li>Use the phone's voice recorder (or a WhatsApp voice note). Hold the phone a hand's width from your mouth.</li>
+    <li>Read each line once, in a warm, friendly voice, as if talking to a child. Then <b>stay quiet for 2 seconds</b> before the next line.</li>
+    <li>Do not say the numbers. If you make a mistake, pause, then say the line again.</li>
+    <li>You can record each part as a separate file. Send the files back.</li>
+  </ol>
+</div>
+<div id="script"></div>
+<script src="../data.js"></script><script src="../art.js"></script><script src="../voicelines.js"></script>
+<script>
+  let n = 0;
+  const row = (t, lang) => `<li>${t}<span class="tag">${lang === 'sw' ? 'Kiswahili' : lang === 'en' ? 'English' : 'Maa'}</span></li>`;
+  let html = VOICE_SCRIPT.map(p => `<h2>${p.part}</h2><ol start="${n + 1}">${p.lines.map(([, t, l]) => (n++, row(t, l))).join('')}</ol>`).join('');
+  html += `<h2>Part 3. Stories in English (one line per page)</h2><ol start="${n + 1}">` + STORIES.flatMap(s => s.pages.map(p => (n++, row(p.en, 'en')))).join('') + '</ol>';
+  html += `<h2>Part 4. Stories in Kiswahili (one line per page)</h2><ol start="${n + 1}">` + STORIES.flatMap(s => s.pages.map(p => (n++, row(p.sw, 'sw')))).join('') + '</ol>';
+  html += `<p style="margin-top:20px"><b>${n} lines in total.</b> Ashe oleng, Sanau!</p>`;
+  document.getElementById('script').innerHTML = html;
+</script>
+</body></html>

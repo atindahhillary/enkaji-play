@@ -32,7 +32,7 @@ jobs:
           W=android/app/src/main/assets/www
           mkdir -p "$W" android/app/src/main/res/mipmap-xxxhdpi
           rsync -a --exclude '.git' --exclude '.github' --exclude 'android' --exclude 'tools' \
-            --exclude 'check.js' --exclude 'voice/review.html' --exclude '.vercel*' --exclude '*.md' ./ "$W/"
+            --exclude 'check.js' --exclude 'voice/review.html' --exclude 'voice/script.html' --exclude '.vercel*' --exclude '*.md' ./ "$W/"
           cp icon-192.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
           du -sh "$W"
 

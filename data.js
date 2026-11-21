@@ -385,4 +385,6 @@ NUMBERS.forEach(n => { MAA['n' + n.n] = { w: n.maa, say: n.maa.toLowerCase().rep
 // Real Maa pronunciations recorded by Sanau: voice/<key>.mp3 for each MAA key below.
 const SANAU = new Set(['n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'cow', 'goat', 'sheep', 'red', 'orange', 'green', 'blue', 'sky', 'yellow']);
 // Brick colour -> MAA key, so every colour can be heard in Maa.
+// Script lines Sanau has recorded (voice/<key>.mp3, keys from voicelines.js). Empty until the recording arrives.
+const SANAU_LINES = new Set([]);
 const BRICK_MAA = { r: 'red', o: 'orange', g: 'green', b: 'blue', p: 'sky', y: 'yellow' };
