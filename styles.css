@@ -1,12 +1,16 @@
 :root {
   color-scheme: light;
-  --bg: #fff8ef; --card: #fff; --ink: #2b1d16; --mute: #6d5d50; --line: #f0e3cf;
+  /* Golden-hour Mara: sand and dust tones, warm cards */
+  --bg: #f8ead2; --card: #fffaf1; --ink: #2b1d16; --mute: #6a5848; --line: #ebd3a8;
   --brand: #1565C0; --brand2: #29B6F6; --pink: #E53935; --red: #c62828; --shuka: #d32f2f;
   --r: #E53935; --o: #FB8C00; --y: #FDD835; --g: #43A047; --b: #1E88E5; --sky: #29B6F6;
   --rad: 22px; --sh: 0 6px 20px rgba(90, 45, 10, .09);
 }
 * { box-sizing: border-box; }
-body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--ink); display: flex; min-height: 100vh; }
+body { margin: 0; font-family: Inter, system-ui, sans-serif; background: linear-gradient(180deg, #fbefd9 0%, var(--bg) 40%, #f1d9ad 100%) fixed var(--bg); color: var(--ink); display: flex; min-height: 100vh; }
+/* The Mara horizon under the bead strip on every page: hills, thatched huts, acacias, cattle. */
+.horizon { height: 64px; margin: -18px -28px 18px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 64' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23a9cde0'/%3E%3Cstop offset='1' stop-color='%23f9d79a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='64' fill='url(%23s)'/%3E%3Ccircle cx='640' cy='40' r='14' fill='%23ffb74d'/%3E%3Cpath d='M0 46 L80 30 L150 40 L260 18 L350 38 L420 28 L520 42 L620 22 L720 36 L800 30 V64 H0Z' fill='%23a5b4c2'/%3E%3Cpath d='M0 54 Q200 44 400 52 T800 50 V64 H0Z' fill='%23d9ad62'/%3E%3Cg fill='%23cfa45a' stroke='%232a1a12' stroke-width='1.2'%3E%3Cpath d='M60 52 L74 38 L88 52Z'/%3E%3Cpath d='M92 53 L102 43 L112 53Z'/%3E%3C/g%3E%3Cpath d='M300 52 V40 M286 40 Q300 33 314 40Z' stroke='%235d4037' stroke-width='2' fill='%23788f3c'/%3E%3Cg fill='%235d4037'%3E%3Cellipse cx='540' cy='52' rx='7' ry='3.5'/%3E%3Cellipse cx='562' cy='53' rx='6' ry='3'/%3E%3Cellipse cx='700' cy='54' rx='6' ry='3'/%3E%3C/g%3E%3C/svg%3E") center / 100% 100% no-repeat; border-bottom: 3px solid #c99a4e; }
+@media (max-width: 760px) { .horizon { margin: -18px -14px 14px; height: 48px; } }
 h1, h2, h3 { letter-spacing: -.03em; line-height: 1.1; margin: 0 0 .4em; font-weight: 900; }
 h1 { font-size: clamp(1.7rem, 4vw, 2.6rem); } h2 { font-size: 1.4rem; } h3 { font-size: 1.08rem; font-weight: 800; }
 p { line-height: 1.55; margin: 0 0 .8em; }

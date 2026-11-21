@@ -344,47 +344,47 @@ const BADGES = [
   ...MODULES.map(m => ({ id: 'mod' + m.id, t: 'Facilitator: ' + m.t, icon: '🎓', how: 'Pass the Session ' + m.id + ' quiz', fac: true })),
 ];
 
-// Maa words used in games. 'say' is a Swahili-style respelling the sw-KE voice can pronounce.
-// Confidence: H checked against Maa sources, M likely, U ask the mothers. Mothers can record the real sound on the Mothers page.
+// Maa words, spoken only in Sanau's voice (voice/<key>.mp3) and spelled as on Sanau's recording script.
+// Colours are spelled as Sanau says them in the stories. Mama's own recording, if she makes one, plays first.
 const MAA = {
-  cow: { w: 'Enkiteng', say: 'enkiteng', en: 'cow', sw: "ng'ombe", c: 'H' },
-  cattle: { w: 'Inkishu', say: 'inkishu', en: 'cattle', sw: "ng'ombe", c: 'M' },
-  calf: { w: 'Enkashe', say: 'enkashe', en: 'calf', sw: 'ndama', c: 'M' },
-  goat: { w: 'Enkine', say: 'enkine', en: 'goat', sw: 'mbuzi', c: 'H' },
-  sheep: { w: 'Enkerr', say: 'enker', en: 'sheep', sw: 'kondoo', c: 'H' },
-  enkang: { w: 'Enkang', say: 'enkang', en: 'homestead', sw: 'boma', c: 'H' },
-  house: { w: 'Enkaji', say: 'enkaji', en: 'house', sw: 'nyumba', c: 'H' },
-  water: { w: 'Enkare', say: 'enkare', en: 'water', sw: 'maji', c: 'H' },
-  milk: { w: 'Kule', say: 'kule', en: 'milk', sw: 'maziwa', c: 'H' },
-  beads: { w: 'Isaen', say: 'isaen', en: 'beads', sw: 'shanga', c: 'M' },
-  red: { w: 'Nanyokie', say: 'nanyokie', en: 'red', sw: 'nyekundu', c: 'M' },
-  // Colours Sanau recorded. w = null until the Maa spelling is confirmed; the sound is Sanau's.
-  orange: { w: null, say: 'orange', en: 'orange', sw: 'rangi ya chungwa', c: 'S' },
-  green: { w: null, say: 'kijani', en: 'green', sw: 'kijani', c: 'S' },
-  blue: { w: null, say: 'bluu', en: 'blue', sw: 'bluu', c: 'S' },
-  sky: { w: null, say: 'samawati', en: 'light blue', sw: 'samawati', c: 'S' },
-  yellow: { w: null, say: 'njano', en: 'yellow', sw: 'njano', c: 'S' },
-  white: { w: 'Naibor', say: 'naibor', en: 'white', sw: 'nyeupe', c: 'H' },
-  black: { w: 'Narok', say: 'narok', en: 'black', sw: 'nyeusi', c: 'H' },
-  good: { w: 'Sidai oleng!', say: 'sidai oleng', en: 'very good', sw: 'vizuri sana', c: 'M' },
-  mother: { w: 'Yeyo', say: 'yeyo', en: 'mother', sw: 'mama', c: 'H' },
-  koko: { w: 'Koko', say: 'koko', en: 'grandmother', sw: 'bibi', c: 'H' },
-  child: { w: 'Enkerai', say: 'enkerai', en: 'child', sw: 'mtoto', c: 'H' },
-  yes: { w: 'Ee', say: 'ee', en: 'yes', sw: 'ndiyo', c: 'H' },
-  look: { w: 'Tadua!', say: 'tadua', en: 'look', sw: 'ona', c: 'M' },
-  come: { w: 'Wou!', say: 'wou', en: 'come', sw: 'njoo', c: 'M' },
-  thanks: { w: 'Ashe oleng', say: 'ashe oleng', en: 'thank you very much', sw: 'asante sana', c: 'H' },
-  hello: { w: 'Takwenya', say: 'takwenya', en: 'hello (to a woman)', sw: 'habari mama', c: 'H' },
-  iko: { w: 'Iko', say: 'eko', en: 'reply to Takwenya', sw: 'salama', c: 'H' },
-  supa: { w: 'Supa', say: 'supa', en: 'hello (to one person)', sw: 'hujambo', c: 'H' },
-  supaAll: { w: 'Entasupai', say: 'entasupai', en: 'hello (to a group)', sw: 'hamjambo', c: 'M' },
-  bye: { w: 'Sere', say: 'sere', en: 'goodbye', sw: 'kwaheri', c: 'M' },
+  cow: { w: 'Enkiteng', en: 'cow', sw: "ng'ombe" },
+  cattle: { w: 'Inkishu', en: 'cattle', sw: "ng'ombe" },
+  calf: { w: 'Enkashe', en: 'calf', sw: 'ndama' },
+  goat: { w: 'Enkine', en: 'goat', sw: 'mbuzi' },
+  sheep: { w: 'Enkerr', en: 'sheep', sw: 'kondoo' },
+  enkang: { w: 'Enkang', en: 'homestead', sw: 'boma' },
+  house: { w: 'Enkaji', en: 'house', sw: 'nyumba' },
+  water: { w: 'Enkare', en: 'water', sw: 'maji' },
+  milk: { w: 'Kule', en: 'milk', sw: 'maziwa' },
+  beads: { w: 'Isaen', en: 'beads', sw: 'shanga' },
+  red: { w: 'Olonyokie', en: 'red', sw: 'nyekundu' },
+  orange: { w: 'Oloyara', en: 'orange', sw: 'rangi ya chungwa' },
+  green: { w: 'Olonyori', en: 'green', sw: 'kijani' },
+  blue: { w: 'Olpus', en: 'blue', sw: 'bluu' },
+  sky: { w: 'Olpus onuko', en: 'light blue', sw: 'samawati' },
+  yellow: { w: 'Osigitoi', en: 'yellow', sw: 'njano' },
+  white: { w: 'Naibor', en: 'white', sw: 'nyeupe' },
+  black: { w: 'Narok', en: 'black', sw: 'nyeusi' },
+  good: { w: 'Sidai oleng!', en: 'very good', sw: 'vizuri sana' },
+  mother: { w: 'Yeyo', en: 'mother', sw: 'mama' },
+  koko: { w: 'Koko', en: 'grandmother', sw: 'bibi' },
+  child: { w: 'Enkerai', en: 'child', sw: 'mtoto' },
+  yes: { w: 'Ee', en: 'yes', sw: 'ndiyo' },
+  look: { w: 'Tadua!', en: 'look', sw: 'ona' },
+  come: { w: 'Wou!', en: 'come', sw: 'njoo' },
+  thanks: { w: 'Ashe oleng', en: 'thank you very much', sw: 'asante sana' },
+  hello: { w: 'Takwenya', en: 'hello (to a woman)', sw: 'habari mama' },
+  iko: { w: 'Iko', en: 'reply to Takwenya', sw: 'salama' },
+  supa: { w: 'Supa', en: 'hello (to one person)', sw: 'hujambo' },
+  supaAll: { w: 'Entasupai', en: 'hello (to a group)', sw: 'hamjambo' },
+  bye: { w: 'Sere', en: 'goodbye', sw: 'kwaheri' },
 };
-NUMBERS.forEach(n => { MAA['n' + n.n] = { w: n.maa, say: n.maa.toLowerCase().replace("'", ''), en: n.en.toLowerCase(), sw: n.sw.toLowerCase(), c: 'H' }; });
+NUMBERS.forEach(n => { MAA['n' + n.n] = { w: n.maa, en: n.en.toLowerCase(), sw: n.sw.toLowerCase() }; });
 
-// Real Maa pronunciations recorded by Sanau: voice/<key>.mp3 for each MAA key below.
-const SANAU = new Set(['n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'cow', 'goat', 'sheep', 'red', 'orange', 'green', 'blue', 'sky', 'yellow']);
+// Every Maa word above has Sanau's recording.
+const SANAU = new Set(Object.keys(MAA));
+// Script lines Sanau recorded (voice/<key>.mp3, keys from voicelines.js): game lines and story pages
+// in English and Kiswahili, plus Sanau's Maa version of each (<key>_maa), played in Maa mode.
+const SANAU_LINES = new Set(["p_welldone", "p_hongera", "p_welldone_maa", "p_tryagain", "p_jaribu", "p_tryagain_maa", "p_pole", "p_pole_maa", "p_asante", "p_asante_maa", "p_sawa", "p_sawa_maa", "p_aii", "p_aii_maa", "p_listen", "p_listen_maa", "p_lookcolours", "p_lookcolours_maa", "p_buildit", "p_buildit_maa", "p_coming", "p_coming_maa", "p_countme", "p_countme_maa", "p_howmanyhome", "p_howmanyhome_maa", "p_howmanynow", "p_howmanynow_maa", "p_beadnext", "p_beadnext_maa", "p_harvest", "p_harvest_maa", "p_drumlisten", "p_drumlisten_maa", "p_yourturn", "p_yourturn_maa", "p_thirsty", "p_thirsty_maa", "p_bug", "p_bug_maa", "p_jenga", "p_jenga_maa", "p_sikiliza", "p_sikiliza_maa", "p_starts", "p_starts_maa", "p_letsplay", "p_letsplay_maa", "s_sixbricks_1_en", "s_sixbricks_1_maa", "s_sixbricks_2_en", "s_sixbricks_2_maa", "s_sixbricks_3_en", "s_sixbricks_3_maa", "s_sixbricks_4_en", "s_sixbricks_4_maa", "s_sixbricks_5_en", "s_sixbricks_5_maa", "s_sixbricks_6_en", "s_sixbricks_6_maa", "s_lostcalf_1_en", "s_lostcalf_1_maa", "s_lostcalf_2_en", "s_lostcalf_2_maa", "s_lostcalf_3_en", "s_lostcalf_3_maa", "s_lostcalf_4_en", "s_lostcalf_4_maa", "s_lostcalf_5_en", "s_lostcalf_5_maa", "s_mamabeads_1_en", "s_mamabeads_1_maa", "s_mamabeads_2_en", "s_mamabeads_2_maa", "s_mamabeads_3_en", "s_mamabeads_3_maa", "s_mamabeads_4_en", "s_mamabeads_4_maa", "s_littleseed_1_en", "s_littleseed_1_maa", "s_littleseed_2_en", "s_littleseed_2_maa", "s_littleseed_3_en", "s_littleseed_3_maa", "s_littleseed_4_en", "s_littleseed_4_maa", "s_sixbricks_1_sw", "s_sixbricks_2_sw", "s_sixbricks_3_sw", "s_sixbricks_4_sw", "s_sixbricks_5_sw", "s_sixbricks_6_sw", "s_lostcalf_1_sw", "s_lostcalf_2_sw", "s_lostcalf_3_sw", "s_lostcalf_4_sw", "s_lostcalf_5_sw", "s_mamabeads_1_sw", "s_mamabeads_2_sw", "s_mamabeads_3_sw", "s_mamabeads_4_sw", "s_littleseed_1_sw", "s_littleseed_2_sw", "s_littleseed_3_sw", "s_littleseed_4_sw"]);
 // Brick colour -> MAA key, so every colour can be heard in Maa.
-// Script lines Sanau has recorded (voice/<key>.mp3, keys from voicelines.js). Empty until the recording arrives.
-const SANAU_LINES = new Set([]);
 const BRICK_MAA = { r: 'red', o: 'orange', g: 'green', b: 'blue', p: 'sky', y: 'yellow' };

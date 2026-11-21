@@ -121,18 +121,22 @@ function lambSVG(cls = '') {
 }
 
 // ---------- Scene kit (800 x 450) ----------
-const SKY = { day: ['#8fd3f7', '#e9f7ff'], sunset: ['#f7934a', '#ffd79a'], night: ['#16224d', '#3b4a86'], dawn: ['#f9b38f', '#fff0d6'] };
+// Golden-hour Mara: soft blue sky melting into gold at the horizon (no purple anywhere).
+const SKY = { day: ['#8cc4e0', '#f8dca2'], golden: ['#7fb6d6', '#fbd08a'], sunset: ['#f7934a', '#ffd79a'], night: ['#16224d', '#3b4a86'], dawn: ['#f9b38f', '#fff0d6'] };
+const SUN = { day: [660, 80, 38, '#ffd54f'], golden: [630, 196, 44, '#ffb74d'] };
 function sky(t = 'day') {
-  const [a, b] = SKY[t], id = uid('sk'), night = t === 'night';
+  const [a, b] = SKY[t], id = uid('sk'), night = t === 'night', [sx0, sy0, sr, sc] = SUN[t] || [400, 230, 66, '#ff7043'];
   const sun = night ? `<circle cx="660" cy="80" r="30" fill="#fff6c9" stroke="${INK}" stroke-width="3"/>${[[120, 60], [300, 40], [480, 90], [560, 30], [220, 110]].map(([sx, sy]) => sparkle(sx, sy, .7, '#fff8d0')).join('')}`
-    : `<g class="spin-slow" style="transform-origin:${t === 'day' ? '660px 80px' : '400px 230px'}">${Array.from({ length: 12 }, (_, i) => { const ang = i * Math.PI / 6, cx = t === 'day' ? 660 : 400, cy = t === 'day' ? 80 : 230, r = t === 'day' ? 48 : 78; return `<path d="M${cx + Math.cos(ang) * r} ${cy + Math.sin(ang) * r} L${cx + Math.cos(ang) * (r + 14)} ${cy + Math.sin(ang) * (r + 14)}" stroke="#f9a825" stroke-width="5" stroke-linecap="round"/>`; }).join('')}</g>
-      <circle cx="${t === 'day' ? 660 : 400}" cy="${t === 'day' ? 80 : 230}" r="${t === 'day' ? 38 : 66}" fill="${t === 'day' ? '#ffd54f' : '#ff7043'}" stroke="${INK}" stroke-width="3"/>`;
+    : `<g class="spin-slow" style="transform-origin:${sx0}px ${sy0}px">${Array.from({ length: 12 }, (_, i) => { const ang = i * Math.PI / 6, r = sr + 10; return `<path d="M${sx0 + Math.cos(ang) * r} ${sy0 + Math.sin(ang) * r} L${sx0 + Math.cos(ang) * (r + 14)} ${sy0 + Math.sin(ang) * (r + 14)}" stroke="#f9a825" stroke-width="5" stroke-linecap="round"/>`; }).join('')}</g>
+      <circle cx="${sx0}" cy="${sy0}" r="${sr}" fill="${sc}" stroke="${INK}" stroke-width="3"/>`;
   const cloud = (cx, cy, k) => night ? '' : `<g class="drift" transform="translate(${cx} ${cy}) scale(${k})"><path d="M-40 10 q-10 -24 14 -26 q8 -22 34 -12 q24 -8 30 16 q18 4 10 22z" fill="#fff" stroke="${INK}" stroke-width="2.5"/></g>`;
-  const far = night ? '#2f3a2c' : '#d8bf74', near = night ? '#26301f' : '#e6cf86';
+  const far = night ? '#2f3a2c' : '#d6a95c', near = night ? '#26301f' : '#e7c27c';
+  // Distant blue-grey hills of the Mara escarpment behind the plain.
+  const hills = night ? '' : `<path d="M0 262 L90 226 L170 246 L300 188 L400 236 L470 214 L560 244 L660 200 L800 240 V300 H0Z" fill="#9fb0bf" stroke="${INK}" stroke-width="2"/><path d="M0 262 L90 226 L170 246 L300 188 L400 236 L470 214 L560 244 L660 200 L800 240" fill="none" stroke="#c7d3dc" stroke-width="5" stroke-linejoin="round" opacity=".7"/>`;
   const tufts = night ? '' : Array.from({ length: 14 }, (_, i) => { const gx = 30 + i * 56, gy = 330 + (i % 3) * 30; return `<path d="M${gx} ${gy} l-5 -12 M${gx} ${gy} l0 -15 M${gx} ${gy} l6 -12" stroke="#9c8a3f" stroke-width="2.5" stroke-linecap="round"/>`; }).join('');
   const farTrees = [[90, 262, .45], [700, 258, .5], [520, 266, .35]].map(([fx, fy, fs]) => acacia(fx, fy, fs, true)).join('');
   return `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs>
-    <rect width="800" height="450" fill="url(#${id})"/>${sun}${cloud(170, 70, 1)}${cloud(470, 50, .8)}
+    <rect width="800" height="450" fill="url(#${id})"/>${sun}${cloud(170, 70, 1)}${cloud(470, 50, .8)}${hills}
     <path d="M0 268 q140 -34 280 -8 t300 -14 t220 8 V450 H0Z" fill="${far}" stroke="${INK}" stroke-width="2.5"/>${farTrees}
     <path d="M0 312 q200 -26 400 0 t400 -8 V450 H0Z" fill="${near}" stroke="${INK}" stroke-width="2.5"/>${tufts}`;
 }
@@ -145,10 +149,13 @@ function acacia(x, y, s = 1, far = false) {
   </g></g>`;
 }
 const hut = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})">
-  <ellipse cx="0" cy="0" rx="78" ry="8" fill="rgba(0,0,0,.14)"/>
-  <path d="M-72 0 Q-76 -62 0 -68 Q76 -62 72 0Z" fill="#a1887f" stroke="${INK}" stroke-width="3"/>
-  <path d="M-58 -22 q30 -6 60 0 M-40 -46 q24 -6 50 0 M10 -14 q20 -4 46 0" stroke="#7b5e57" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <path d="M-13 0 V-28 Q0 -38 13 -28 V0Z" fill="#3e2723" stroke="${INK}" stroke-width="2.5"/></g>`;
+  <ellipse cx="0" cy="0" rx="80" ry="8" fill="rgba(0,0,0,.16)"/>
+  <path d="M-58 0 V-52 Q0 -60 58 -52 V0 Q0 6 -58 0Z" fill="#b9814f" stroke="${INK}" stroke-width="3"/>
+  <path d="M-46 -14 q20 -4 34 0 M14 -32 q16 -3 30 0" stroke="#9a6438" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M-80 -46 Q-40 -96 0 -128 Q40 -96 80 -46 Q0 -34 -80 -46Z" fill="#cfa45a" stroke="${INK}" stroke-width="3"/>
+  <path d="M0 -124 L-56 -48 M0 -124 L-28 -42 M0 -124 L0 -40 M0 -124 L28 -42 M0 -124 L56 -48" stroke="#a87d3a" stroke-width="2.5" fill="none"/>
+  <path d="M-80 -46 Q0 -34 80 -46" stroke="#8d6530" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M-14 0 V-34 H14 V0Z" fill="#3e2723" stroke="${INK}" stroke-width="2.5"/></g>`;
 function boma(x, y, w) { let s = ''; for (let i = 0; i <= w; i += 16) s += limb(`M${x + i} ${y} l${((i / 16) % 2 ? 4 : -4)} -42`, '#8d6e63', 4); return s; }
 const sparkle = (x, y, k = 1, col = '#FDD835') => `<g transform="translate(${x} ${y}) scale(${k})"><path class="twinkle" d="M0 -12 Q2 -2 12 0 Q2 2 0 12 Q-2 2 -12 0 Q-2 -2 0 -12Z" fill="${col}" stroke="${INK}" stroke-width="1.8"/></g>`;
 // Thick yellow explainer arrow from (x1,y1) to (x2,y2), drawn on.

@@ -127,7 +127,13 @@ function lineKey(text) {
     VOICE_SCRIPT.forEach(p => p.lines.forEach(([k, t]) => { LINE_BY_TEXT[t] = k; }));
     if (typeof STORIES !== 'undefined') STORIES.forEach(s => s.pages.forEach((p, i) => { LINE_BY_TEXT[p.en] = STORY_LINE_KEY(s.id, i, 'en'); LINE_BY_TEXT[p.sw] = STORY_LINE_KEY(s.id, i, 'sw'); }));
   }
-  const k = LINE_BY_TEXT[text];
+  let k = LINE_BY_TEXT[text];
+  if (window.MAA_MODE) {
+    // Maa mode plays Sanau's Maa version. A longer game line gets the Maa of the script line inside it.
+    if (!k) { const t = Object.keys(LINE_BY_TEXT).find(t => t.length > 8 && text.includes(t)); k = t && LINE_BY_TEXT[t]; }
+    const m = k && (MAA_OF[k] || k.replace(/_(en|sw)$/, '')) + '_maa';
+    if (m && SANAU_LINES.has(m)) return m;
+  }
   return k && SANAU_LINES.has(k) ? k : null;
 }
 // Plays Sanau's clip for this text if recorded. Returns true if it is playing.

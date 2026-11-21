@@ -9,6 +9,15 @@ const DEF = { name: 'Naserian', stars: 0, badges: [], days: [], played: {}, done
 let S;
 try { S = { ...DEF, ...JSON.parse(localStorage.getItem('enkaji') || '{}') }; } catch { S = { ...DEF }; }
 const save = () => { try { localStorage.setItem('enkaji', JSON.stringify(S)); } catch {} };
+// Maa mode: games and stories speak in Sanau's recorded Maa where a Maa line exists.
+window.MAA_MODE = !!S.maa;
+const maaBtn = () => `<button class="listen maa-mode" data-maamode aria-pressed="${MAA_MODE}">🗣️ ${MAA_MODE ? 'Speaking Maa' : 'Speak Maa'}</button>`;
+document.addEventListener('click', e => {
+  if (!e.target.closest('[data-maamode]')) return;
+  S.maa = window.MAA_MODE = !MAA_MODE; save(); stopSpeech();
+  document.querySelectorAll('[data-maamode]').forEach(b => b.outerHTML = maaBtn());
+  toast(MAA_MODE ? 'Maa on: Sanau speaks in Maa' : 'Maa off: English and Kiswahili');
+});
 
 function streak() {
   let n = 0, d = new Date();
@@ -121,7 +130,8 @@ function speak(text, lang = 'en', onend) {
 speak.n = 0; speak.cb = {};
 window.__ttsDone = id => { const f = speak.cb[id]; delete speak.cb[id]; f && f(); };
 // Speak a Maa word: Mama's own recording if there is one, otherwise the Swahili voice.
-function sayMaa(k) { REC.play('maa-' + k).then(a => a || playSanau(k)).then(a => { if (!a && MAA[k]) speak(MAA[k].say, 'sw'); }); }
+// Maa is only ever spoken by a real voice: Mama's own recording, else Sanau's. Never a computer voice.
+function sayMaa(k) { stopSpeech(); REC.play('maa-' + k).then(a => a || playSanau(k)); }
 document.addEventListener('click', e => { const b = e.target.closest('[data-maa]'); if (b) sayMaa(b.dataset.maa); });
 const listenBtn = (text, lang = 'en', label = '🔊 Listen') => `<button class="listen" data-say="${esc(text)}" data-lang="${lang}">${label}</button>`;
 document.addEventListener('click', e => { const b = e.target.closest('[data-say]'); if (b) speak(b.dataset.say, b.dataset.lang); });
@@ -163,8 +173,10 @@ const APK_URL = 'https://github.com/atindahhillary/enkaji-play/releases/download
 const HOOK_EN = 'Supa! Takwenya! Every enkaji is a classroom. Six bricks, five minutes a day, and the best teacher a child will ever have: Mama. Games, stories and activities in Maa, Swahili and English. No reading needed.';
 const HOOK_SW = 'Habari! Kila nyumba ni darasa. Matofali sita, dakika tano kwa siku, na mwalimu bora wa mtoto: Mama. Michezo, hadithi na shughuli kwa Kimaasai, Kiswahili na Kiingereza. Huhitaji kusoma.';
 V.welcome = () => {
-  const hero = scene('dawn', hut(640, 340, 1.1), acacia(130, 330, 1.1), person(300, 410, 1.35, { ...MAMA, point: true }), person(440, 410, 1.25, { ...NASERIAN, wave: true }), person(530, 412, 1.1, LEMAYIAN),
-    `<g transform="translate(340 150)">${['r', 'o', 'g', 'b', 'p', 'y'].map((c, i) => brickSVG(c, i * 40 - 20, Math.abs(i - 2.5) * 9, 8)).join('')}</g>`, sparkle(330, 120, 1.2), sparkle(600, 130), sparkle(250, 200, .8));
+  // Golden hour in the Mara: huts, an acacia, cattle on the plain, and the family playing with bricks on the ground.
+  const hero = scene('golden', hut(90, 318, .8), hut(205, 300, .62), acacia(440, 300, 1.05), cow(660, 300, .42, '#8d5524'), cow(730, 296, .38, '#f2efe6', true), cow(590, 304, .36, '#2b1d16'),
+    person(250, 420, 1.15, { ...MAMA, point: true }), person(500, 422, 1.05, { ...NASERIAN, wave: true }), person(610, 424, .95, LEMAYIAN),
+    `<g transform="translate(330 392)">${['r', 'o', 'g', 'b', 'p', 'y'].map((c, i) => brickSVG(c, i * 34 - 20, (i % 2) * 6, 7)).join('')}</g>`, sparkle(360, 330, 1.1), sparkle(700, 140), sparkle(120, 150, .8));
   const who = [
     ['girl', '#e1f5fe', 'For children', 'Count cows into the boma, copy Koko\'s tower, find the shuka at Talek market. Every game speaks, so little ones can play alone.', '#/games', '▶ Play now'],
     ['mama', '#ffe9d6', 'For Mama', 'Picture and voice guides, no reading needed. Play while you milk, cook and bead. Record Maa words in your own voice.', '#/mothers', 'Start here, Mama'],
@@ -212,7 +224,7 @@ V.welcome.after = () => {
   $('#countMaa').onclick = async () => {
     for (let n = 1; n <= 5; n++) {
       const a = await playSanau('n' + n);
-      if (!a) { speak(NUMBERS.slice(0, 5).map(x => x.maa).join(', '), 'sw'); return; }
+      if (!a) return;
       await new Promise(r => { a.onended = r; a.onerror = r; });
     }
   };
@@ -407,6 +419,7 @@ V.game = id => {
   ${CBE[id] ? `<p class="cbe-tag">📘 ${CBE[id]}</p>` : ''}
   <div class="levels" role="group" aria-label="Level">${LEVELS.map((L, i) => `<button class="lvl-b ${tier === i + 1 ? 'on' : ''}" data-tier="${i + 1}" aria-pressed="${tier === i + 1}">${L.icon} ${L.t} <span class="lvl-bead ${done > i ? 'got' : ''}" style="--bc:${L.bead}" title="${L.beadName} bead"></span></button>`).join('')}</div>
   <div class="lvl-progress" id="lvlProg"></div>
+  <div class="row" style="margin:0 0 10px">${maaBtn()}</div>
   <div class="card gamebox" id="game"></div>`;
 };
 V.game.tier = {};
@@ -428,7 +441,7 @@ V.story = id => {
   const s = STORIES.find(x => x.id === id); if (!s) return V.notfound();
   return `<a href="#/stories" class="mute">← All stories</a><h1 style="margin-top:10px">${s.t}</h1>
   <div class="story-stage" id="stage"><div class="sbox" id="sbox"></div><div class="subs" id="subs" aria-hidden="true"></div><div class="cap" id="cap" aria-live="polite"></div></div>
-  <div class="ctl"><button class="btn alt" id="prev" aria-label="Previous page">◀</button><button class="btn" id="playS">▶ Play story</button><button class="btn alt" id="next" aria-label="Next page">▶</button><button class="listen" id="sayW">🔊 Swahili</button><button class="listen" id="musicB" aria-pressed="true">🎵 Music</button></div>
+  <div class="ctl"><button class="btn alt" id="prev" aria-label="Previous page">◀</button><button class="btn" id="playS">▶ Play story</button><button class="btn alt" id="next" aria-label="Next page">▶</button><button class="listen" id="sayW">🔊 Swahili</button><button class="listen" id="musicB" aria-pressed="true">🎵 Music</button>${maaBtn()}</div>
   <div class="ctl"><div class="dots" id="dots"></div></div>`;
 };
 V.story.after = id => {
@@ -455,7 +468,8 @@ V.story.after = id => {
   $('#next').onclick = () => { stop(); go(1); };
   $('#musicB').onclick = e => { music = !music; e.currentTarget.setAttribute('aria-pressed', music); e.currentTarget.textContent = music ? '🎵 Music' : '🔇 Music'; SND.music(music && auto); };
   $('#playS').onclick = () => { if (auto) return stop(); if (i >= s.pages.length) i = 0; auto = true; $('#playS').textContent = '⏸ Pause'; SND.music(music); show(); step(); };
-  $('#sayW').onclick = () => { const p = s.pages[i]; if (p) speak(p.sw, 'sw'); };
+  // The Swahili button always plays Swahili, even in Maa mode.
+  $('#sayW').onclick = () => { const p = s.pages[i], m = window.MAA_MODE; if (!p) return; window.MAA_MODE = false; speak(p.sw, 'sw'); window.MAA_MODE = m; };
   show();
 };
 
@@ -480,9 +494,9 @@ V.mothers = () => {
   <div class="sec"><h2>Count in three languages</h2></div>
   <div class="card"><div class="grid g5">${NUMBERS.map(n => `<button class="chip" style="padding:12px" data-maa="n${n.n}"><b style="font-size:1.4rem">${n.n}</b><br>${n.maa}<br><span class="mute small">${n.sw} · ${n.en}</span></button>`).join('')}</div><p class="small mute" style="margin:10px 0 0">Tap a number to hear Sanau count in Maa. Spellings vary, so check them with the mothers.</p></div>
   <div class="sec" id="maa-words"><h2>🎙️ Mama's Voice: Maa words</h2><span class="pill">Used in the games</span></div>
-  <div class="card"><p>No phone can speak Maa yet, so the games use a Swahili voice for Maa words. <b>Mama, record each word in your own voice</b> and the games will play YOUR voice to the children. Recordings stay on this phone.</p>
-    <p class="small mute">🎙️ recorded by Sanau, a Maa speaker · ✅ checked in Maa sources · ❔ please check with the mothers in the Maasai Mara. Spellings vary (Purko, Keekonyokie).</p>
-    <div class="grid g3" data-words>${Object.entries(MAA).map(([k, m]) => `<div class="word-row"><div><b>${m.w || '🔊 ' + m.en}</b> ${SANAU.has(k) ? '🎙️' : ''}${m.c === 'H' ? '✅' : m.c === 'S' ? '' : '❔'}<div class="small mute">${m.en} · ${m.sw}</div></div><div class="row" style="gap:6px"><button class="listen" data-maa="${k}" aria-label="Play ${m.w}">🔊</button><button class="listen rec ${REC.has('maa-' + k) ? 'has' : ''}" data-rec="${k}" aria-label="Record ${m.w}">🎙️</button></div></div>`).join('')}</div></div>
+  <div class="card"><p>Every Maa word here is spoken by <b>Sanau</b>, a Maa speaker from the Mara. No computer voice ever speaks Maa. <b>Mama, you can also record each word in your own voice</b> and the games will play YOUR voice to the children. Recordings stay on this phone.</p>
+    <p class="small mute">🎙️ Sanau's voice and spelling. In games and stories, tap <b>🗣️ Speak Maa</b> to hear Sanau say the whole line in Maa.</p>
+    <div class="grid g3" data-words>${Object.entries(MAA).map(([k, m]) => `<div class="word-row"><div><b>${m.w}</b> 🎙️<div class="small mute">${m.en} · ${m.sw}</div></div><div class="row" style="gap:6px"><button class="listen" data-maa="${k}" aria-label="Play ${m.w}">🔊</button><button class="listen rec ${REC.has('maa-' + k) ? 'has' : ''}" data-rec="${k}" aria-label="Record ${m.w}">🎙️</button></div></div>`).join('')}</div></div>
   <div class="card" style="margin-top:12px"><h3>🇰🇪 Kenyan accent</h3><p class="small" style="margin:0" data-voice></p></div>
   <div class="sec"><h2>How we greet in Maa</h2>${listenBtn(GREET_WAYS.map(g => g.t + '. ' + g.p).join(' '), 'en', '🔊')}</div>
   <div class="grid g2">${GREET_WAYS.map(g => `<div class="card"><div class="row" style="justify-content:space-between"><span style="font-size:2rem">${g.icon}</span>${listenBtn(g.t + '. ' + g.p)}</div><h3>${g.t}</h3><p class="mute" style="margin:0">${g.p}</p></div>`).join('')}</div>

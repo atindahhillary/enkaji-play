@@ -41,14 +41,17 @@ function flyTo(node, target, { dur = 520, lift = 90, endScale = .7 } = {}) {
 // Talk in sequence: [{maa:'look'}, {en:'...'}, {sw:'...'}]. Maa plays Mama's recording if one exists.
 async function talk(parts) {
   const id = talk.id = (talk.id || 0) + 1;
+  let saidMaa = false;
   for (const p of parts) {
     if (talk.id !== id) return;
+    // In Maa mode, a Kiswahili line right after a line Sanau said in Maa is a repeat of it, so skip it.
+    if (window.MAA_MODE && p.sw && saidMaa) { saidMaa = false; continue; }
+    saidMaa = !!(window.MAA_MODE && p.en && /_maa$/.test(lineKey(p.en) || ''));
     await new Promise(res => {
       const t = setTimeout(res, 7000); // some speech engines never fire onend
       const done = () => { clearTimeout(t); res(); };
       if (p.maa) {
-        const m = MAA[p.maa];
-        REC.play('maa-' + p.maa).then(a => a || playSanau(p.maa)).then(a => { if (a) { a.onended = done; a.onerror = done; } else speak(m.say, 'sw', done); });
+        REC.play('maa-' + p.maa).then(a => a || playSanau(p.maa)).then(a => { if (a) { a.onended = done; a.onerror = done; } else done(); });
       } else speak(p.sw || p.en, p.sw ? 'sw' : 'en', done);
     });
   }
@@ -186,7 +189,7 @@ const GAME_MOUNT = {
       if (!st.live()) return;
       const C = el.querySelector('[data-c]'), opts = shuffle([n, ...shuffle([n - 2, n - 1, n + 1, n + 2].filter(v => v >= 1 && v <= 10)).slice(0, 2)]);
       C.innerHTML = opts.map((o, i) => `<button class="pop" style="animation-delay:${i * 60}ms" data-n="${o}">${o}</button>`).join('');
-      st.say('Sasa, how many cows have come home?', [{ en: 'Sasa, how many cows have come home?' }]);
+      st.say('So, how many cows came home?', [{ en: 'So, how many cows came home?' }]);
       C.querySelectorAll('button').forEach(b => b.onclick = async () => {
         if (busy) return;
         if (+b.dataset.n !== n) { restart(b, 'wiggle'); SND.play('no'); st.say('Count again, touch each cow.', [{ sw: 'Hesabu tena.' }]); return; }

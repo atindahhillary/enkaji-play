@@ -24,5 +24,7 @@ const VOICE_SCRIPT = [
     ['p_letsplay', 'Let’s play and learn!', 'en'],
   ] },
 ];
+// Sanau said one Maa line for each English + Kiswahili pair; a Kiswahili key points to its English partner's Maa clip (<key>_maa).
+const MAA_OF = { p_hongera: 'p_welldone', p_jaribu: 'p_tryagain' };
 // Story pages are recorded too (Part 3 in English, Part 4 in Kiswahili); keys are built from the story id and page.
 const STORY_LINE_KEY = (storyId, page, lang) => `s_${storyId.replace(/-/g, '')}_${page + 1}_${lang}`;
