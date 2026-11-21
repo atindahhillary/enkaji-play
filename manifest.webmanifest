@@ -1,11 +1,25 @@
 {
+  "id": "./",
   "name": "Enkaji Play: Six Bricks in the Mara",
   "short_name": "Enkaji Play",
-  "description": "Learning through play with Six Bricks for facilitators and Mothers Who Teach in Sekenani.",
+  "description": "Learning through play with Six Bricks for children, Mothers Who Teach and facilitators in the Maasai Mara. Works offline.",
+  "lang": "en-KE",
   "start_url": "./#/home",
   "scope": "./",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#fff8ef",
   "theme_color": "#c62828",
-  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+  "categories": ["education", "kids"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Games", "url": "./#/games", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "Mama", "url": "./#/mothers", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "Training", "url": "./#/training", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
+  ]
 }

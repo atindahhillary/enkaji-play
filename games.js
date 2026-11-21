@@ -1,4 +1,4 @@
-// Six animated games set in Sekenani life. Each mount(el, api) draws into el.
+// Six animated games set in the Maasai Mara life. Each mount(el, api) draws into el.
 // Shared motion language (Playful): pop / drop-squash / hop / wiggle / flyTo / burst, ease-out-back.
 // Every timer checks el.isConnected, so nothing keeps talking after the child leaves the page.
 

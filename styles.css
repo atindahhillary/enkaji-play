@@ -309,3 +309,46 @@ img.lamb { display: block; width: 100%; height: auto; }
 svg.avatar { border-radius: 50%; display: block; aspect-ratio: 1; }
 .side-lamb .lamb { width: 76px; } .keep .lamb { width: 96px; flex: none; } .empty .lamb { width: 96px; margin: 0 auto 6px; }
 .bk-wrap { display: flex; flex-direction: column; gap: 6px; } .bk-wrap .bk { flex: 1; } .bk-wrap .listen { align-self: stretch; }
+
+/* ===== Landing page ===== */
+.landing { display: block; }
+.l-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 28px; align-items: center; padding: 10px 0 6px; }
+.l-tag { font-weight: 800; letter-spacing: .08em; font-size: .85rem; color: var(--r-dk); }
+.l-hero h1 { font-size: clamp(2.3rem, 5.4vw, 3.9rem); letter-spacing: -.045em; margin: 8px 0 12px; }
+.l-sub { font-size: 1.15rem; max-width: 520px; }
+.l-ctas { display: flex; gap: 10px; flex-wrap: wrap; }
+.l-art { border-radius: 26px; overflow: hidden; border: 3px solid #2a1a12; box-shadow: 0 14px 30px rgba(90,45,10,.18); background: #fff; }
+.l-art .scene { display: block; width: 100%; height: auto; }
+.l-stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin: 26px 0 6px; }
+.l-stats div { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 14px 8px; text-align: center; box-shadow: var(--sh); }
+.l-stats b { display: block; font-size: 1.8rem; font-weight: 900; color: var(--brand); }
+.l-stats span { font-size: .85rem; color: var(--mute); font-weight: 600; }
+.l-who { text-decoration: none; color: var(--ink); display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.l-who .avatar { width: 84px; } .l-who .btn { margin-top: auto; }
+.l-num { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; font-weight: 900; font-size: 1.4rem; color: #fff; background: var(--c); border: 3px solid #2a1a12; margin-bottom: 8px; }
+.l-num[style*="--y"] { color: #2a1a12; }
+.l-quote { display: flex; gap: 18px; align-items: center; margin: 26px 0; background: var(--cream); }
+.l-quote .lamb { width: 110px; flex: none; }
+.l-q { font-size: 1.2rem; font-weight: 700; line-height: 1.45; margin: 0 0 12px; }
+.l-quote .avatar { width: 44px; margin-right: -8px; border: 2px solid #fff; }
+.l-quote .row a { margin-left: 14px; font-weight: 700; }
+.l-final { margin: 30px 0 10px; padding: 30px 24px; border-radius: 26px; text-align: center; color: #fff; position: relative; overflow: hidden; background: linear-gradient(110deg, var(--r), var(--r-dk)); }
+.l-final::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent 0 22px, rgba(0,0,0,.13) 22px 26px), repeating-linear-gradient(90deg, transparent 0 22px, rgba(0,0,0,.13) 22px 26px); }
+.l-final > * { position: relative; } .l-final h2 { font-size: clamp(1.5rem, 4vw, 2.2rem); } .l-final .l-ctas { justify-content: center; }
+.l-final .btn.alt { background: #fff; }
+@media (max-width: 900px) { .l-hero { grid-template-columns: 1fr; } .l-art { order: -1; } .l-stats { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 760px) { .l-ctas .btn.big { width: 100%; justify-content: center; } .l-quote { flex-direction: column; text-align: center; } .l-quote .row { justify-content: center; } }
+
+/* ===== Install as an app ===== */
+.install-top { position: fixed; top: 18px; right: 76px; z-index: 30; height: 48px; padding: 0 16px; border-radius: 99px; border: 0; background: var(--r); color: #fff; font-weight: 800; box-shadow: var(--sh); }
+.install-top[hidden], [data-install][hidden] { display: none !important; }
+.install-chip { background: var(--r) !important; color: #fff !important; }
+.l-final .install-big { background: #fff; color: var(--r-dk); }
+.install-card { display: flex; align-items: center; gap: 14px; margin-top: 16px; border-left: 8px solid var(--r); }
+.install-card:has([data-install][hidden]) { display: none; }
+.install-help { border: 3px solid #2a1a12; border-radius: 24px; padding: 22px; max-width: 420px; width: calc(100% - 32px); }
+.install-help::backdrop { background: rgba(20, 12, 8, .55); }
+.ih-steps { display: grid; gap: 10px; margin: 14px 0 18px; }
+.ih-step { display: flex; gap: 12px; align-items: center; background: var(--sand); border-radius: 14px; padding: 12px; }
+.ih-step .ih-n { flex: none; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--r); color: #fff; border: 2px solid #2a1a12; }
+@media (max-width: 760px) { .install-top { position: absolute; top: 20px; right: 68px; padding: 0 12px; font-size: .85rem; } .install-card { flex-wrap: wrap; } .install-card .btn { width: 100%; justify-content: center; } }

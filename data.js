@@ -1,6 +1,6 @@
 // Content for Enkaji Play. Plain data so facilitators can edit it without touching app code.
 
-// The six bricks, in the order used in Sekenani training: red, orange, green, blue, sky blue, yellow.
+// The six bricks, in the order used in the Maasai Mara training: red, orange, green, blue, sky blue, yellow.
 // Key 'p' is kept for sky blue so older saved demos still work.
 const BRICKS = [
   { k: 'r', name: 'Red', sw: 'Nyekundu', hex: '#E53935', idea: 'The red of a Maasai shuka' },
@@ -12,7 +12,7 @@ const BRICKS = [
 ];
 const BRICK = Object.fromEntries(BRICKS.map(b => [b.k, b]));
 
-// Maa numbers: confirm pronunciation with mothers in Sekenani before training.
+// Maa numbers: confirm pronunciation with mothers in the Maasai Mara before training.
 const NUMBERS = [
   { n: 1, maa: 'Nabo', sw: 'Moja', en: 'One' }, { n: 2, maa: 'Are', sw: 'Mbili', en: 'Two' },
   { n: 3, maa: 'Uni', sw: 'Tatu', en: 'Three' }, { n: 4, maa: "Ong'uan", sw: 'Nne', en: 'Four' },
@@ -221,7 +221,7 @@ const MODULES = [
       { h: 'Play fits CBE', p: 'Communication, critical thinking, creativity, self-efficacy and learning to learn are all CBE core competencies. Six Bricks practises them in 5 minutes a day.' },
     ],
     practice: { h: 'Remember your own play', steps: ['In pairs, share a game you played as a child in your village.', 'What did it teach you? Counting, strategy, courage?', 'Match it to one of the five qualities.'] },
-    reflect: 'Which game from your childhood could a mother in Sekenani play with her child tomorrow?',
+    reflect: 'Which game from your childhood could a mother in the Maasai Mara play with her child tomorrow?',
     quiz: [
       { q: 'Care for Education says learning should happen through...', o: ['Instruction', 'Construction', 'Memorising'], a: 1 },
       { q: 'Which is NOT one of the five qualities of playful learning?', o: ['Joyful', 'Iterative', 'Silent'], a: 2 },
@@ -245,7 +245,7 @@ const MODULES = [
   { id: 3, c: 'y', t: 'Numbers & Words', sub: 'Numeracy and literacy with bricks',
     goals: ['Use bricks for counting, patterns, adding and taking away', 'Use bricks for syllables, letters, positional words and story telling', 'Teach numbers in Maa, Swahili and English'],
     ideas: [
-      { h: 'Counting with meaning', p: 'Children in Sekenani count cattle, goats and calabashes every day. Turn bricks into cows and the boma into a number line.' },
+      { h: 'Counting with meaning', p: 'Children in the Maasai Mara count cattle, goats and calabashes every day. Turn bricks into cows and the boma into a number line.' },
       { h: 'Patterns are maths', p: "Maasai beadwork is full of patterns. Spotting what comes next in Mama's collar is the same thinking as algebra later on." },
       { h: 'Bricks as syllables', p: 'One brick per clap: Le-ma-yi-an. Children hear the parts of words before they read them.' },
       { h: 'Home language first', p: 'Start in Maa, then Swahili, then English. A child who can count in Maa can learn to count in English faster, not slower.' },
@@ -275,7 +275,7 @@ const MODULES = [
   { id: 5, c: 'b', t: 'Mothers Who Teach', sub: 'Training mothers as home teachers',
     goals: ['Respect mothers as the first teachers and matriarchs of the home', 'Train mothers of any literacy level using Show, Do, Talk', 'Run a monthly Mama\'s Circle'],
     ideas: [
-      { h: 'Mothers already teach', p: 'Mothers in Sekenani teach beadwork, cooking, herding, songs and respect every day. Six Bricks adds a tool, it does not replace her wisdom.' },
+      { h: 'Mothers already teach', p: 'Mothers in the Maasai Mara teach beadwork, cooking, herding, songs and respect every day. Six Bricks adds a tool, it does not replace her wisdom.' },
       { h: 'Show, Do, Talk', p: 'SHOW the activity with bricks (no reading needed). Mother DOES it with her child while you watch. TALK about what the child learned. Use pictures and voice, never long handouts.' },
       { h: 'Play while you work', p: 'Counting cups while cooking, patterns while beading, positions while herding. Learning fits into the day she already has.' },
       { h: "The Mama's Circle", p: 'Once a month, mothers meet under a tree. Sing, share one success, learn one new brick game, and plan. Mothers who teach each other keep going.' },
@@ -297,7 +297,7 @@ const MODULES = [
       { h: 'Keep it local', p: 'Use the Mara: cattle, wildlife, rain, rangers, tourists, the market in Talek. A child learns more from what they know.' },
     ],
     practice: { h: 'Build your strand', steps: ['Open the Team page and find your strand.', 'Adapt one activity for Little Ones and one for School Starters.', 'Teach it to the whole group in 5 minutes.'] },
-    reflect: 'What is the one idea from your work you most want every child in Sekenani to understand?',
+    reflect: 'What is the one idea from your work you most want every child in the Maasai Mara to understand?',
     quiz: [
       { q: 'Progress is best tracked by...', o: ['Exams', 'Watching what children do', 'Guessing'], a: 1 },
       { q: 'A good themed activity uses...', o: ['Things from the child\'s life', 'Only textbook pictures', 'Long talks'], a: 0 },

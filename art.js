@@ -198,7 +198,7 @@ const nums = (list, y) => list.map(([nx, t]) => `<g transform="translate(${nx} $
 const STORIES = [
   { id: 'six-bricks', t: "Naserian's Six Bricks", age: 'little', act: 'count-herd', cover: '#B71C1C',
     pages: [
-      { s: () => scene('dawn', hut(610, 340, 1.2), acacia(150, 330, 1.2), label('SEKENANI, MAASAI MARA'), person(390, 405, 1.3, { ...NASERIAN, wave: true }), sparkle(470, 170, 1.2), sparkle(320, 200)), en: 'In Sekenani, the sun wakes up early. So does Naserian.', sw: 'Huko Sekenani, jua huamka mapema. Naserian pia.' },
+      { s: () => scene('dawn', hut(610, 340, 1.2), acacia(150, 330, 1.2), label('MAASAI MARA'), person(390, 405, 1.3, { ...NASERIAN, wave: true }), sparkle(470, 170, 1.2), sparkle(320, 200)), en: 'In the Maasai Mara, the sun wakes up early. So does Naserian.', sw: 'Huko Maasai Mara, jua huamka mapema. Naserian pia.' },
       { s: () => scene('day', hut(660, 340), label('SIX BRICKS!'), person(300, 410, 1.35, MAMA), person(440, 410, 1.3, { ...NASERIAN, holding: miniBricks(['r', 'o', 'g', 'b', 'p', 'y']) }),
           `<g transform="translate(480 120)">${['r', 'o', 'g', 'b', 'p', 'y'].map((c, i) => brickSVG(c, i * 44 - 40, Math.abs(i - 2.5) * 10, 9)).join('')}</g>`, arrow(470, 260, 520, 170), sparkle(700, 110), sparkle(430, 100)),
         en: 'Mama gives her a small beaded pouch. Inside are six bright bricks!', sw: 'Mama anampa mfuko mdogo wa shanga. Ndani kuna matofali sita!' },
@@ -215,7 +215,7 @@ const STORIES = [
           `<g transform="translate(410 300)">${['r', 'b', 'y'].map((c, i) => brickSVG(c, i * 30 - 45, 0, 7)).join('')}</g>`),
         en: 'Tonight, Naserian will teach her baby brother. Can you count your bricks too?', sw: 'Leo usiku, Naserian atamfundisha mdogo wake. Wewe pia unaweza kuhesabu?' },
     ] },
-  { id: 'lost-calf', t: 'The Lost Calf of Sekenani', age: 'both', act: 'where-calf', cover: '#B34700',
+  { id: 'lost-calf', t: 'The Lost Calf of the Maasai Mara', age: 'both', act: 'where-calf', cover: '#B34700',
     pages: [
       { s: () => scene('day', label('ONE CALF IS MISSING!'), boma(60, 400, 330), cow(230, 400, 1, '#8d5524'), person(580, 410, 1.35, LEMAYIAN), `<text class="hand" x="660" y="200" font-size="90" fill="#E53935" stroke="${INK}" stroke-width="3">?</text>`),
         en: 'Lemayian counts the cattle. One calf is missing!', sw: 'Lemayian anahesabu ng\'ombe. Ndama mmoja amepotea!' },

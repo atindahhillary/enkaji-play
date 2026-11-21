@@ -4,13 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Enkaji Play | Six Bricks in the Mara</title>
-<meta name="description" content="Learning through play with Six Bricks for facilitators and Mothers Who Teach in Sekenani, Maasai Mara.">
+<meta name="description" content="Learning through play with Six Bricks for facilitators and Mothers Who Teach in the Maasai Mara.">
 <meta name="theme-color" content="#c62828">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='10' y='40' width='80' height='45' rx='8' fill='%23E53935'/><rect x='18' y='28' width='16' height='14' rx='3' fill='%23E53935'/><rect x='42' y='28' width='16' height='14' rx='3' fill='%23E53935'/><rect x='66' y='28' width='16' height='14' rx='3' fill='%23E53935'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Enkaji Play">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Patrick+Hand+SC&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="games.css">
@@ -18,7 +21,7 @@
 <body>
 <a class="skip" href="#view">Skip to content</a>
 <aside class="side">
-  <a class="logo" href="#/home" aria-label="Enkaji Play home"><span class="logo-star">⭐</span><span>Enkaji<br><b>Play</b></span></a>
+  <a class="logo" href="#/welcome" aria-label="Enkaji Play welcome page"><span class="logo-star">⭐</span><span>Enkaji<br><b>Play</b></span></a>
   <nav id="nav" aria-label="Main">
     <a href="#/home" data-r="home"><i>🏠</i>Home</a>
     <a href="#/games" data-r="games"><i>🎮</i>Games</a>
@@ -34,10 +37,17 @@
 <main>
   <div class="beadstrip" aria-hidden="true"></div>
   <button id="sndBtn" class="snd-btn" aria-label="Sound">🔊</button>
+  <button id="installTop" class="install-top" hidden>📲 Install app</button>
   <div id="view" tabindex="-1"></div>
-  <footer class="foot">Enkaji means "home" in Maa. Six Bricks is a LEGO Foundation tool; learn more from <a href="https://www.carefored.co.za/" target="_blank" rel="noopener">Care for Education</a>. Built for facilitators and Mothers Who Teach in Sekenani, Maasai Mara.</footer>
+  <footer class="foot">Enkaji means "home" in Maa. Six Bricks is a LEGO Foundation tool; learn more from <a href="https://www.carefored.co.za/" target="_blank" rel="noopener">Care for Education</a>. Built for facilitators and Mothers Who Teach in the Maasai Mara.</footer>
 </main>
 <div id="toast" role="status" aria-live="polite"></div>
+<dialog id="installHelp" class="install-help" aria-labelledby="ihTitle">
+  <h2 id="ihTitle">📲 Put Enkaji Play on your phone</h2>
+  <p>It installs like an app, with its own icon, and works <b>without signal</b> after the first time.</p>
+  <div class="ih-steps" id="ihSteps"></div>
+  <div class="row" style="justify-content:space-between"><button class="listen" id="ihListen">🔊 Listen</button><button class="btn" id="ihClose">Got it</button></div>
+</dialog>
 <script src="data.js"></script>
 <script src="sound.js"></script>
 <script src="art.js"></script>

@@ -9,10 +9,12 @@ http.createServer((q, r) => {
     const name = (u.searchParams.get('name') || '').replace(/[^a-z0-9-]/gi, ''); // only safe file names
     let body = ''; q.on('data', d => body += d);
     q.on('end', () => {
-      const m = body.match(/^data:image\/webp;base64,(.+)$/);
+      const m = body.match(/^data:image\/(webp|png);base64,(.+)$/);
       if (!name || !m) { r.writeHead(400); return r.end('bad'); }
-      fs.mkdirSync(path.join(root, 'assets'), { recursive: true });
-      fs.writeFileSync(path.join(root, 'assets', name + '.webp'), Buffer.from(m[1], 'base64'));
+      // PNGs (app icons) go in the site root; WebP renders go in assets/.
+      const dir = m[1] === 'png' ? root : path.join(root, 'assets');
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, name + '.' + m[1]), Buffer.from(m[2], 'base64'));
       r.writeHead(200); r.end('ok');
     });
     return;

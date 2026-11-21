@@ -89,11 +89,68 @@ const pill = (c, text) => `<span class="pill tint" style="--pc:${c};background:$
 const actCard = a => `<a class="card act" href="#/activity/${a.id}">${S.done[a.id] ? '<span class="done" title="Done">✅</span>' : ''}${buildSVG(a.demo, { u: 14 })}
   <div class="row">${pill(DOMAINS[a.dom].c, DOMAINS[a.dom].icon + ' ' + DOMAINS[a.dom].t)}<span class="pill">${a.mins} min</span></div>
   <h3>${a.t}</h3><p class="small mute" style="margin:0">${AGES[a.age]}</p></a>`;
-const storyCover = s => `<img src="assets/cover-${s.id}.webp" alt="" decoding="async">`;
+const storyCover = s => s.pages[0].s();
 function updateLamb() { $('#sideLamb').innerHTML = lambSVG('bounce'); }
 
 // ---------- Views ----------
 const V = {};
+
+// ---------- Landing page: the first screen for new visitors ----------
+const HOOK_EN = 'Supa! Takwenya! Every enkaji is a classroom. Six bricks, five minutes a day, and the best teacher a child will ever have: Mama. Games, stories and activities in Maa, Swahili and English. No reading needed.';
+const HOOK_SW = 'Habari! Kila nyumba ni darasa. Matofali sita, dakika tano kwa siku, na mwalimu bora wa mtoto: Mama. Michezo, hadithi na shughuli kwa Kimaasai, Kiswahili na Kiingereza. Huhitaji kusoma.';
+V.welcome = () => {
+  const hero = scene('dawn', hut(640, 340, 1.1), acacia(130, 330, 1.1), person(300, 410, 1.35, { ...MAMA, point: true }), person(440, 410, 1.25, { ...NASERIAN, wave: true }), person(530, 412, 1.1, LEMAYIAN),
+    `<g transform="translate(340 150)">${['r', 'o', 'g', 'b', 'p', 'y'].map((c, i) => brickSVG(c, i * 40 - 20, Math.abs(i - 2.5) * 9, 8)).join('')}</g>`, sparkle(330, 120, 1.2), sparkle(600, 130), sparkle(250, 200, .8));
+  const who = [
+    ['girl', '#e1f5fe', 'For children', 'Count cows into the boma, copy Koko\'s tower, find the shuka at Talek market. Every game speaks, so little ones can play alone.', '#/games', '▶ Play now'],
+    ['mama', '#ffe9d6', 'For Mama', 'Picture and voice guides, no reading needed. Play while you milk, cook and bead. Record Maa words in your own voice.', '#/mothers', 'Start here, Mama'],
+    ['man', '#e3f2fd', 'For facilitators', 'A 3 day training in 6 sessions, a timetable, printable activity cards and a Mama\'s Circle guide.', '#/training', 'Open the training'],
+  ];
+  const peek = ['cattle', 'milk', 'copy'].map(id => GAMES.find(g => g.id === id));
+  return `<div class="landing">
+  <section class="l-hero">
+    <div class="l-copy">
+      <div class="l-tag">SUPA! TAKWENYA! · MAASAI MARA</div>
+      <h1>Every enkaji is a classroom.</h1>
+      <p class="l-sub">Six bricks, five minutes a day, and the best teacher a child will ever have: <b>Mama</b>. Games, stories and activities in Maa, Swahili and English. <b>No reading needed.</b></p>
+      <div class="l-ctas"><a class="btn big" href="#/games">▶ Play now</a><a class="btn big alt" href="#/mothers">👩🏾 I'm a Mama</a><a class="btn big alt" href="#/training">🎓 I'm a facilitator</a></div>
+      <div class="row" style="margin-top:14px"><button class="listen install-chip" data-install>📲 Install the app</button>${listenBtn(HOOK_EN, 'en', '🔊 Listen')}${listenBtn(HOOK_SW, 'sw', '🔊 Sikiliza')}<button class="listen" id="countMaa">🎙️ Hear Sanau count in Maa</button></div>
+    </div>
+    <div class="l-art">${hero}</div>
+  </section>
+
+  <section class="l-stats">${[[ACTIVITIES.length, 'brick activities'], [GAMES.length, 'talking games'], [STORIES.length, 'Mara stories'], [3, 'languages'], [6, 'bricks'], ['📶', 'works offline']].map(([n, t]) => `<div><b>${n}</b><span>${t}</span></div>`).join('')}</section>
+
+  <div class="sec"><h2>${dot('r')}Something for everyone at home</h2></div>
+  <section class="grid g3">${who.map(([k, bg, t, p, href, cta]) => `<a class="card l-who" href="${href}">${AV(k, t, bg)}<h3>${t}</h3><p class="mute">${p}</p><span class="btn">${cta} →</span></a>`).join('')}</section>
+
+  <div class="sec"><h2>${dot('o')}Five minutes, three steps</h2></div>
+  <section class="grid g3 l-steps">
+    ${[['r', '1', 'Greet', 'Say "Takwenya!" and hold the six bricks. Name the colours together.'], ['g', '2', 'Play', 'One brick challenge or one game. Let the child lead. Mistakes are part of play.'], ['b', '3', 'Talk', 'Ask "Tell me what you built". Praise the trying, not only the answer.']]
+      .map(([k, n, t, p]) => `<div class="card"><div class="l-num" style="--c:var(--${k})">${n}</div><h3>${t}</h3><p class="mute" style="margin:0">${p}</p></div>`).join('')}
+  </section>
+
+  <div class="sec"><h2>${dot('g')}Take a peek</h2><a href="#/games">All games →</a></div>
+  <section class="grid g5">${peek.map(tile).join('')}<a class="tile" href="#/story/${STORIES[0].id}"><div class="cover" aria-hidden="true">${storyCover(STORIES[0])}</div><div class="tb"><h3>${STORIES[0].t}</h3><span class="play" style="background:${STORIES[0].cover}">▶ Watch</span></div></a></section>
+
+  <section class="card l-quote">${lambSVG()}<div><p class="l-q">"Mothers in the Maasai Mara already teach beadwork, herding, songs and respect. Enkaji Play adds a little play to the day they already have."</p>
+    <div class="row">${TEAM.map(t => AV(t.k === 'biz' ? 'ruth' : t.k, t.role, t.av.wrap + '33')).join('')}<a href="#/team">Meet the team →</a></div></div></section>
+
+  <section class="l-final"><h2>Start today. Five minutes. Six bricks.</h2><p>Open it once with signal and it keeps working offline. Install it on your phone like an app.</p>
+    <div class="l-ctas"><button class="btn big install-big" data-install>📲 Install the app</button><a class="btn big" href="#/games">▶ Play now</a><a class="btn big alt" href="#/mothers">👩🏾 I'm a Mama</a><a class="btn big alt" href="#/training">🎓 I'm a facilitator</a></div></section>
+  </div>`;
+};
+V.welcome.after = () => {
+  S.seen = true; save();
+  // Play Sanau counting one to five, one clip after another.
+  $('#countMaa').onclick = async () => {
+    for (let n = 1; n <= 5; n++) {
+      const a = await playSanau('n' + n);
+      if (!a) { speak(NUMBERS.slice(0, 5).map(x => x.maa).join(', '), 'sw'); return; }
+      await new Promise(r => { a.onended = r; a.onerror = r; });
+    }
+  };
+};
 
 V.home = () => {
   const d = today(), pick = ACTIVITIES[new Date().getDate() % ACTIVITIES.length];
@@ -109,7 +166,7 @@ V.home = () => {
     </div></section>
   <section class="hello"><div style="flex:1"><div class="tag">Supa! Takwenya!</div>
     <div class="name">Let's play and learn</div>
-    <div style="font-weight:600">Six bricks. Endless ideas. Learning at home in Sekenani.</div></div>
+    <div style="font-weight:600">Six bricks. Endless ideas. Learning at home in the Maasai Mara.</div></div>
     ${AV('girl', 'Naserian', '#fff3e0')}<div class="hero-band"></div></section>
   <div class="stats">
     <a class="card stat" href="#/progress" style="--c:var(--y)"><span class="ic">⭐</span><div><span>Stars</span><b>${S.stars}</b></div></a>
@@ -240,6 +297,7 @@ V.mothers = () => {
     <div><div style="font-weight:800;letter-spacing:.06em">TAKWENYA, MAMA! · IKO!</div><h1>Mothers Who Teach</h1>
     <p style="font-size:1.1rem;max-width:560px">You are your child's first and best teacher. You already teach beadwork, songs, cooking and respect. Six bricks add a little play to the day you already have.</p>
     ${listenBtn('Takwenya Mama! You are your child\'s first and best teacher. You do not need to read to teach. Look at the pictures, press the listen button, and play together for five minutes every day.', 'en', '🔊 Listen, Mama')} ${listenBtn('Habari Mama! Wewe ni mwalimu wa kwanza wa mtoto wako. Huhitaji kusoma ili kufundisha. Angalia picha, bonyeza kitufe cha kusikiliza, na mcheze pamoja dakika tano kila siku.', 'sw', '🔊 Sikiliza kwa Kiswahili')}</div></section>
+  <div class="card install-card"><span style="font-size:2.4rem">📲</span><div style="flex:1"><h3 style="margin:0">Put Enkaji Play on your phone</h3><p class="mute" style="margin:4px 0 0">One tap. It gets its own icon and works without signal.</p></div><button class="btn" data-install>Install</button></div>
   <div class="sec"><h2>How to use this</h2></div>
   <div class="how4"><div><span>👀</span>Look at the picture</div><div><span>🔊</span>Press Listen</div><div><span>🧱</span>Play 5 minutes</div><div><span>🤗</span>Praise the trying</div></div>
   <div class="sec"><h2>🤱🏾 Play together on the phone</h2>${listenBtn('Play together on the phone. Sit with your child. Sort the harvest, milk the cow, and play the drum. Then play the same game with real beans, cups and a tin drum.', 'en', '🔊')}</div>
@@ -254,7 +312,7 @@ V.mothers = () => {
   <div class="card"><div class="grid g5">${NUMBERS.map(n => `<button class="chip" style="padding:12px" data-maa="n${n.n}"><b style="font-size:1.4rem">${n.n}</b><br>${n.maa}<br><span class="mute small">${n.sw} · ${n.en}</span></button>`).join('')}</div><p class="small mute" style="margin:10px 0 0">Tap a number to hear Sanau count in Maa. Spellings vary, so check them with the mothers.</p></div>
   <div class="sec" id="maa-words"><h2>🎙️ Mama's Voice: Maa words</h2><span class="pill">Used in the games</span></div>
   <div class="card"><p>No phone can speak Maa yet, so the games use a Swahili voice for Maa words. <b>Mama, record each word in your own voice</b> and the games will play YOUR voice to the children. Recordings stay on this phone.</p>
-    <p class="small mute">🎙️ recorded by Sanau, a Maa speaker · ✅ checked in Maa sources · ❔ please check with the mothers in Sekenani. Spellings vary (Purko, Keekonyokie).</p>
+    <p class="small mute">🎙️ recorded by Sanau, a Maa speaker · ✅ checked in Maa sources · ❔ please check with the mothers in the Maasai Mara. Spellings vary (Purko, Keekonyokie).</p>
     <div class="grid g3" data-words>${Object.entries(MAA).map(([k, m]) => `<div class="word-row"><div><b>${m.w || '🔊 ' + m.en}</b> ${SANAU.has(k) ? '🎙️' : ''}${m.c === 'H' ? '✅' : m.c === 'S' ? '' : '❔'}<div class="small mute">${m.en} · ${m.sw}</div></div><div class="row" style="gap:6px"><button class="listen" data-maa="${k}" aria-label="Play ${m.w}">🔊</button><button class="listen rec ${REC.has('maa-' + k) ? 'has' : ''}" data-rec="${k}" aria-label="Record ${m.w}">🎙️</button></div></div>`).join('')}</div></div>
   <div class="card" style="margin-top:12px"><h3>🇰🇪 Kenyan accent</h3><p class="small" style="margin:0" data-voice></p></div>
   <div class="sec"><h2>How we greet in Maa</h2>${listenBtn(GREET_WAYS.map(g => g.t + '. ' + g.p).join(' '), 'en', '🔊')}</div>
@@ -335,7 +393,7 @@ V.module.after = id => {
 V.team = () => `<h1>The Facilitator Team</h1><p class="mute" style="max-width:720px">Each facilitator brings a strand from their own work. Together they cover the whole child: soil, digital, health, dreams, food and money.</p>
   <div class="grid g2 team">${TEAM.map(t => `<div class="card"><div class="row">${AV(t.k === 'biz' ? 'ruth' : t.k, t.role, t.av.wrap + '33')}<div><h2 style="margin:0">${t.name ? t.name + ', ' : ''}${t.role}</h2><span class="pill">${t.strand}</span></div></div>
     <p style="margin-top:12px">${t.blurb}</p><b class="small">Signature activities</b><div class="row" style="margin-top:6px">${t.acts.map(a => `<a class="chip" href="#/activity/${a}">${ACT[a].t}</a>`).join('')}</div></div>`).join('')}</div>
-  <div class="card" style="margin-top:16px"><h3>How the team works with mothers</h3><p style="margin:0">Each facilitator adopts a cluster of homes in Sekenani. They visit once a month, lead the Mama's Circle in turns, and bring their strand to the local schools so children carry the games home.</p></div>`;
+  <div class="card" style="margin-top:16px"><h3>How the team works with mothers</h3><p style="margin:0">Each facilitator adopts a cluster of homes in the Maasai Mara. They visit once a month, lead the Mama's Circle in turns, and bring their strand to the local schools so children carry the games home.</p></div>`;
 
 V.progress = () => {
   const done = Object.keys(S.done);
@@ -356,14 +414,48 @@ V.notfound = () => `<h1>Page not found</h1><a class="btn" href="#/home">Go home<
 // ---------- Router ----------
 function render() {
   window.speechSynthesis?.cancel(); SND.music(false);
-  const [, r = 'home', arg] = (location.hash || '#/home').split('/');
+  // New visitors land on the welcome page; returning visitors go straight to Home.
+  const [, r = 'home', arg] = (location.hash || (S.seen ? '#/home' : '#/welcome')).split('/');
   const view = V[r] && r !== 'notfound' ? V[r] : V.notfound;
   $('#view').innerHTML = view(arg);
   view.after && view.after(arg);
-  const navKey = { activity: 'activities', game: 'games', story: 'stories', module: 'training', cards: 'training', bricks: 'home' }[r] || r;
+  if (typeof syncInstall === 'function') syncInstall();
+  const navKey = { welcome: 'home', activity: 'activities', game: 'games', story: 'stories', module: 'training', cards: 'training', bricks: 'home' }[r] || r;
   document.querySelectorAll('#nav a').forEach(a => { const on = a.dataset.r === navKey; a.classList.toggle('on', on); on ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'); });
 }
 window.addEventListener('hashchange', () => { render(); scrollTo(0, 0); $('#view').focus({ preventScroll: true }); });
+// ---------- Install as an app (PWA) ----------
+// Android Chrome and Edge fire beforeinstallprompt: we keep it and show our own button.
+// iPhone Safari has no prompt, so the button opens step-by-step help instead.
+let installEvt = null;
+const isInstalled = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const INSTALL_STEPS = isIOS
+  ? [['1', 'Open this page in <b>Safari</b>.'], ['2', 'Tap the <b>Share</b> button (a square with an arrow up).'], ['3', 'Tap <b>Add to Home Screen</b>, then <b>Add</b>.']]
+  : [['1', 'Open this page in <b>Chrome</b>.'], ['2', 'Tap the menu <b>⋮</b> at the top right.'], ['3', 'Tap <b>Install app</b> or <b>Add to Home screen</b>, then <b>Install</b>.']];
+const INSTALL_SAY = isIOS ? 'Open this page in Safari. Tap the share button. Then tap Add to Home Screen.'
+  : 'Open this page in Chrome. Tap the menu with three dots at the top right. Then tap Install app, or Add to Home screen.';
+function installApp() {
+  if (installEvt) {
+    installEvt.prompt();
+    installEvt.userChoice.then(c => { if (c.outcome === 'accepted') toast('📲 Installing Enkaji Play...'); installEvt = null; syncInstall(); });
+    return;
+  }
+  $('#ihSteps').innerHTML = INSTALL_STEPS.map(([n, t]) => `<div class="ih-step"><b class="ih-n">${n}</b><span>${t}</span></div>`).join('');
+  const d = $('#installHelp'); d.showModal ? d.showModal() : d.setAttribute('open', '');
+}
+function syncInstall() {
+  const show = !isInstalled();
+  $('#installTop').hidden = !show;
+  document.querySelectorAll('[data-install]').forEach(b => b.hidden = !show);
+}
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; syncInstall(); });
+window.addEventListener('appinstalled', () => { installEvt = null; toast('🎉 Enkaji Play is on your phone!'); syncInstall(); });
+document.addEventListener('click', e => { if (e.target.closest('[data-install], #installTop')) installApp(); });
+$('#ihClose').onclick = () => { window.speechSynthesis?.cancel(); const d = $('#installHelp'); d.close ? d.close() : d.removeAttribute('open'); };
+$('#ihListen').onclick = () => speak(INSTALL_SAY);
+syncInstall();
+
 updateLamb();
 render();
 REC.ready.then(() => location.hash.includes('mothers') && render());
