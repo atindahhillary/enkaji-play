@@ -219,3 +219,54 @@ export function acacia() {
   for (const [x, y, z, sx] of [[0, 1.75, 0, 1.6], [.7, 1.65, .1, 1], [-.75, 1.62, -.1, 1.1]]) g.add(ball(.6, leaf, x, y, z, sx, .28, .9));
   return g;
 }
+
+// ---------- story props and poses ----------
+// Point: right arm reaches forward and up toward what the character is looking at.
+export function point(rig) { rest(rig); rig.AR.sh.rotation.set(-1.35, 0, -.35); rig.AR.el.rotation.set(-.15, 0, 0); rig.head.rotation.set(-.05, -.2, .05); }
+// Hold something in front of the chest with both hands.
+export function hold(rig, prop) {
+  rest(rig); for (const [A, s] of [[rig.AL, 1], [rig.AR, -1]]) { A.sh.rotation.set(-.7, 0, s * .1); A.el.rotation.set(-1.1, 0, 0); }
+  if (prop && prop.isObject3D) { prop.position.set(0, -.25, .55); rig.chest.add(prop); }
+}
+// Boma: a ring (or arc) of thorny sticks.
+export function boma(r = 1.6, arc = Math.PI * 1.4, start = Math.PI * .8) {
+  const g = G(), n = Math.round(r * arc * 6), wood = matte('#7a5a40', .95);
+  for (let i = 0; i <= n; i++) { const a = start + arc * i / n; const st = M(new THREE.CylinderGeometry(.035, .05, .8 + (i % 3) * .12, 8), wood, Math.cos(a) * r, .42, Math.sin(a) * r); st.rotation.set((i % 2 ? .12 : -.1), 0, (i % 3 - 1) * .1); g.add(st); }
+  for (const y of [.35, .65]) { const rail = M(new THREE.TorusGeometry(r, .03, 6, 64, arc), wood, 0, y, 0); rail.rotation.set(Math.PI / 2, 0, start); g.add(rail); }
+  return g;
+}
+export function river(w = 30, d = 3.2) {
+  const g = G(); const water = M(new THREE.BoxGeometry(w, .06, d), new THREE.MeshPhysicalMaterial({ color: '#4fb3e8', roughness: .15, clearcoat: 1, transmission: 0 }), 0, .03, 0); water.receiveShadow = true; g.add(water);
+  for (const s of [1, -1]) g.add(M(new THREE.BoxGeometry(w, .1, .25), matte('#a7834a', 1), 0, .05, s * d / 2));
+  for (let i = 0; i < 9; i++) g.add(ball(.09, matte('#9e9e9e', .7), -10 + i * 2.4, .06, (i % 2 ? 1 : -1) * (d / 2 + .1), 1.4, .6, 1));
+  return g;
+}
+export function fire() {
+  const g = G(), wood = matte('#5d4037', .9);
+  for (const r of [.5, -.6, 1.6]) { const l = M(new THREE.CylinderGeometry(.06, .06, .8, 10), wood, 0, .08, 0); l.rotation.set(Math.PI / 2, r, 0); g.add(l); }
+  const flame = c => new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: 2.2, roughness: 1 });
+  g.add(M(new THREE.ConeGeometry(.24, .7, 20), flame('#ff7a1a'), 0, .42, 0)); g.add(M(new THREE.ConeGeometry(.13, .45, 20), flame('#ffd54f'), .04, .32, .05));
+  const light = new THREE.PointLight('#ff9a3c', 14, 9, 1.6); light.position.set(0, .7, 0); light.castShadow = true; g.add(light);
+  return g;
+}
+export function maize(h = 1, cob = true) {
+  const g = G(), green = matte('#5aa83a', .7), leaf = matte('#6fbf47', .7);
+  g.add(M(new THREE.CylinderGeometry(.04, .06, 2.2 * h, 10), green, 0, 1.1 * h, 0));
+  for (let i = 0; i < 6; i++) { const lf = ball(.32 * h, leaf, 0, (.5 + i * .3) * h, 0, 1.4, .06, .35); lf.rotation.set(0, i * 2.1, -.5); lf.translateX(.35 * h); g.add(lf); }
+  if (cob) { g.add(ball(.11 * h, gloss('#FDD835'), .12 * h, 1.4 * h, 0, .8, 1.9, .8)); g.add(ball(.1 * h, leaf, .1 * h, 1.3 * h, 0, .9, 1.6, .9)); }
+  return g;
+}
+export function rain(n = 140) {
+  const g = G(), m = new THREE.MeshPhysicalMaterial({ color: '#7fd0ff', roughness: .1, clearcoat: 1 });
+  for (let i = 0; i < n; i++) g.add(ball(.035, m, -7 + (i * 1.37) % 14, .4 + (i * .53) % 4.2, -3 + (i * .71) % 4.5, 1, 2.6, 1));
+  return g;
+}
+export function seed(s = 1) { return ball(.16 * s, gloss('#FDD835'), 0, 0, 0, 1, .78, .9); }
+// Soil cut-away: topsoil, subsoil, rock.
+export function soil() {
+  const g = G(), w = 4.2, d = 1.2;
+  [['#4e342e', .55], ['#a1887f', .55], ['#9e9e9e', .6]].forEach(([c, h], i) => g.add(M(new THREE.BoxGeometry(w, h, d), matte(c, .95), 0, 1.7 - i * .58, 0)));
+  g.add(ball(.13, gloss('#FDD835'), -.4, 2.03, .3, 1, .75, .9));
+  const worm = M(new THREE.TorusGeometry(.18, .045, 10, 24, Math.PI * 1.3), matte('#e57373', .5), -1.3, 1.75, .62); g.add(worm);
+  return g;
+}

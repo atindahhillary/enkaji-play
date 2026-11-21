@@ -45,6 +45,7 @@
 .pips { letter-spacing: -2px; }
 .host { display: flex; align-items: flex-start; gap: 10px; text-align: left; margin: 6px 0 12px; }
 .host-av { width: 66px; flex: none; transform-origin: bottom center; }
+.host-av .avatar { width: 100%; height: auto; }
 .bubble { position: relative; background: #fff; border-radius: 18px; padding: 10px 14px; box-shadow: 0 4px 14px rgba(0,0,0,.08); font-weight: 600; flex: 1; max-width: 560px; }
 .bubble::before { content: ''; position: absolute; left: -8px; top: 18px; border: 8px solid transparent; border-right-color: #fff; border-left: 0; }
 .bubble > b { display: block; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--brand); }

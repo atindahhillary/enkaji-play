@@ -402,3 +402,30 @@ img.cow3d { object-fit: contain; }
 @keyframes wdOut { to { transform: translateY(110%); opacity: 0; } }
 @media (max-width: 760px) { .win-dance { width: 120px; height: 156px; right: 6px; bottom: 88px; } }
 @media (prefers-reduced-motion: reduce) { .win-dance, .win-dance i { animation: none; } }
+
+/* Animated backgrounds: sunny day (games) and sunset (landing), see bgSunny()/bgSunset() in art.js */
+.bg-anim { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; display: block; pointer-events: none; }
+.bg-anim .bg-rays { animation: bgSpin 50s linear infinite; }
+.bg-anim .bg-glow { animation: bgPulse 3.2s ease-in-out infinite alternate; }
+.bg-anim .bg-cloud { animation: bgDrift 70s linear infinite; }
+.bg-anim .bg-cloud.c2 { animation-duration: 95s; animation-delay: -40s; }
+.bg-anim .bg-cloud.c3 { animation-duration: 120s; animation-delay: -85s; }
+.bg-anim .bg-sway { animation: bgSway 4.5s ease-in-out infinite alternate; }
+.bg-anim .bg-streak { animation: bgDriftSlow 90s linear infinite; } .bg-anim .bg-streak.s2 { animation-duration: 130s; animation-delay: -60s; }
+.bg-anim .bg-flock { animation: bgFly 22s linear infinite; } .bg-anim .bg-flock.f2 { animation-duration: 28s; animation-delay: -13s; translate: 0 70px; }
+.bg-anim .bg-wing { transform-box: fill-box; transform-origin: center; animation: bgFlap .32s ease-in-out infinite alternate; }
+.bg-anim .bg-par { animation: bgSlide 140s linear infinite; } .bg-anim .p2 { animation-duration: 80s; } .bg-anim .p3 { animation-duration: 45s; }
+@keyframes bgSpin { to { transform: rotate(360deg); } }
+@keyframes bgPulse { to { transform: scale(1.1); opacity: .85; } }
+@keyframes bgDrift { from { transform: translateX(-160px); } to { transform: translateX(960px); } }
+@keyframes bgDriftSlow { from { transform: translateX(820px); } to { transform: translateX(-360px); } }
+@keyframes bgSway { from { transform: rotate(-1.6deg); } to { transform: rotate(1.6deg); } }
+@keyframes bgFly { from { transform: translate(-120px, 150px); } 50% { transform: translate(400px, 110px); } to { transform: translate(940px, 130px); } }
+@keyframes bgFlap { to { transform: scaleY(-.5); } }
+@keyframes bgSlide { to { transform: translateX(-800px); } }
+@media (prefers-reduced-motion: reduce) { .bg-anim * { animation: none !important; } }
+/* Landing hero sits on the animated sunset; the copy gets a soft cream card for easy reading */
+.l-sunset { position: relative; isolation: isolate; overflow: hidden; border-radius: 28px; padding: 22px; border: 3px solid #2a1a12; box-shadow: 0 14px 30px rgba(90,45,10,.18); }
+.l-sunset .l-copy { background: rgba(255, 248, 236, .88); border-radius: 22px; padding: 18px 20px; backdrop-filter: blur(2px); }
+.l-sunset .l-art { border: 0; box-shadow: none; background: none; border-radius: 0; align-self: end; margin-bottom: -22px; }
+@media (max-width: 900px) { .l-sunset { padding: 14px; } .l-sunset .l-art { margin: 0 -6px -14px; } }

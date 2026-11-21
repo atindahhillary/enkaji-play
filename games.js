@@ -66,7 +66,7 @@ const HOSTS = {
 };
 function stage(el, host, scene, name) {
   el.innerHTML = `<div class="stage ${scene}">
-    <div class="sky-life" aria-hidden="true"><i></i><i></i><i></i></div>
+    ${bgSunny()}
     <div class="hud"><span class="lvl" data-lvl></span><span data-stars class="pips"></span></div>
     <div class="host"><div class="host-av">${HOSTS[host]()}</div><div class="bubble" data-bubble aria-live="polite"><b>${name}</b><span></span></div></div>
     <div class="arena" data-arena></div>

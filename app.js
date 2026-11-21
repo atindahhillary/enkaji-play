@@ -182,7 +182,7 @@ const HOOK_EN = 'Supa! Takwenya! Every enkaji is a classroom. Six bricks, five m
 const HOOK_SW = 'Habari! Kila nyumba ni darasa. Matofali sita, dakika tano kwa siku, na mwalimu bora wa mtoto: Mama. Michezo, hadithi na shughuli kwa Kimaasai, Kiswahili na Kiingereza. Huhitaji kusoma.';
 V.welcome = () => {
   // Golden hour in the Mara, rendered in 3D (tools/studio3d.html): the family playing with bricks by their enkaji.
-  const hero = `<img class="hero3d" src="assets/hero3d.webp" width="880" height="560" alt="Mama, Naserian and Lemayian with six bricks outside their enkaji in the Maasai Mara, cattle grazing behind" decoding="async">`;
+  const hero = `<img class="hero3d" src="assets/hero-family.webp" width="880" height="620" alt="Mama, Naserian and Lemayian with six bricks outside their enkaji in the Maasai Mara, cattle grazing behind" decoding="async">`;
   const who = [
     ['girl', '#e1f5fe', 'For children', 'Count cows into the boma, copy Koko\'s tower, find the shuka at Talek market. Every game speaks, so little ones can play alone.', '#/games', '▶ Play now'],
     ['mama', '#ffe9d6', 'For Mama', 'Picture and voice guides, no reading needed. Play while you milk, cook and bead. Record Maa words in your own voice.', '#/mothers', 'Start here, Mama'],
@@ -191,7 +191,7 @@ V.welcome = () => {
   const peek = ['cattle', 'milk', 'copy'].map(id => GAMES.find(g => g.id === id));
   return `<div class="landing">
 
-  <section class="l-hero">
+  <section class="l-hero l-sunset">${bgSunset()}
     <div class="l-copy">
       <div class="l-tag">SUPA! TAKWENYA! · MAASAI MARA</div>
       <h1>Every enkaji is a classroom.</h1>

@@ -2,8 +2,9 @@
 <html lang="en"><head><meta charset="utf-8"><title>Enkaji 3D studio</title>
 <style>body { font-family: Inter, system-ui, sans-serif; background: #f4e3c4; margin: 16px; } img { background: #fff3; margin: 4px; vertical-align: top; max-width: 100%; } #log { white-space: pre; }</style></head>
 <body><h1>Enkaji 3D studio</h1><p>Renders the 3D cast into assets/ (run <code>node tools/serve.js</code>, open this page, press Render).</p>
-<button id="go">Render all</button> <span id="log"></span><div id="out"></div>
+<button id="go">Render all</button> <button id="st">Render stories</button> <span id="log"></span><div id="out"></div>
 <script type="module">
+import { PAGES, renderPage } from './stories3d.js';
 import { THREE, person, rest, wave, dance, BPM, brick, BRICK_COLS, cow, hut, acacia, ball, matte } from './cast3d.js';
 
 // The same cast as art.js CAST (kind, shuka colour, collar colours), plus a skin tone each.
@@ -103,6 +104,26 @@ document.getElementById('go').onclick = async () => {
   for (const k of ['girl', 'boy']) { log('dance ' + k); sizes['dance-' + k] = await danceStrip(k); }
   log('hero'); sizes.hero3d = await hero();
   window.DONE = sizes; log('done ' + JSON.stringify(sizes));
+};
+// Story pages: assets/story-<id>-<n>.webp, and their anchors for art.js.
+document.getElementById('st').onclick = async () => {
+  const all = PAGES(CAST), anchors = {};
+  for (const [id, pages] of Object.entries(all)) for (let i = 0; i < pages.length; i++) {
+    log('story ' + id + ' ' + (i + 1)); const [t, build] = pages[i];
+    const r = renderPage(renderer, t, build); anchors[id + '-' + (i + 1)] = r.anchors;
+    await save('story-' + id + '-' + (i + 1), r.canvas, .82);
+  }
+  window.ANCHORS = anchors; window.DONE = true; log('stories done');
+};
+// Landing family on a transparent background (stands on the animated sunset): assets/hero-family.webp
+window.familyCut = async () => {
+  const scene = studio({ wide: true });
+  const fam = [['mama', -1.15, .1, .25, 'wave'], ['girl', .3, .8, -.1, 'dance'], ['boy', 1.45, .45, -.35, 'rest']];
+  fam.forEach(([k, x, z, ry, p]) => { const r = person(CAST[k]); rest(r); if (p === 'wave') wave(r, .12); if (p === 'dance') dance(r, 1.7); r.root.position.set(x, 0, z); r.root.rotation.y = ry; scene.add(r.root); });
+  BRICK_COLS.forEach((col, i) => { const b = brick(col); b.position.set(-.55 + i * .3, 0, 1.6 + (i % 2) * .15); b.rotation.y = i * .7; scene.add(b); });
+  const k = cow('#a0612c', '#f4efe6'); k.position.set(2.9, 0, -1.1); k.rotation.y = -.7; k.scale.setScalar(.85); scene.add(k);
+  const cam = new THREE.PerspectiveCamera(30, 1, .1, 120); cam.position.set(.4, 2.1, 7.4); cam.lookAt(.6, 1.15, 0);
+  return save('hero-family', shot(scene, cam, 880, 620), .86);
 };
 </script>
 </body></html>

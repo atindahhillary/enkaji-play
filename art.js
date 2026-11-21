@@ -285,3 +285,88 @@ const TILE_ART = {
   firewood: () => `<svg viewBox="0 0 120 90"><g transform="translate(14 8) scale(.8)">${svgInner(BUNDLE)}</g><g transform="translate(80 8) scale(.8)">${svgInner(STICK)}</g><g transform="translate(94 8) scale(.8)">${svgInner(STICK)}</g></svg>`,
   market: () => `<svg viewBox="0 0 120 90"><circle cx="40" cy="48" r="20" fill="#fdd835" stroke="${INK}" stroke-width="3"/><text x="33" y="56" font-size="20" font-weight="900" fill="#8a6500">5</text><circle cx="80" cy="52" r="16" fill="#cfd8dc" stroke="${INK}" stroke-width="3"/><text x="70" y="59" font-size="16" font-weight="900" fill="#455a64">10</text></svg>`,
 };
+
+// ---------- Animated backgrounds (flat cartoon style, from the user's two references) ----------
+// Flat acacia: brown trunk with forked branches and layered flat-topped canopies.
+const flatAcacia = (x, y, s, leaf = ['#5fae3a', '#7cc443', '#4a9330'], bark = '#7a4a2a') => `<g transform="translate(${x} ${y}) scale(${s})">
+  <path d="M-6 0 L-4 -70 L-30 -110 M-4 -70 L2 -96 L30 -118 M2 -96 L4 -126" stroke="${bark}" stroke-width="9" stroke-linecap="round" fill="none"/>
+  <ellipse cx="-30" cy="-118" rx="58" ry="17" fill="${leaf[2]}"/><ellipse cx="30" cy="-126" rx="62" ry="18" fill="${leaf[2]}"/>
+  <ellipse cx="-28" cy="-124" rx="52" ry="14" fill="${leaf[0]}"/><ellipse cx="32" cy="-132" rx="56" ry="15" fill="${leaf[0]}"/>
+  <ellipse cx="0" cy="-140" rx="44" ry="12" fill="${leaf[1]}"/></g>`;
+const puff = (x, y, s, c = '#fff') => `<g transform="translate(${x} ${y}) scale(${s})" fill="${c}"><ellipse cx="0" cy="0" rx="46" ry="20"/><circle cx="-18" cy="-12" r="20"/><circle cx="12" cy="-20" r="26"/><circle cx="36" cy="-6" r="16"/></g>`;
+// Games: a bright sunny day on green hills (the Mara after the rains). Sun pulses, rays turn, clouds drift, the acacia sways.
+function bgSunny() {
+  return `<svg class="bg-anim bg-sunny" viewBox="0 0 800 560" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <defs><linearGradient id="bgsS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3fa9f0"/><stop offset=".55" stop-color="#9fd8fb"/></linearGradient>
+  <radialGradient id="bgsG"><stop offset="0" stop-color="#fff7b0" stop-opacity=".95"/><stop offset=".45" stop-color="#ffe46b" stop-opacity=".45"/><stop offset="1" stop-color="#ffe46b" stop-opacity="0"/></radialGradient></defs>
+  <rect width="800" height="560" fill="url(#bgsS)"/>
+  <g class="bg-sun" style="transform-origin:620px 110px"><circle cx="620" cy="110" r="110" fill="url(#bgsG)" class="bg-glow"/>
+    <g class="bg-rays" style="transform-origin:620px 110px">${Array.from({ length: 16 }, (_, i) => `<path d="M620 110 L${620 + Math.cos(i * Math.PI / 8) * 62} ${110 + Math.sin(i * Math.PI / 8) * 62}" stroke="#ffd21f" stroke-width="${i % 2 ? 5 : 9}" stroke-linecap="round"/>`).join('')}</g>
+    <circle cx="620" cy="110" r="34" fill="#ffe14a"/><circle cx="620" cy="110" r="26" fill="#fff07a"/></g>
+  <g class="bg-cloud c1">${puff(0, 90, 1)}</g><g class="bg-cloud c2">${puff(0, 150, .7)}</g><g class="bg-cloud c3">${puff(0, 60, .55, '#ffffffcc')}</g>
+  <path d="M0 330 Q120 270 260 300 T520 290 T800 300 V560 H0Z" fill="#a7d96a"/>
+  <path d="M0 360 Q170 310 330 345 T640 330 T800 350 V560 H0Z" fill="#86c64e"/>
+  <g class="bg-sway" style="transform-origin:120px 420px">${flatAcacia(120, 420, 1.2)}</g>
+  <path d="M0 410 Q200 370 420 400 T800 395 V560 H0Z" fill="#6aae3c"/>
+  <path d="M0 470 Q240 440 480 462 T800 455 V560 H0Z" fill="#4f9230"/>
+  ${Array.from({ length: 10 }, (_, i) => `<path d="M${40 + i * 78} ${478 - (i % 3) * 6} l-6 -14 m6 14 l0 -18 m0 18 l7 -14" stroke="#3c7a22" stroke-width="3" stroke-linecap="round"/>`).join('')}
+  </svg>`;
+}
+// Landing: a golden sunset with birds flying, cloud streaks drifting and hills sliding past (parallax).
+function bgSunset() {
+  const bird = (x, y, s, d) => `<g transform="translate(${x} ${y}) scale(${s})"><path class="bg-wing" style="animation-delay:${d}s" d="M-10 0 Q-5 -6 0 0 Q5 -6 10 0" stroke="#3b1d0e" stroke-width="2.4" fill="none" stroke-linecap="round"/></g>`;
+  const flock = [[0, 0, 1, 0], [18, 8, .8, .1], [-16, 10, .85, .2], [34, 16, .7, .05], [-30, 20, .7, .15], [10, 24, .6, .25], [48, 6, .6, .3]].map(b => bird(...b)).join('');
+  const hills = (fill, path) => `<path d="${path}" fill="${fill}"/>`;
+  const loop = inner => `<g>${inner}</g><g transform="translate(800 0)">${inner}</g>`; // two copies side by side so the slide loops seamlessly
+  return `<svg class="bg-anim bg-sunset" viewBox="0 0 800 520" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <defs><linearGradient id="bgtS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f07a12"/><stop offset=".45" stop-color="#f9a52a"/><stop offset=".7" stop-color="#ffd474"/></linearGradient>
+  <radialGradient id="bgtG"><stop offset="0" stop-color="#fff8b5"/><stop offset=".35" stop-color="#ffe56b" stop-opacity=".7"/><stop offset="1" stop-color="#ffcc4d" stop-opacity="0"/></radialGradient></defs>
+  <rect width="800" height="520" fill="url(#bgtS)"/>
+  <circle cx="560" cy="250" r="150" fill="url(#bgtG)" class="bg-glow" style="transform-origin:560px 250px"/>
+  <circle cx="560" cy="250" r="58" fill="#ffe24d"/><circle cx="560" cy="250" r="46" fill="#fff27a"/>
+  <g class="bg-streak s1"><rect x="0" y="200" width="260" height="10" rx="5" fill="#ffe7a8" opacity=".8"/><rect x="60" y="214" width="180" height="8" rx="4" fill="#ffe7a8" opacity=".6"/></g>
+  <g class="bg-streak s2"><rect x="0" y="282" width="320" height="12" rx="6" fill="#ffe0a0" opacity=".7"/></g>
+  <g class="bg-flock f1">${flock}</g><g class="bg-flock f2">${flock}</g>
+  <g class="bg-par p1">${loop(hills('#e5732a', 'M0 318 L70 300 L140 312 L210 292 L300 306 L380 288 L470 304 L560 294 L640 308 L720 290 L800 318 V520 H0Z'))}</g>
+  <g class="bg-par p2">${loop(hills('#cf5a1f', 'M0 352 Q100 330 200 344 T400 340 T600 346 T800 352 V520 H0Z') + flatAcacia(180, 352, .55, ['#b85a1c', '#c96a24', '#9e4c18'], '#5a2a14') + flatAcacia(620, 350, .45, ['#b85a1c', '#c96a24', '#9e4c18'], '#5a2a14'))}</g>
+  <g class="bg-par p3">${loop(hills('#f0d7a4', 'M0 392 Q200 372 400 386 T800 392 V520 H0Z') + flatAcacia(90, 404, .95, ['#e0a23a', '#efb84b', '#c98a2c'], '#6b3a1e'))}</g>
+  <path d="M0 440 Q200 425 400 436 T800 440 V520 H0Z" fill="#ecc98a"/>
+  </svg>`;
+}
+
+// ---------- 3D story pages ----------
+// Each page is a 3D render (tools/stories3d.js) under a slow camera push, with the explainer layer
+// (hand-lettered labels, marks, arrows) popping in on top. Positions come from the render's anchors.
+const scene3d = (file, ...parts) => `<svg viewBox="0 0 800 450" class="scene" role="img"><g class="kb"><image href="assets/story-${file}.webp" width="800" height="450"/></g>${parts.map((p, i) => `<g class="pop-in" style="animation-delay:${(.45 + i * .35).toFixed(2)}s">${p}</g>`).join('')}</svg>`;
+const bigQ = (x, y, size = 90) => `<text class="hand" x="${x}" y="${y}" text-anchor="middle" font-size="${size}" fill="#E53935" stroke="${INK}" stroke-width="3">?</text>`;
+const tag = (t, x, y, anchor = 'middle', size = 22) => `<text class="hand" x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" fill="${INK}" stroke="#fff" stroke-width="6" paint-order="stroke">${t}</text>`;
+const STORY3D = {
+  'six-bricks': [
+    () => scene3d('six-bricks-1', label('MAASAI MARA'), sparkle(480, 120, 1.2), sparkle(320, 150)),
+    () => scene3d('six-bricks-2', label('SIX BRICKS!', 150, 60), arrow(483, 262, 490, 95), sparkle(640, 70), sparkle(350, 80)),
+    () => scene3d('six-bricks-3', label('SIX COLOURS'), ...['r', 'o', 'g', 'b', 'p', 'y'].map((c, i) => tag(BRICK[c].name.toUpperCase(), [203, 309, 415, 522, 628, 734][i], 408, 'middle', 19))),
+    () => scene3d('six-bricks-4', label('BRICK COWS'), arrow(320, 178, 565, 268)),
+    () => scene3d('six-bricks-5', label('NABO · ARE · UNI'), nums([[352, '1'], [551, '2'], [742, '3']], 118)),
+    () => scene3d('six-bricks-6', label('TEACHING AT HOME')),
+  ],
+  'lost-calf': [
+    () => scene3d('lost-calf-1', label('ONE CALF IS MISSING!'), bigQ(714, 128)),
+    () => scene3d('lost-calf-2', label('UNDER THE TREE?'), mark(false, 457, 267)),
+    () => scene3d('lost-calf-3', label('BEHIND THE ENKAJI?'), mark(false, 569, 124)),
+    () => scene3d('lost-calf-4', label('BESIDE THE RIVER!'), mark(true, 604, 120), arrow(250, 165, 515, 245), sparkle(690, 100), sparkle(520, 90)),
+    () => scene3d('lost-calf-5', label('HOME, BESIDE MAMA'), sparkle(250, 140, 1.3, '#E53935')),
+  ],
+  'mama-beads': [
+    () => scene3d('mama-beads-1', label("MAMA'S BEADWORK"), sparkle(410, 180), sparkle(300, 200, .8)),
+    () => scene3d('mama-beads-2', label('A PATTERN'), tag('ROUND AND ROUND', 400, 226, 'middle', 30)),
+    () => scene3d('mama-beads-3', label('COPY THE PATTERN')),
+    () => scene3d('mama-beads-4', label('WHAT COMES NEXT?'), bigQ(758, 245, 64), sparkle(712, 300, 1.2)),
+  ],
+  'little-seed': [
+    () => scene3d('little-seed-1', label('A TINY SEED'), arrow(310, 150, 380, 184), sparkle(430, 170)),
+    () => scene3d('little-seed-2', label('GOOD SOIL'), tag('TOPSOIL', 684, 224, 'start'), tag('SUBSOIL', 684, 270, 'start'), tag('ROCK', 684, 318, 'start')),
+    () => scene3d('little-seed-3', label('RAIN!')),
+    () => scene3d('little-seed-4', label('MAIZE!'), sparkle(415, 70, 1.3), sparkle(520, 110)),
+  ],
+};
+STORIES.forEach(st => st.pages.forEach((p, i) => { const f = STORY3D[st.id]?.[i]; if (f) p.s = f; }));
