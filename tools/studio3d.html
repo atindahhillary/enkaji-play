@@ -5,6 +5,7 @@
 <button id="go">Render all</button> <button id="st">Render stories</button> <span id="log"></span><div id="out"></div>
 <script type="module">
 import { PAGES, renderPage } from './stories3d.js';
+import { PROPS, TILES, frame } from './props3d.js';
 import { THREE, person, rest, wave, dance, BPM, brick, BRICK_COLS, cow, hut, acacia, ball, matte } from './cast3d.js';
 
 // The same cast as art.js CAST (kind, shuka colour, collar colours), plus a skin tone each.
@@ -33,7 +34,7 @@ function studio({ shadow = true, bg = null, wide = false } = {}) {
   key.shadow.mapSize.set(2048, 2048); Object.assign(key.shadow.camera, wide ? { left: -9, right: 9, top: 7, bottom: -4, far: 40 } : { left: -2, right: 2, top: 3, bottom: -1, far: 20 }); key.shadow.mapSize.set(wide ? 4096 : 2048, wide ? 4096 : 2048); key.shadow.bias = -.0004; key.shadow.normalBias = .03; scene.add(key);
   const rim = new THREE.DirectionalLight('#cfe6ff', 2.1); rim.position.set(-3, 4, -5); scene.add(rim);
   const fill = new THREE.DirectionalLight('#ffd2a8', .7); fill.position.set(-5, 2, 3); scene.add(fill);
-  if (shadow) { const sc = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.ShadowMaterial({ opacity: .28 })); sc.rotation.x = -Math.PI / 2; sc.receiveShadow = true; scene.add(sc); }
+  if (shadow) { const sc = new THREE.Mesh(new THREE.CircleGeometry(4, 48), new THREE.ShadowMaterial({ opacity: .28 })); sc.rotation.x = -Math.PI / 2; sc.receiveShadow = true; scene.add(sc); }
   return scene;
 }
 // Render at 2x and scale down for clean edges; returns a 2D canvas.
@@ -124,6 +125,15 @@ window.familyCut = async () => {
   const k = cow('#a0612c', '#f4efe6'); k.position.set(2.9, 0, -1.1); k.rotation.y = -.7; k.scale.setScalar(.85); scene.add(k);
   const cam = new THREE.PerspectiveCamera(30, 1, .1, 120); cam.position.set(.4, 2.1, 7.4); cam.lookAt(.6, 1.15, 0);
   return save('hero-family', shot(scene, cam, 880, 620), .86);
+};
+// Props, word pictures, Kerri and game tiles (transparent): assets/<name>.webp and assets/tile-<game>.webp
+window.renderProps = async () => {
+  const all = [...Object.entries(PROPS), ...Object.entries(TILES).map(([k, v]) => ['tile-' + k, v])], sizes = {};
+  for (const [name, [make, w, h, yaw = .3, pitch = .3, pad]] of all) {
+    log(name); const scene = studio({ wide: true }), obj = make(); scene.add(obj);
+    sizes[name] = await save(name, shot(scene, frame(obj, w, h, yaw, pitch, pad), w, h), .86);
+  }
+  window.PROPS_DONE = sizes; log('props done'); return sizes;
 };
 </script>
 </body></html>

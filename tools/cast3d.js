@@ -242,10 +242,12 @@ export function river(w = 30, d = 3.2) {
   return g;
 }
 export function fire() {
-  const g = G(), wood = matte('#5d4037', .9);
-  for (const r of [.5, -.6, 1.6]) { const l = M(new THREE.CylinderGeometry(.06, .06, .8, 10), wood, 0, .08, 0); l.rotation.set(Math.PI / 2, r, 0); g.add(l); }
-  const flame = c => new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: 2.2, roughness: 1 });
-  g.add(M(new THREE.ConeGeometry(.24, .7, 20), flame('#ff7a1a'), 0, .42, 0)); g.add(M(new THREE.ConeGeometry(.13, .45, 20), flame('#ffd54f'), .04, .32, .05));
+  const g = G(), wood = matte('#6d4c41', .9);
+  for (const r of [0, 1.05, 2.1]) { const arm = G(); arm.rotation.y = r; const log = M(new THREE.CylinderGeometry(.07, .08, .95, 10), wood, 0, .08, 0); log.rotation.z = Math.PI / 2; arm.add(log); g.add(arm); }
+  const flame = c => new THREE.MeshBasicMaterial({ color: c, toneMapped: false }); // unlit so the flame stays vivid
+  g.add(ball(.24, flame('#ff6a13'), 0, .38, 0, 1, 1.5, 1)); g.add(M(new THREE.ConeGeometry(.2, .42, 24), flame('#ff6a13'), 0, .72, 0));
+  g.add(ball(.15, flame('#ffb02e'), .02, .34, .1, 1, 1.5, 1)); g.add(M(new THREE.ConeGeometry(.12, .28, 20), flame('#ffb02e'), .02, .58, .1));
+  g.add(ball(.08, flame('#fff3a0'), .03, .3, .18, 1, 1.4, 1));
   const light = new THREE.PointLight('#ff9a3c', 14, 9, 1.6); light.position.set(0, .7, 0); light.castShadow = true; g.add(light);
   return g;
 }
@@ -269,4 +271,98 @@ export function soil() {
   g.add(ball(.13, gloss('#FDD835'), -.4, 2.03, .3, 1, .75, .9));
   const worm = M(new THREE.TorusGeometry(.18, .045, 10, 24, Math.PI * 1.3), matte('#e57373', .5), -1.3, 1.75, .62); g.add(worm);
   return g;
+}
+
+// ---------- Kerri, game props and word pictures ----------
+// Kerri the Maasai sheep: a round cloud of cream wool, a brown face with big lidded eyes.
+export function lamb() {
+  const g = G(), wool = once('wool', () => new THREE.MeshPhysicalMaterial({ color: '#f3e6cf', roughness: .95, sheen: 1, sheenColor: '#ffffff' })), face = matte('#8d4a26', .6);
+  for (const [x, y, z, r] of [[0, .62, 0, .36], [-.28, .58, .12, .26], [.26, .6, .14, .25], [-.3, .58, -.14, .25], [.22, .58, -.16, .25], [0, .82, 0, .26], [-.12, .78, .2, .22], [.1, .78, -.2, .22], [-.42, .66, 0, .2]]) g.add(ball(r, wool, x, y, z));
+  for (const [x, z] of [[.2, .15], [.2, -.15], [-.22, .15], [-.22, -.15]]) g.add(M(new THREE.CapsuleGeometry(.055, .2, 6, 12), matte('#4e2f1c', .6), x, .2, z));
+  const head = G(.45, .72, 0); g.add(head); head.add(ball(.22, face, 0, 0, 0, 1.05, 1, .9));
+  head.add(ball(.14, wool, -.05, .17, 0, 1, .7, 1));                        // woolly fringe
+  head.add(ball(.1, matte('#b5704a', .55), .17, -.08, 0, .8, .7, 1));       // muzzle
+  for (const s of [1, -1]) {
+    const eye = G(.12, .04, s * .13); head.add(eye); eye.rotation.y = -s * .6;
+    eye.add(ball(.075, gloss('#fbf7f2'), 0, 0, 0, .6, 1.1, 1)); eye.add(ball(.05, gloss('#1d0f08'), .035, -.008, 0, .5, 1.05, 1));
+    eye.add(ball(.013, once('hl', () => new THREE.MeshBasicMaterial({ color: '#ffffff' })), .055, .02, .015));
+    put(head, ball(.08, face, -.06, .06, s * .22, .5, .3, 1)).rotation.x = s * .5; // ear
+  }
+  return g;
+}
+export function goat() {
+  const g = G(), hair = matte('#f4efe6', .8), patch = matte('#5d4037', .8);
+  g.add(ball(.36, hair, 0, .6, 0, 1.25, .85, .8)); g.add(ball(.16, patch, -.12, .72, .18, 1.3, 1, .4));
+  for (const [x, z] of [[.24, .14], [.24, -.14], [-.26, .14], [-.26, -.14]]) g.add(M(new THREE.CapsuleGeometry(.05, .26, 6, 12), hair, x, .22, z));
+  const head = G(.5, .86, 0); g.add(head); head.add(ball(.18, hair, 0, 0, 0, 1.2, .95, .85));
+  put(head, M(new THREE.ConeGeometry(.05, .16, 10), hair, .12, -.2, 0)).rotation.z = Math.PI; // beard
+  for (const s of [1, -1]) {
+    head.add(ball(.04, gloss('#1d0f08'), .14, .05, s * .1));
+    put(head, M(new THREE.ConeGeometry(.03, .22, 10), matte('#bdb3a4', .5), -.05, .2, s * .06)).rotation.z = .5; // horn
+    put(head, ball(.09, hair, -.06, .02, s * .17, .4, .25, 1)).rotation.x = s * .9;                         // ear
+  }
+  return g;
+}
+export function drum(k = 'L') {
+  const g = G(), body = matte(k === 'L' ? '#8d4a26' : '#c62828', .6), skin = matte('#f3e2c7', .7);
+  g.add(M(new THREE.CylinderGeometry(.42, .32, .9, 40), body, 0, .45, 0));
+  g.add(M(new THREE.CylinderGeometry(.43, .43, .04, 40), skin, 0, .91, 0));
+  for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2; const c = M(new THREE.CylinderGeometry(.012, .012, .9, 6), skin, Math.cos(a) * .375, .45, Math.sin(a) * .375); c.rotation.set(-Math.sin(a) * .11, 0, Math.cos(a) * .11); g.add(c); }
+  put(g, M(new THREE.TorusGeometry(.42, .03, 8, 40), gloss('#FDD835'), 0, .86, 0)).rotation.x = Math.PI / 2;
+  return g;
+}
+export const bean = () => { const g = G(); g.add(ball(.2, gloss('#8d3b2a'), 0, .12, 0, 1.4, .75, .9)); g.add(ball(.05, matte('#d08b72', .5), .05, .2, .06, 1.6, .4, .6)); return g; };
+export const cob = () => { const g = G(); g.add(ball(.14, gloss('#FDD835'), 0, .32, 0, .8, 2.2, .8)); put(g, ball(.13, matte('#66bb6a', .7), -.08, .22, .05, .6, 2, .7)).rotation.z = .35; return g; };
+export const stone = () => { const g = G(); for (const [x, y, z, r, c] of [[-.1, .13, 0, .17, '#9e9e9e'], [.14, .11, .06, .14, '#8d8d8d'], [.02, .28, .02, .12, '#b0b0b0']]) g.add(ball(r, matte(c, .9), x, y, z, 1.15, .85, 1)); return g; };
+export function basket(item) {
+  const g = G(), weave = matte('#c8a165', .9);
+  g.add(M(new THREE.CylinderGeometry(.55, .42, .5, 40, 1, true), weave, 0, .25, 0));
+  g.add(M(new THREE.CylinderGeometry(.42, .42, .03, 40), weave, 0, .02, 0));
+  for (const y of [.12, .25, .38]) put(g, M(new THREE.TorusGeometry(.43 + y * .25, .018, 6, 48), matte('#9c7a45', .9), 0, y, 0)).rotation.x = Math.PI / 2;
+  put(g, M(new THREE.TorusGeometry(.56, .045, 10, 48), matte('#a8844f', .9), 0, .5, 0)).rotation.x = Math.PI / 2;
+  if (item) for (const [x, z, r] of [[-.15, .05, .3], [.15, -.05, -.4], [0, .15, 1.2]]) { const it = item(); it.position.set(x, .38, z); it.rotation.y = r; it.scale.setScalar(.8); g.add(it); }
+  return g;
+}
+export function cup(level = .6) {
+  const g = G(), glass = new THREE.MeshPhysicalMaterial({ color: '#ffffff', roughness: .1, transparent: true, opacity: .45 });
+  g.add(M(new THREE.CylinderGeometry(.26, .21, .6, 32, 1, true), glass, 0, .3, 0));
+  if (level > 0) g.add(M(new THREE.CylinderGeometry(.205 + .05 * level, .205, .58 * level, 32), matte('#fffdf4', .5), 0, .29 * level + .01, 0));
+  put(g, M(new THREE.TorusGeometry(.12, .025, 8, 24, Math.PI), glass, .27, .32, 0)).rotation.z = -Math.PI / 2;
+  return g;
+}
+export function shukaCloth() { const g = G(); for (let i = 0; i < 3; i++) put(g, M(new THREE.BoxGeometry(1, .08, .7), shuka('#c62828'), 0, .04 + i * .085, 0)).rotation.y = (i - 1) * .06; return g; }
+export function sun3d() {
+  const g = G(), core = new THREE.MeshStandardMaterial({ color: '#ffd54f', emissive: '#ffb300', emissiveIntensity: .8, roughness: .4 });
+  g.add(ball(.4, core, 0, .6, 0));
+  for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; put(g, M(new THREE.ConeGeometry(.07, .26, 12), core, Math.cos(a) * .58, .6 + Math.sin(a) * .58, 0)).rotation.z = a - Math.PI / 2; }
+  return g;
+}
+export function drop() {
+  const g = G(), w = new THREE.MeshPhysicalMaterial({ color: '#4fc3f7', roughness: .05, clearcoat: 1 });
+  g.add(ball(.3, w, 0, .32, 0)); g.add(M(new THREE.ConeGeometry(.29, .5, 32), w, 0, .7, 0)); g.add(ball(.07, new THREE.MeshBasicMaterial({ color: '#ffffff' }), -.12, .42, .25));
+  return g;
+}
+export function stick(len = 1.6) {
+  const g = G(), wood = matte('#8d6e63', .9);
+  g.add(M(new THREE.CylinderGeometry(.06, .07, len, 12), wood, 0, len / 2, 0));
+  put(g, M(new THREE.CylinderGeometry(.03, .02, .25, 8), wood, .07, len * .7, 0)).rotation.z = -.6; // a little side twig
+  return g;
+}
+export function bundle() {
+  const g = G();
+  for (let i = 0; i < 10; i++) { const s = stick(1.6); s.position.set((i % 5 - 2) * .13, 0, i < 5 ? .06 : -.06); s.rotation.z = (i % 5 - 2) * .02; g.add(s); }
+  for (const y of [.45, 1.1]) put(g, M(new THREE.TorusGeometry(.36, .03, 8, 32), matte('#c62828', .7), 0, y, 0)).rotation.x = Math.PI / 2;
+  return g;
+}
+// A glossy block with letters printed on the front (syllables, letters, sums).
+export function textBlock(text, col = '#ffffff', ink = '#2a1a12', w = .9) {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 220; const x = c.getContext('2d');
+  x.fillStyle = col; x.fillRect(0, 0, 256, 220); x.fillStyle = ink; x.font = '900 150px Inter, system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(text, 128, 118);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const side = new THREE.MeshPhysicalMaterial({ color: col, roughness: .35, clearcoat: .6 }), face = new THREE.MeshPhysicalMaterial({ map: t, roughness: .35, clearcoat: .6 });
+  const g = G(); g.add(M(new THREE.BoxGeometry(w, .78, .3), [side, side, side, side, face, side], 0, .39, 0)); return g;
+}
+export function coin() { const g = G(); put(g, M(new THREE.CylinderGeometry(.3, .3, .07, 40), gloss('#fbc02d'), 0, .3, 0)).rotation.x = Math.PI / 2; g.add(M(new THREE.TorusGeometry(.24, .02, 8, 40), gloss('#f9a825'), 0, .3, .04)); return g; }
+export function beadString(cols = ['#E53935', '#ffffff', '#1E88E5', '#FDD835', '#E53935', '#ffffff', '#43A047']) {
+  const g = G(); cols.forEach((c, i) => { const a = Math.PI * (i + .5) / cols.length; g.add(ball(.13, gloss(c), -Math.cos(a) * .9, .7 - Math.sin(a) * .45, 0)); }); return g;
 }

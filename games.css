@@ -213,3 +213,9 @@
 .walk-out-h { animation: walkOutH .8s ease-in forwards; }
 @keyframes walkOutH { to { transform: translateX(-60vw); opacity: 0; } }
 @media (max-width: 760px) { .pic-b { width: 100px; } .pic-b svg { height: 70px; } .slot, .syl { min-width: 60px; height: 54px; font-size: 1.4rem; } .small-herd .hc { width: 48px; } .big-letter { font-size: 4.5rem; } }
+
+/* 3D props (tools/props3d.js) fill the same slots the drawings did */
+img.p3d { display: block; width: 100%; height: auto; pointer-events: none; user-select: none; -webkit-user-drag: none; }
+.pic-b img.p3d, .pic-b img.cow3d { height: 90px; object-fit: contain; }
+.word-pic img { max-width: 100%; max-height: 100%; object-fit: contain; }
+@media (max-width: 760px) { .pic-b img.p3d, .pic-b img.cow3d { height: 70px; } }

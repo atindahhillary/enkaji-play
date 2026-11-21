@@ -102,23 +102,7 @@ function cow(x, y, s = 1, col = '#8d5524', flip = false, cls = '', patch) {
   </g></g>`;
 }
 // Kerri the Maasai sheep, the mascot (woolly cloud body, bead collar).
-function lambSVG(cls = '') {
-  const puffs = [[40, 52, 16], [58, 44, 17], [76, 50, 16], [34, 66, 14], [82, 66, 14], [50, 70, 16], [68, 70, 16]];
-  return `<svg viewBox="0 0 120 110" class="lamb ${cls}" role="img" aria-label="Kerri the Maasai sheep">
-    <ellipse cx="60" cy="104" rx="38" ry="5" fill="rgba(0,0,0,.14)"/>
-    ${[44, 56, 68, 80].map(lx => limb(`M${lx} 76 V100`, '#5d3a24', 6)).join('')}
-    ${puffs.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r + 2.5}" fill="${INK}"/>`).join('')}
-    ${puffs.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#f6e7cf"/>`).join('')}
-    <path d="M86 40 q-14 4 -14 16 q14 6 22 -2z" fill="#8d4a26" stroke="${INK}" stroke-width="2.5"/>
-    <ellipse cx="98" cy="50" rx="17" ry="15" fill="#a0522d" stroke="${INK}" stroke-width="3"/>
-    <ellipse cx="106" cy="57" rx="9" ry="7" fill="#d9a27a" stroke="${INK}" stroke-width="2"/>
-    <g class="eyes"><circle cx="94" cy="46" r="3.6" fill="#fff" stroke="${INK}" stroke-width="1.5"/><circle cx="104" cy="45" r="3.6" fill="#fff" stroke="${INK}" stroke-width="1.5"/><circle cx="95" cy="46.5" r="1.8" fill="${INK}"/><circle cx="105" cy="45.5" r="1.8" fill="${INK}"/></g>
-    <path d="M102 60 q4 3 8 0" stroke="${INK}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-    <path d="M84 62 Q90 72 100 68" stroke="${INK}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M84 62 Q90 72 100 68" stroke="#E53935" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <circle cx="88" cy="67" r="2" fill="#FDD835"/><circle cx="94" cy="69.5" r="2" fill="#1E88E5"/>
-    <circle cx="61" cy="36" r="9" fill="${INK}"/><circle cx="61" cy="36" r="6.5" fill="#f6e7cf"/>
-  </svg>`;
-}
+function lambSVG(cls = '') { return `<img class="lamb ${cls}" src="assets/kerri.webp" alt="Kerri the Maasai sheep" decoding="async" draggable="false">`; }
 
 // ---------- Scene kit (800 x 450) ----------
 // Golden-hour Mara: soft blue sky melting into gold at the horizon (no purple anywhere).
@@ -270,21 +254,8 @@ const STORIES = [
 const svgInner = svg => svg.slice(svg.indexOf('>') + 1, svg.lastIndexOf('</svg>'));
 
 // Game tile art.
-const TILE_ART = {
-  copy: () => `<svg viewBox="0 0 120 90">${brickSVG('r', 20, 60, 12)}${brickSVG('y', 32, 44, 12)}${brickSVG('b', 20, 28, 12)}<text x="92" y="58" font-size="36" fill="#fff" font-weight="900" stroke="${INK}" stroke-width="2" paint-order="stroke">?</text></svg>`,
-  cattle: () => `<svg viewBox="0 0 260 150">${cow(80, 140, .62, '#8d5524')}${cow(190, 144, .55, '#f2efe6')}<text x="8" y="34" font-size="30" fill="#fff" font-weight="900" stroke="${INK}" stroke-width="3" paint-order="stroke">1 2 3</text></svg>`,
-  beads: () => `<svg viewBox="0 0 120 90">${['#E53935', '#fff', '#1E88E5', '#E53935', '#fff'].map((c, i) => `<circle cx="${14 + i * 20}" cy="46" r="9" fill="${c}" stroke="${INK}" stroke-width="2"/>`).join('')}<text x="102" y="54" font-size="24" fill="#fff" font-weight="900" stroke="${INK}" stroke-width="2" paint-order="stroke">?</text></svg>`,
-  colour: () => `<svg viewBox="0 0 120 90">${['r', 'g', 'b', 'p'].map((c, i) => brickSVG(c, 6 + (i % 2) * 58, 30 + Math.floor(i / 2) * 32, 12)).join('')}</svg>`,
-  code: () => `<svg viewBox="0 0 120 90">${[0, 1, 2].map(i => `<rect x="${14 + i * 32}" y="56" width="26" height="26" rx="6" fill="#fff" stroke="${INK}" stroke-width="2"/><text x="${20 + i * 32}" y="75" font-size="16">${['⬆️', '➡️', '➡️'][i]}</text>`).join('')}${cow(46, 50, .3, '#8d5524')}<text x="94" y="40" font-size="22">💧</text></svg>`,
-  harvest: () => `<svg viewBox="0 0 120 90"><g transform="translate(30 54)">${HARVEST.bean.svg.replace('<svg', '<svg x="-20" y="-14" width="40" height="28"')}</g><g transform="translate(62 48)">${HARVEST.maize.svg.replace('<svg', '<svg x="-14" y="-24" width="28" height="48"')}</g><g transform="translate(94 56)">${HARVEST.stone.svg.replace('<svg', '<svg x="-18" y="-13" width="36" height="26"')}</g></svg>`,
-  milk: () => `<svg viewBox="0 0 120 90">${[0, 1, 2].map(i => `<g transform="translate(${22 + i * 38} 30)"><path d="M-12 0 L-10 40 L10 40 L12 0Z" fill="#fff" stroke="${INK}" stroke-width="3"/>${i < 2 ? `<path d="M-11 10 L-10 40 L10 40 L11 10Z" fill="#fffdf5"/><path d="M-11 10 H11" stroke="#bdbdbd" stroke-width="2"/>` : ''}</g>`).join('')}<text x="8" y="22" font-size="18" font-weight="900" fill="#fff" stroke="${INK}" stroke-width="2.5" paint-order="stroke">1 2 3</text></svg>`,
-  drum: () => `<svg viewBox="0 0 120 90"><g transform="translate(38 50) scale(.5)">${svgInner(drumSVG('L'))}</g><g transform="translate(86 56) scale(.38)">${svgInner(drumSVG('H'))}</g></svg>`,
-  silabi: () => `<svg viewBox="0 0 120 90">${['ma', 'ji'].map((s, i) => `<g transform="translate(${18 + i * 46} 28)"><rect width="40" height="34" rx="8" fill="#fff" stroke="${INK}" stroke-width="3"/><text x="20" y="24" text-anchor="middle" font-size="18" font-weight="900" fill="${INK}">${s}</text></g>`).join('')}<text x="104" y="52" font-size="20">💧</text></svg>`,
-  letters: () => `<svg viewBox="0 0 120 90"><text x="16" y="66" font-size="56" font-weight="900" fill="#fff" stroke="${INK}" stroke-width="3" paint-order="stroke">c</text><g transform="translate(80 76) scale(.32)">${cow(0, 0, 1, '#8d5524')}</g></svg>`,
-  herd: () => `<svg viewBox="0 0 120 90"><text x="8" y="30" font-size="20" font-weight="900" fill="#fff" stroke="${INK}" stroke-width="2.5" paint-order="stroke">3 + 2</text><g transform="translate(36 82) scale(.3)">${cow(0, 0, 1, '#f2efe6')}</g><g transform="translate(88 84) scale(.3)">${cow(0, 0, 1, '#2b1d16')}</g></svg>`,
-  firewood: () => `<svg viewBox="0 0 120 90"><g transform="translate(14 8) scale(.8)">${svgInner(BUNDLE)}</g><g transform="translate(80 8) scale(.8)">${svgInner(STICK)}</g><g transform="translate(94 8) scale(.8)">${svgInner(STICK)}</g></svg>`,
-  market: () => `<svg viewBox="0 0 120 90"><circle cx="40" cy="48" r="20" fill="#fdd835" stroke="${INK}" stroke-width="3"/><text x="33" y="56" font-size="20" font-weight="900" fill="#8a6500">5</text><circle cx="80" cy="52" r="16" fill="#cfd8dc" stroke="${INK}" stroke-width="3"/><text x="70" y="59" font-size="16" font-weight="900" fill="#455a64">10</text></svg>`,
-};
+// Game tile art: a small 3D still life per game (tools/props3d.js).
+const TILE_ART = Object.fromEntries(['copy', 'cattle', 'beads', 'colour', 'code', 'harvest', 'milk', 'drum', 'silabi', 'letters', 'herd', 'firewood', 'market'].map(id => [id, () => `<img class="p3d" src="assets/tile-${id}.webp" alt="" decoding="async">`]));
 
 // ---------- Animated backgrounds (flat cartoon style, from the user's two references) ----------
 // Flat acacia: brown trunk with forked branches and layered flat-topped canopies.

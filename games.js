@@ -767,20 +767,11 @@ const GAME_MOUNT = {
 };
 
 // ---------- Art for the Mama games (same outlined explainer style) ----------
-const HARVEST = {
-  bean: { t: 'beans', svg: `<svg viewBox="-24 -16 48 32"><ellipse rx="18" ry="11" fill="#8d3b2a" stroke="${INK}" stroke-width="3"/><path d="M-7 -4 q7 5 14 0" stroke="#d08b72" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>` },
-  maize: { t: 'maize', svg: `<svg viewBox="-20 -32 40 64"><path d="M2 26 q-22 -6 -16 -40" fill="#66bb6a" stroke="${INK}" stroke-width="2.5"/><ellipse rx="11" ry="25" fill="#FDD835" stroke="${INK}" stroke-width="3"/>${[-14, -6, 2, 10].map(y => `<path d="M-7 ${y} h14" stroke="#e0a800" stroke-width="2"/>`).join('')}</svg>` },
-  stone: { t: 'stones', svg: `<svg viewBox="-22 -16 44 32"><path d="M-18 5 Q-19 -11 -2 -12 Q17 -13 18 2 Q17 12 0 12 Q-17 12 -18 5Z" fill="#9e9e9e" stroke="${INK}" stroke-width="3"/><path d="M-6 -4 l6 2" stroke="#bdbdbd" stroke-width="3" stroke-linecap="round"/></svg>` },
-};
-const basketSVG = k => `<svg viewBox="-55 -50 110 90" aria-hidden="true"><path d="M-48 -18 L48 -18 L37 32 L-37 32Z" fill="#c8a165" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
-  ${[-6, 6, 18].map(y => `<path d="M${-46 + (y + 18) * .2} ${y} H${46 - (y + 18) * .2}" stroke="#9c7a45" stroke-width="3"/>`).join('')}
-  <ellipse cx="0" cy="-18" rx="48" ry="8" fill="#a8844f" stroke="${INK}" stroke-width="3"/><g transform="translate(0 6) scale(.9)">${HARVEST[k].svg.replace('<svg', '<svg x="-22" y="-18" width="44" height="36"')}</g></svg>`;
-const drumSVG = k => `<svg viewBox="-60 -70 120 140" aria-hidden="true"><path d="M-44 -40 L-34 56 L34 56 L44 -40Z" fill="${k === 'L' ? '#8d4a26' : '#c62828'}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M-40 -30 L-26 50 M-20 -30 L-10 50 M0 -30 L6 50 M20 -30 L20 50 M40 -30 L32 50" stroke="#f3e2c7" stroke-width="2.5" opacity=".8"/>
-  <ellipse cx="0" cy="-40" rx="44" ry="12" fill="#f3e2c7" stroke="${INK}" stroke-width="3"/><ellipse cx="0" cy="56" rx="34" ry="8" fill="rgba(0,0,0,.18)"/></svg>`;
-
-
-// ---------- Words and pictures for the CBE games (things a child in the Maasai Mara sees every day) ----------
+const p3d = (src, alt = '') => `<img class="p3d" src="assets/${src}.webp" alt="${alt}" decoding="async" draggable="false">`;
+// 3D renders (tools/props3d.js): harvest items, baskets, drums.
+const HARVEST = { bean: { t: 'beans', svg: p3d('hv-bean') }, maize: { t: 'maize', svg: p3d('hv-maize') }, stone: { t: 'stones', svg: p3d('hv-stone') } };
+const basketSVG = k => p3d('basket-' + k, HARVEST[k].t + ' basket');
+const drumSVG = k => p3d('drum-' + k, k === 'L' ? 'low drum' : 'high drum');// ---------- Words and pictures for the CBE games (things a child in the Maasai Mara sees every day) ----------
 // Kiswahili words split into syllables (silabi), as taught in Grade 1 Kiswahili.
 const WORDS_SW = [
   { w: 'mama', s: ['ma', 'ma'], en: 'mother', pic: 'mama' }, { w: 'baba', s: ['ba', 'ba'], en: 'father', pic: 'baba' },
@@ -804,29 +795,14 @@ function swNum(n) {
   return t ? ten[t] + (o ? ' na ' + one[o] : '') : one[o];
 }
 const box = (vb, inner) => `<svg viewBox="${vb}" aria-hidden="true">${inner}</svg>`;
+// Word pictures: 3D renders, plus the 3D cow, Kerri and the cast portraits.
+const PIC3D = { goat: 'pic-goat', hut: 'pic-hut', tree: 'pic-tree', drum: 'drum-L', maize: 'hv-maize', beads: 'pic-beads', sun: 'pic-sun', water: 'pic-water', fire: 'pic-fire', cup: 'pic-cup', shuka: 'pic-shuka', brick: 'pic-brick' };
 function pic(name) {
-  switch (name) {
-    case 'cow': return cowImg('#8d5524');
-    case 'goat': return box('-60 -70 130 80', `<ellipse cx="0" cy="0" rx="44" ry="6" fill="rgba(0,0,0,.14)"/>${[-26, -14, 14, 26].map(x => limb(`M${x} -24 V-4`, '#f2efe6', 6)).join('')}
-      <ellipse cx="0" cy="-34" rx="36" ry="18" fill="#f2efe6" stroke="${INK}" stroke-width="3"/><ellipse cx="-8" cy="-38" rx="12" ry="8" fill="#5d4037"/>
-      <path d="M28 -44 Q46 -58 54 -40 Q58 -28 46 -26 Q36 -30 28 -36Z" fill="#f2efe6" stroke="${INK}" stroke-width="3"/><path d="M50 -28 q2 10 -4 14" stroke="${INK}" stroke-width="3" fill="none"/>
-      ${limb('M40 -52 Q34 -64 24 -64', '#bdb3a4', 3)}<circle cx="44" cy="-42" r="2.5" fill="${INK}"/><path d="M-36 -40 q-8 -8 -4 -16" stroke="${INK}" stroke-width="3" fill="none"/>`);
-    case 'hut': return box('-80 -75 160 85', hut(0, 0, 1));
-    case 'tree': return box('-105 -150 210 158', acacia(0, 0, 1));
-    case 'drum': return drumSVG('L');
-    case 'maize': return HARVEST.maize.svg;
-    case 'beads': return box('-50 -30 100 60', `<path d="M-40 -18 Q0 40 40 -18" stroke="#6d4c41" stroke-width="2" fill="none"/>${Array.from({ length: 7 }, (_, i) => { const a = Math.PI * (i + .5) / 7; return `<circle cx="${(-Math.cos(a) * 36).toFixed(1)}" cy="${(-14 + Math.sin(a) * 30).toFixed(1)}" r="7" fill="${['#E53935', '#fff', '#1E88E5', '#FDD835'][i % 4]}" stroke="${INK}" stroke-width="2"/>`; }).join('')}`);
-    case 'sun': return box('-60 -60 120 120', `${Array.from({ length: 12 }, (_, i) => { const a = i * Math.PI / 6; return `<path d="M${Math.cos(a) * 34} ${Math.sin(a) * 34} L${Math.cos(a) * 50} ${Math.sin(a) * 50}" stroke="#f9a825" stroke-width="6" stroke-linecap="round"/>`; }).join('')}<circle r="28" fill="#ffd54f" stroke="${INK}" stroke-width="3"/><circle cx="-9" cy="-4" r="3" fill="${INK}"/><circle cx="9" cy="-4" r="3" fill="${INK}"/><path d="M-9 8 q9 7 18 0" stroke="${INK}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`);
-    case 'water': return box('-40 -50 80 90', `<path d="M0 -44 Q30 -6 30 14 A30 30 0 0 1 -30 14 Q-30 -6 0 -44Z" fill="#4fc3f7" stroke="${INK}" stroke-width="3"/><path d="M-14 10 q0 12 10 16" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>`);
-    case 'fire': return box('-40 -75 80 82', fire(0, 0));
-    case 'cup': return box('-40 -45 80 80', `<path d="M-24 -30 L-20 26 L20 26 L24 -30Z" fill="#fff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M-23 -16 L-21 24 L21 24 L23 -16Z" fill="#fffdf2"/><path d="M24 -18 q18 2 14 18 q-4 10 -16 8" stroke="${INK}" stroke-width="3" fill="none"/>`);
-    case 'shuka': return box('-50 -40 100 80', `<rect x="-40" y="-32" width="80" height="64" rx="6" fill="#c62828" stroke="${INK}" stroke-width="3"/>${[-20, 0, 20].map(v => `<path d="M${v} -32 V32" stroke="rgba(0,0,0,.3)" stroke-width="6"/><path d="M-40 ${v} H40" stroke="rgba(0,0,0,.3)" stroke-width="6"/>`).join('')}`);
-    case 'brick': return box('0 -8 92 40', brickSVG('r', 6, 6, 20));
-    case 'lamb': return lambSVG();
-    case 'mama': return AV('mama', 'mama', '#ffe9d6');
-    case 'baba': return AV('man', 'baba', '#e3f2fd');
-  }
-  return '';
+  if (name === 'cow') return cowImg('#8d5524');
+  if (name === 'lamb') return lambSVG();
+  if (name === 'mama') return AV('mama', 'mama', '#ffe9d6');
+  if (name === 'baba') return AV('man', 'baba', '#e3f2fd');
+  return PIC3D[name] ? p3d(PIC3D[name], name) : '';
 }
-const STICK = `<svg viewBox="0 0 14 90" aria-hidden="true"><rect x="3" y="2" width="8" height="86" rx="4" fill="#8d6e63" stroke="${INK}" stroke-width="2"/></svg>`;
-const BUNDLE = `<svg viewBox="0 0 70 90" aria-hidden="true">${Array.from({ length: 10 }, (_, i) => `<rect x="${4 + i * 6}" y="${2 + (i % 3) * 2}" width="8" height="84" rx="4" fill="#8d6e63" stroke="${INK}" stroke-width="2"/>`).join('')}<rect x="0" y="40" width="70" height="10" rx="3" fill="#E53935" stroke="${INK}" stroke-width="2"/></svg>`;
+const STICK = p3d('stick');
+const BUNDLE = p3d('bundle');
