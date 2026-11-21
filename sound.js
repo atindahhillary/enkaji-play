@@ -61,7 +61,7 @@ const SND = (() => {
     const bass = [146.8, 146.8, 110, 123.5]; // D D A B, one per bar
     const eighth = 60 / 96 / 2; let n = 0, next = a.currentTime + .1;
     bed = { g, iv: setInterval(() => {
-      const duck = window.speechSynthesis && speechSynthesis.speaking ? .35 : 1;
+      const duck = (window.EnkajiApp ? EnkajiApp.speaking() : window.speechSynthesis && speechSynthesis.speaking) ? .35 : 1;
       g.gain.setTargetAtTime(duck, a.currentTime, .25);
       while (next < a.currentTime + .25) {
         const bar = Math.floor(n / 8);
@@ -77,7 +77,7 @@ const SND = (() => {
     music: v => { try { music(v); } catch {} },
     play: k => { try { fx[k] && fx[k](); } catch {} },
     get on() { return on; },
-    toggle() { on = !on; try { localStorage.setItem('enkaji-sound', on ? 'on' : 'off'); } catch {} if (!on) { window.speechSynthesis?.cancel(); music(false); } return on; },
+    toggle() { on = !on; try { localStorage.setItem('enkaji-sound', on ? 'on' : 'off'); } catch {} if (!on) { stopSpeech(); music(false); } return on; },
   };
 })();
 
@@ -117,6 +117,9 @@ const REC = (() => {
     async remove(k) { await tx('readwrite', s => s.delete(k)); keys.delete(k); delete cache[k]; },
   };
 })();
+
+// Stop any speech: the browser's, or Android's when running inside the app.
+function stopSpeech() { try { window.speechSynthesis && speechSynthesis.cancel(); } catch {} try { window.EnkajiApp && EnkajiApp.stop(); } catch {} }
 
 // Play Sanau's recorded clip for a Maa word, if there is one. Resolves to the Audio, or false.
 function playSanau(k) {

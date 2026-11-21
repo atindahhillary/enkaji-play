@@ -352,3 +352,6 @@ svg.avatar { border-radius: 50%; display: block; aspect-ratio: 1; }
 .ih-step { display: flex; gap: 12px; align-items: center; background: var(--sand); border-radius: 14px; padding: 12px; }
 .ih-step .ih-n { flex: none; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--r); color: #fff; border: 2px solid #2a1a12; }
 @media (max-width: 760px) { .install-top { position: absolute; top: 20px; right: 68px; padding: 0 12px; font-size: .85rem; } .install-card { flex-wrap: wrap; } .install-card .btn { width: 100%; justify-content: center; } }
+
+.apk-chip { text-decoration: none; display: inline-flex; align-items: center; background: #e8f5e9 !important; color: #1B5E20 !important; }
+[data-apk][hidden] { display: none !important; }

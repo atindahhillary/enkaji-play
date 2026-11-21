@@ -172,3 +172,43 @@
 .beats i { width: 18px; height: 18px; border-radius: 50%; border: 3px solid #2a1a12; background: #fff; }
 .beats i.on { background: #FDD835; animation: popIn .25s var(--back); }
 @media (max-width: 760px) { .cups { grid-template-columns: repeat(5, 40px); gap: 8px; } .cup { width: 40px; height: 52px; } .cow-btn { width: 170px; } .basket-b { width: 100px; } .drum-b.big { width: 130px; } .drum-b.small { width: 95px; } }
+
+/* ===== Levels, beads and CBE games ===== */
+.cbe-tag { display: inline-block; background: #e3f2fd; color: var(--ink); border-radius: 10px; padding: 6px 12px; font-size: .9rem; font-weight: 600; margin: -4px 0 10px; }
+.levels { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.lvl-b { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 8px 16px; border-radius: 99px; border: 2px solid var(--line); background: #fff; font-weight: 800; color: var(--ink); }
+.lvl-b.on { background: var(--brand); color: #fff; border-color: var(--brand); }
+.lvl-bead { display: inline-block; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #2a1a12; background: #e0d6c8; opacity: .6; vertical-align: -3px; }
+.lvl-bead.got { background: var(--bc); opacity: 1; box-shadow: inset -2px -3px 0 rgba(0,0,0,.18); }
+.lvl-progress { margin: 0 0 12px; font-weight: 600; letter-spacing: .02em; }
+.tile .art { position: relative; }
+.tile-beads { position: absolute; right: 8px; top: 8px; display: flex; gap: 3px; }
+.tile-beads i { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #2a1a12; background: rgba(255,255,255,.4); }
+.tile-beads i.got { background: var(--bc); }
+.collar-card { text-align: center; } .bead-collar { width: 100%; max-width: 560px; height: auto; }
+.word-pic { width: 150px; height: 120px; margin: 0 auto 6px; display: grid; place-items: center; }
+.word-pic svg, .word-pic .avatar { max-width: 100%; max-height: 100%; }
+.slots { display: flex; gap: 10px; justify-content: center; margin: 8px 0 14px; }
+.slot { min-width: 72px; height: 60px; border-radius: 14px; border: 3px dashed #2a1a12; background: #fff; display: grid; place-items: center; font-size: 1.7rem; font-weight: 900; }
+.slot:not(:empty) { border-style: solid; background: #fff8d6; }
+.syl-tiles { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
+.syl { min-width: 72px; min-height: 60px; border-radius: 14px; border: 3px solid #2a1a12; background: #fff; font-size: 1.6rem; font-weight: 900; box-shadow: 0 4px 0 #2a1a12; color: var(--ink); }
+.syl.used { opacity: .25; }
+.big-letter { font-size: 6rem; font-weight: 900; line-height: 1; color: #fff; -webkit-text-stroke: 4px #2a1a12; paint-order: stroke; text-shadow: 0 6px 0 rgba(0,0,0,.15); }
+.big-letter small { font-size: 3rem; margin-left: 12px; }
+.pics { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin: 12px 0; }
+.pic-b { width: 130px; padding: 10px; border-radius: 18px; border: 3px solid #2a1a12; background: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; font-weight: 800; color: var(--ink); }
+.pic-b svg, .pic-b .avatar { width: 100%; height: 90px; }
+.pic-b.right { background: #dcfce7; }
+.target-num { font-size: 4.2rem; font-weight: 900; color: #fff; -webkit-text-stroke: 3px #2a1a12; paint-order: stroke; line-height: 1; }
+.wood { display: flex; gap: 14px; justify-content: center; margin: 12px 0; flex-wrap: wrap; }
+.wood-col { flex: 1; min-width: 150px; max-width: 320px; background: rgba(255,255,255,.75); border-radius: 16px; padding: 10px; border: 2px solid #2a1a12; }
+.bundles, .sticks { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; min-height: 92px; align-items: flex-end; margin-top: 6px; }
+.bundle { width: 46px; } .stick { width: 12px; } .bundle svg, .stick svg { width: 100%; display: block; }
+.sum-line { font-size: 2rem; font-weight: 900; text-align: center; margin: 4px 0; }
+.small-herd .hc { width: 64px; } .small-herd .hc svg { width: 100%; display: block; }
+.walk-in-h { animation: walkInH .7s cubic-bezier(.2,.7,.3,1) backwards; }
+@keyframes walkInH { from { transform: translateX(60vw); } }
+.walk-out-h { animation: walkOutH .8s ease-in forwards; }
+@keyframes walkOutH { to { transform: translateX(-60vw); opacity: 0; } }
+@media (max-width: 760px) { .pic-b { width: 100px; } .pic-b svg { height: 70px; } .slot, .syl { min-width: 60px; height: 54px; font-size: 1.4rem; } .small-herd .hc { width: 48px; } .big-letter { font-size: 4.5rem; } }

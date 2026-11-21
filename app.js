@@ -26,6 +26,54 @@ function badge(id) {
   const b = BADGES.find(x => x.id === id);
   setTimeout(() => toast(`🏅 New badge: ${b.t}!`), 1400);
 }
+// ---------- Levels and bead awards ----------
+// Every game has three levels. Win LEVEL_GOAL rounds at a level to earn its bead for your collar.
+const LEVEL_GOAL = 5;
+const LEVELS = [
+  { t: 'Beginner', icon: '🌱', bead: '#ffffff', beadName: 'white' },
+  { t: 'Intermediate', icon: '🌿', bead: '#E53935', beadName: 'red' },
+  { t: 'Advanced', icon: '🌳', bead: '#1E88E5', beadName: 'blue' },
+];
+function levelWin(id, tier) {
+  S.tw = S.tw || {}; S.tiers = S.tiers || {};
+  S.tw[id + tier] = (S.tw[id + tier] || 0) + 1;
+  if (S.tw[id + tier] >= LEVEL_GOAL && (S.tiers[id] || 0) < tier) {
+    S.tiers[id] = tier; save();
+    const L = LEVELS[tier - 1], g = GAMES.find(x => x.id === id);
+    setTimeout(() => { toast(`📿 ${L.t} complete! The ${L.beadName} bead for ${g.t} is on your collar.`); confetti(); SND.play('cheer'); }, 1800);
+    badge('collar1');
+    if (GAMES.every(x => (S.tiers[x.id] || 0) >= 1)) badge('collarWhite');
+    if (GAMES.every(x => (S.tiers[x.id] || 0) >= 3)) badge('collarAll');
+  }
+  save();
+}
+const beadCount = () => GAMES.reduce((n, g) => n + ((S.tiers || {})[g.id] || 0), 0);
+// The child's collar: three beads per game (white, red, blue), grey until earned.
+function beadCollar() {
+  const beads = GAMES.flatMap(g => LEVELS.map((L, i) => ({ g, L, got: ((S.tiers || {})[g.id] || 0) > i })));
+  const n = beads.length;
+  return `<svg viewBox="0 0 400 210" class="bead-collar" role="img" aria-label="Bead collar, ${beadCount()} beads earned">
+    <path d="M20 20 Q200 330 380 20" fill="none" stroke="#6d4c41" stroke-width="2"/>
+    ${beads.map((b, i) => { const a = Math.PI * (i + .5) / n, x = 200 - Math.cos(a) * 180, y = 20 + Math.sin(a) * 170;
+      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${b.got ? 10 : 6.5}" fill="${b.got ? b.L.bead : '#f1e9dc'}" stroke="${b.got ? INK : '#c9bba6'}" stroke-width="${b.got ? 2.5 : 1}"><title>${b.g.t}: ${b.L.t}${b.got ? '' : ' (not yet)'}</title></circle>`; }).join('')}
+  </svg>`;
+}
+// Which part of the Kenyan CBE each game practises (lower primary uses "Activities" names).
+const CBE = {
+  copy: 'PP1-PP2 Mathematical Activities: visual memory, matching and patterns',
+  cattle: 'PP1-Grade 1 Mathematical Activities: counting and number recognition 1-10',
+  beads: 'PP1-Grade 2 Mathematical Activities: patterns',
+  colour: 'PP1-PP2 Language Activities: colour words in English, Kiswahili and Maa',
+  market: 'Grade 1-3 Mathematical Activities: money (Kenyan coins), adding',
+  code: 'Logical thinking: sequencing and fixing mistakes (supports Mathematical Activities)',
+  harvest: 'PP1-PP2 Mathematical Activities: sorting, grouping and counting',
+  milk: 'PP2-Grade 1 Mathematical Activities: counting, more and less (capacity)',
+  drum: 'PP1-PP2 Language Activities: listening and auditory memory',
+  silabi: 'Grade 1-2 Kiswahili Language Activities: kusoma silabi na maneno',
+  letters: 'PP2-Grade 1 English Language Activities: letter-sound recognition',
+  herd: 'Grade 1-2 Mathematical Activities: addition and subtraction within 10, then 20',
+  firewood: 'Grade 2-3 Mathematical Activities: place value (tens and ones)',
+};
 function playedGame(id) { const d = today(); S.played[d] = [...new Set([...(S.played[d] || []), id])]; save(); }
 function bump(key, need, badgeId) { S.count[key] = (S.count[key] || 0) + 1; if (S.count[key] >= need) badge(badgeId); save(); return S.count[key]; }
 
@@ -53,9 +101,15 @@ const PRON = [
   [/\bisaen\b/gi, 'ee-saen'], [/\benkare\b/gi, 'en-kahreh'], [/\binkishu\b/gi, 'in-keeshoo'],
 ];
 function speak(text, lang = 'en', onend) {
-  if (!('speechSynthesis' in window) || !SND.on) { onend && onend(); return; }
-  window.speechSynthesis.cancel();
+  if (!SND.on) { onend && onend(); return; }
   if (lang === 'en') text = PRON.reduce((t, [re, say]) => t.replace(re, say), text);
+  if (window.EnkajiApp) { // Android app: native TextToSpeech (Android WebView has no Web Speech API)
+    const id = 'u' + (++speak.n); speak.cb[id] = onend;
+    if (!EnkajiApp.speak(text, lang, id)) { delete speak.cb[id]; onend && onend(); }
+    return;
+  }
+  if (!('speechSynthesis' in window)) { onend && onend(); return; }
+  window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.voice = VOICE.pick(lang); // Kenyan voice first (en-KE / sw-KE), then the nearest available
   u.lang = u.voice ? u.voice.lang : (lang === 'sw' ? 'sw-KE' : 'en-KE');
@@ -63,6 +117,8 @@ function speak(text, lang = 'en', onend) {
   if (onend) { u.onend = onend; u.onerror = onend; }
   speechSynthesis.speak(u);
 }
+speak.n = 0; speak.cb = {};
+window.__ttsDone = id => { const f = speak.cb[id]; delete speak.cb[id]; f && f(); };
 // Speak a Maa word: Mama's own recording if there is one, otherwise the Swahili voice.
 function sayMaa(k) { REC.play('maa-' + k).then(a => a || playSanau(k)).then(a => { if (!a && MAA[k]) speak(MAA[k].say, 'sw'); }); }
 document.addEventListener('click', e => { const b = e.target.closest('[data-maa]'); if (b) sayMaa(b.dataset.maa); });
@@ -79,11 +135,16 @@ const GAMES = [
   { id: 'market', t: "Ruth's Market", k: 'b', c: '#0D47A1', d: 'Pay with shillings' },
   { id: 'code', t: 'Code the Cow', k: 'g', c: '#1B5E20', d: 'Arrow cards, find the water' },
   // Mama and child games, shown on the Mama page
+  // CBE literacy and numeracy
+  { id: 'silabi', t: 'Silabi za Nyumbani', k: 'r', c: '#B71C1C', d: 'Build Kiswahili words' },
+  { id: 'letters', t: 'Letter Sounds', k: 'sky', c: '#01579B', d: 'Which picture starts with...?' },
+  { id: 'herd', t: 'The Herd Comes and Goes', k: 'o', c: '#B34700', d: 'Add and take away' },
+  { id: 'firewood', t: "Mama's Firewood", k: 'y', c: '#6B5200', d: 'Tens and ones' },
   { id: 'harvest', t: 'Sort the Harvest', k: 'g', c: '#1B5E20', d: 'Beans, maize, stones', mama: true },
   { id: 'milk', t: 'Milking Time', k: 'sky', c: '#01579B', d: 'Fill the cups, then stop', mama: true },
   { id: 'drum', t: 'Drum Echo', k: 'r', c: '#B71C1C', d: 'Listen and play it back', mama: true },
 ];
-const tile = g => `<a class="tile" href="#/game/${g.id}"><div class="art" style="background:var(--${g.k})">${TILE_ART[g.id]()}</div><div class="tb"><h3>${g.t}</h3><span class="play" style="background:${g.c}">Play</span></div></a>`;
+const tile = g => `<a class="tile" href="#/game/${g.id}"><div class="art" style="background:var(--${g.k})">${TILE_ART[g.id]()}<span class="tile-beads">${LEVELS.map((L, i) => `<i style="--bc:${L.bead}" class="${((S.tiers || {})[g.id] || 0) > i ? 'got' : ''}"></i>`).join('')}</span></div><div class="tb"><h3>${g.t}</h3><span class="play" style="background:${g.c}">Play</span></div></a>`;
 const dot = k => `<span class="dot" style="--c:var(--${k})" aria-hidden="true"></span>`;
 const pill = (c, text) => `<span class="pill tint" style="--pc:${c};background:${c}26">${text}</span>`;
 const actCard = a => `<a class="card act" href="#/activity/${a.id}">${S.done[a.id] ? '<span class="done" title="Done">✅</span>' : ''}${buildSVG(a.demo, { u: 14 })}
@@ -96,6 +157,8 @@ function updateLamb() { $('#sideLamb').innerHTML = lambSVG('bounce'); }
 const V = {};
 
 // ---------- Landing page: the first screen for new visitors ----------
+// The offline Android app, rebuilt by GitHub Actions on every push (see .github/workflows/android.yml).
+const APK_URL = 'https://github.com/atindahhillary/enkaji-play/releases/download/app-latest/enkaji-play.apk';
 const HOOK_EN = 'Supa! Takwenya! Every enkaji is a classroom. Six bricks, five minutes a day, and the best teacher a child will ever have: Mama. Games, stories and activities in Maa, Swahili and English. No reading needed.';
 const HOOK_SW = 'Habari! Kila nyumba ni darasa. Matofali sita, dakika tano kwa siku, na mwalimu bora wa mtoto: Mama. Michezo, hadithi na shughuli kwa Kimaasai, Kiswahili na Kiingereza. Huhitaji kusoma.';
 V.welcome = () => {
@@ -114,7 +177,7 @@ V.welcome = () => {
       <h1>Every enkaji is a classroom.</h1>
       <p class="l-sub">Six bricks, five minutes a day, and the best teacher a child will ever have: <b>Mama</b>. Games, stories and activities in Maa, Swahili and English. <b>No reading needed.</b></p>
       <div class="l-ctas"><a class="btn big" href="#/games">▶ Play now</a><a class="btn big alt" href="#/mothers">👩🏾 I'm a Mama</a><a class="btn big alt" href="#/training">🎓 I'm a facilitator</a></div>
-      <div class="row" style="margin-top:14px"><button class="listen install-chip" data-install>📲 Install the app</button>${listenBtn(HOOK_EN, 'en', '🔊 Listen')}${listenBtn(HOOK_SW, 'sw', '🔊 Sikiliza')}<button class="listen" id="countMaa">🎙️ Hear Sanau count in Maa</button></div>
+      <div class="row" style="margin-top:14px"><button class="listen install-chip" data-install>📲 Install the app</button><a class="listen apk-chip" data-apk href="${APK_URL}">🤖 Android APK</a>${listenBtn(HOOK_EN, 'en', '🔊 Listen')}${listenBtn(HOOK_SW, 'sw', '🔊 Sikiliza')}<button class="listen" id="countMaa">🎙️ Hear Sanau count in Maa</button></div>
     </div>
     <div class="l-art">${hero}</div>
   </section>
@@ -137,7 +200,7 @@ V.welcome = () => {
     <div class="row">${TEAM.map(t => AV(t.k === 'biz' ? 'ruth' : t.k, t.role, t.av.wrap + '33')).join('')}<a href="#/team">Meet the team →</a></div></div></section>
 
   <section class="l-final"><h2>Start today. Five minutes. Six bricks.</h2><p>Open it once with signal and it keeps working offline. Install it on your phone like an app.</p>
-    <div class="l-ctas"><button class="btn big install-big" data-install>📲 Install the app</button><a class="btn big" href="#/games">▶ Play now</a><a class="btn big alt" href="#/mothers">👩🏾 I'm a Mama</a><a class="btn big alt" href="#/training">🎓 I'm a facilitator</a></div></section>
+    <div class="l-ctas"><button class="btn big install-big" data-install>📲 Install the app</button><a class="btn big install-big" data-apk href="${APK_URL}">🤖 Download Android APK</a><a class="btn big" href="#/games">▶ Play now</a><a class="btn big alt" href="#/mothers">👩🏾 I'm a Mama</a><a class="btn big alt" href="#/training">🎓 I'm a facilitator</a></div></section>
   </div>`;
 };
 V.welcome.after = () => {
@@ -243,14 +306,29 @@ V.activity.after = id => {
   $('#didIt').onclick = () => { S.done[id] = (S.done[id] || 0) + 1; S.doneOn = S.doneOn || {}; S.doneOn[today()] = (S.doneOn[today()] || 0) + 1; save(); star(1, '⭐ Great playing together!'); if (Object.keys(S.done).length >= 5) badge('mama'); render(); };
 };
 
-V.games = () => `<h1>Games</h1><p class="mute">Short games for children 3-8. Every win earns a star. Sound on for voices!</p><div class="grid g5">${GAMES.filter(g => !g.mama).map(tile).join('')}</div>
+V.games = () => `<h1>Games</h1><p class="mute">Short games for children 3-8, matched to the Kenyan CBE. Every game has three levels: 🌱 Beginner, 🌿 Intermediate, 🌳 Advanced. Finish a level to earn a bead for your collar!</p><div class="grid g5">${GAMES.filter(g => !g.mama).map(tile).join('')}</div>
   <div class="sec"><h2>🤱🏾 Play with Mama</h2></div><div class="grid g5">${GAMES.filter(g => g.mama).map(tile).join('')}</div>
   <div class="card" style="margin-top:18px"><h3>For grown-ups</h3><p class="mute" style="margin:0">Screens are a treat, not the teacher. After each game, play the same idea with real bricks, stones or beads.</p></div>`;
 V.game = id => {
   const g = GAMES.find(x => x.id === id); if (!g) return V.notfound();
-  return `<a href="#/games" class="mute">← All games</a><h1 style="margin-top:10px">${g.t}</h1><div class="card gamebox" id="game"></div>`;
+  const done = (S.tiers || {})[id] || 0, tier = V.game.tier[id] || Math.min(3, done + 1);
+  V.game.tier[id] = tier;
+  return `<a href="#/games" class="mute">← All games</a><h1 style="margin-top:10px">${g.t}</h1>
+  ${CBE[id] ? `<p class="cbe-tag">📘 ${CBE[id]}</p>` : ''}
+  <div class="levels" role="group" aria-label="Level">${LEVELS.map((L, i) => `<button class="lvl-b ${tier === i + 1 ? 'on' : ''}" data-tier="${i + 1}" aria-pressed="${tier === i + 1}">${L.icon} ${L.t} <span class="lvl-bead ${done > i ? 'got' : ''}" style="--bc:${L.bead}" title="${L.beadName} bead"></span></button>`).join('')}</div>
+  <div class="lvl-progress" id="lvlProg"></div>
+  <div class="card gamebox" id="game"></div>`;
 };
-V.game.after = id => GAME_MOUNT[id]($('#game'), { star, badge, bump, speak, played: () => playedGame(id) });
+V.game.tier = {};
+V.game.after = id => {
+  document.querySelectorAll('[data-tier]').forEach(b => b.onclick = () => { V.game.tier[id] = +b.dataset.tier; render(); });
+  const tier = V.game.tier[id];
+  const prog = () => { const n = Math.min(LEVEL_GOAL, (S.tw || {})[id + tier] || 0), L = LEVELS[tier - 1], got = ((S.tiers || {})[id] || 0) >= tier;
+    $('#lvlProg').innerHTML = got ? `<span class="lvl-bead got" style="--bc:${L.bead}"></span> <b>${L.t} complete!</b> You earned the ${L.beadName} bead.`
+      : `<span class="lvl-bead" style="--bc:${L.bead}"></span> Win <b>${LEVEL_GOAL - n}</b> more to earn the <b>${L.beadName} bead</b> ${'●'.repeat(n)}${'○'.repeat(LEVEL_GOAL - n)}`; };
+  prog();
+  GAME_MOUNT[id]($('#game'), { star, badge, bump, speak, tier, played: () => { playedGame(id); levelWin(id, tier); prog(); } });
+};
 
 V.stories = () => `<h1>Mara Stories</h1><p class="mute">Animated stories that read themselves aloud in English, with Swahili lines. Each ends with a brick challenge.</p>
   <div class="grid g3">${STORIES.map(s => `<a class="tile" href="#/story/${s.id}"><div class="cover" aria-hidden="true">${storyCover(s)}</div><div class="tb"><h3>${s.t}</h3><span class="play" style="background:${s.cover}">▶ Watch</span></div></a>`).join('')}</div>`;
@@ -282,7 +360,7 @@ V.story.after = id => {
   const go = d => { i = Math.max(0, Math.min(s.pages.length, i + d)); show(); };
   // Let the scene draw itself in, then narrate, hold a beat, turn the page.
   const step = () => { if (!auto || i >= s.pages.length) return; const page = i; setTimeout(() => { if (!auto || page !== i) return; speak(s.pages[i].en, 'en', () => setTimeout(() => { if (auto && page === i) { go(1); step(); } }, 1200)); }, 1300); };
-  const stop = () => { auto = false; window.speechSynthesis?.cancel(); SND.music(false); $('#playS').textContent = '▶ Play story'; };
+  const stop = () => { auto = false; stopSpeech(); SND.music(false); $('#playS').textContent = '▶ Play story'; };
   $('#prev').onclick = () => { stop(); go(-1); };
   $('#next').onclick = () => { stop(); go(1); };
   $('#musicB').onclick = e => { music = !music; e.currentTarget.setAttribute('aria-pressed', music); e.currentTarget.textContent = music ? '🎵 Music' : '🔇 Music'; SND.music(music && auto); };
@@ -297,7 +375,7 @@ V.mothers = () => {
     <div><div style="font-weight:800;letter-spacing:.06em">TAKWENYA, MAMA! · IKO!</div><h1>Mothers Who Teach</h1>
     <p style="font-size:1.1rem;max-width:560px">You are your child's first and best teacher. You already teach beadwork, songs, cooking and respect. Six bricks add a little play to the day you already have.</p>
     ${listenBtn('Takwenya Mama! You are your child\'s first and best teacher. You do not need to read to teach. Look at the pictures, press the listen button, and play together for five minutes every day.', 'en', '🔊 Listen, Mama')} ${listenBtn('Habari Mama! Wewe ni mwalimu wa kwanza wa mtoto wako. Huhitaji kusoma ili kufundisha. Angalia picha, bonyeza kitufe cha kusikiliza, na mcheze pamoja dakika tano kila siku.', 'sw', '🔊 Sikiliza kwa Kiswahili')}</div></section>
-  <div class="card install-card"><span style="font-size:2.4rem">📲</span><div style="flex:1"><h3 style="margin:0">Put Enkaji Play on your phone</h3><p class="mute" style="margin:4px 0 0">One tap. It gets its own icon and works without signal.</p></div><button class="btn" data-install>Install</button></div>
+  <div class="card install-card"><span style="font-size:2.4rem">📲</span><div style="flex:1"><h3 style="margin:0">Put Enkaji Play on your phone</h3><p class="mute" style="margin:4px 0 0">One tap. It gets its own icon and works without signal.</p></div><button class="btn" data-install>Install</button><a class="btn alt" data-apk href="${APK_URL}">🤖 APK</a></div>
   <div class="sec"><h2>How to use this</h2></div>
   <div class="how4"><div><span>👀</span>Look at the picture</div><div><span>🔊</span>Press Listen</div><div><span>🧱</span>Play 5 minutes</div><div><span>🤗</span>Praise the trying</div></div>
   <div class="sec"><h2>🤱🏾 Play together on the phone</h2>${listenBtn('Play together on the phone. Sit with your child. Sort the harvest, milk the cow, and play the drum. Then play the same game with real beans, cups and a tin drum.', 'en', '🔊')}</div>
@@ -324,7 +402,9 @@ V.mothers.track = 'little';
 V.mothers.after = () => {
   document.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { V.mothers.track = b.dataset.t; render(); });
   const voiceNote = () => {
-    const l = VOICE.label(), ke = VOICE.kenyan('en') || VOICE.kenyan('sw'), v = $('[data-voice]'); if (!v) return;
+    const v = $('[data-voice]'); if (!v) return;
+    if (window.EnkajiApp) { v.innerHTML = `The app speaks with this phone's voices: <b>${esc(EnkajiApp.voice('en'))}</b> and <b>${esc(EnkajiApp.voice('sw'))}</b>. To add Swahili, open the phone's Settings, then Text-to-speech.`; return; }
+    const l = VOICE.label(), ke = VOICE.kenyan('en') || VOICE.kenyan('sw');
     v.innerHTML = `This phone speaks English with <b>${esc(l.en)}</b> and Swahili with <b>${esc(l.sw)}</b>. ` +
       (ke ? '🎉 A Kenyan voice was found! English is read in an East African accent.' : 'No Kenyan voice on this phone yet. For a Kenyan accent, open the site in <b>Microsoft Edge</b> (it has Kenyan English and Swahili voices), or add <b>Swahili</b> in your phone\'s Text-to-speech settings.');
   };
@@ -399,6 +479,8 @@ V.progress = () => {
   const done = Object.keys(S.done);
   return `<h1>My Progress</h1>
   <div class="stats"><div class="card stat" style="--c:var(--y)"><span class="ic">⭐</span><div><span>Stars</span><b>${S.stars}</b></div></div><div class="card stat" style="--c:var(--o)"><span class="ic">🔥</span><div><span>Day Streak</span><b>${streak()}</b></div></div><div class="card stat" style="--c:var(--g)"><span class="ic">🧱</span><div><span>Activities</span><b>${done.length}</b></div></div></div>
+  <div class="sec"><h2>My bead collar</h2><span class="mute small">White = Beginner · Red = Intermediate · Blue = Advanced</span></div>
+  <div class="card collar-card">${beadCollar()}<p class="mute small" style="margin:8px 0 0">${beadCount()} of ${GAMES.length * 3} beads. Finish a level in any game to earn its bead.</p></div>
   <div class="sec"><h2>Badges</h2></div>
   ${S.badges.length ? '' : `<div class="card center empty">${lambSVG()}<h3>No badges yet</h3><p class="mute">Play a game or a brick challenge to earn your first one.</p><a class="btn" href="#/games">Let's play</a></div>`}
   <div class="grid g5" style="margin-top:12px">${BADGES.filter(b => !b.fac).map(b => `<div class="card badge ${S.badges.includes(b.id) ? '' : 'lock'}"><div class="i">${b.icon}</div><b>${b.t}</b><div class="small mute">${b.how}</div></div>`).join('')}</div>
@@ -413,7 +495,7 @@ V.notfound = () => `<h1>Page not found</h1><a class="btn" href="#/home">Go home<
 
 // ---------- Router ----------
 function render() {
-  window.speechSynthesis?.cancel(); SND.music(false);
+  stopSpeech(); SND.music(false);
   // New visitors land on the welcome page; returning visitors go straight to Home.
   const [, r = 'home', arg] = (location.hash || (S.seen ? '#/home' : '#/welcome')).split('/');
   const view = V[r] && r !== 'notfound' ? V[r] : V.notfound;
@@ -428,7 +510,7 @@ window.addEventListener('hashchange', () => { render(); scrollTo(0, 0); $('#view
 // Android Chrome and Edge fire beforeinstallprompt: we keep it and show our own button.
 // iPhone Safari has no prompt, so the button opens step-by-step help instead.
 let installEvt = null;
-const isInstalled = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isInstalled = () => !!window.EnkajiApp || matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 const INSTALL_STEPS = isIOS
   ? [['1', 'Open this page in <b>Safari</b>.'], ['2', 'Tap the <b>Share</b> button (a square with an arrow up).'], ['3', 'Tap <b>Add to Home Screen</b>, then <b>Add</b>.']]
@@ -448,11 +530,12 @@ function syncInstall() {
   const show = !isInstalled();
   $('#installTop').hidden = !show;
   document.querySelectorAll('[data-install]').forEach(b => b.hidden = !show);
+  if (window.EnkajiApp) document.querySelectorAll('[data-apk]').forEach(b => b.hidden = true);
 }
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; syncInstall(); });
 window.addEventListener('appinstalled', () => { installEvt = null; toast('🎉 Enkaji Play is on your phone!'); syncInstall(); });
 document.addEventListener('click', e => { if (e.target.closest('[data-install], #installTop')) installApp(); });
-$('#ihClose').onclick = () => { window.speechSynthesis?.cancel(); const d = $('#installHelp'); d.close ? d.close() : d.removeAttribute('open'); };
+$('#ihClose').onclick = () => { stopSpeech(); const d = $('#installHelp'); d.close ? d.close() : d.removeAttribute('open'); };
 $('#ihListen').onclick = () => speak(INSTALL_SAY);
 syncInstall();
 
@@ -462,4 +545,4 @@ REC.ready.then(() => location.hash.includes('mothers') && render());
 const sndBtn = $('#sndBtn'), sndIcon = () => { sndBtn.textContent = SND.on ? '🔊' : '🔇'; sndBtn.setAttribute('aria-pressed', SND.on); };
 sndIcon(); sndBtn.onclick = () => { SND.toggle(); sndIcon(); toast(SND.on ? 'Sound on' : 'Sound off'); };
 // Offline: cache the site so it opens without signal in the Mara.
-if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator && location.protocol === 'https:' && !window.EnkajiApp) navigator.serviceWorker.register('sw.js').catch(() => {});

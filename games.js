@@ -81,7 +81,8 @@ function stage(el, host, scene, name) {
     },
     kerri(mood) { const k = q('[data-kerri]'); if (!k) return; k.className = 'kerri'; void k.offsetWidth; k.classList.add(mood); },
     hud(level, label = 'Level') { const l = q('[data-lvl]'); if (l) l.textContent = `${label} ${level}`; },
-    win(n) { const s = q('[data-stars]'); if (s) { s.textContent = '⭐'.repeat(Math.min(n, 10)); restart(s, 'pop'); } },
+    win() { const s = q('[data-stars]'); if (s) { s.textContent = '⭐'.repeat(Math.min(++st.k, 10)); restart(s, 'pop'); } },
+    k: 0,
   };
   return st;
 }
@@ -97,7 +98,7 @@ const GAME_MOUNT = {
   // ---------- 1. Copy Koko's Tower: look, remember, rebuild ----------
   copy(el, api) {
     const st = stage(el, 'koko', 's-home', 'Koko');
-    let level = 1, target = [], mine = [], busy = true, wins = 0;
+    let level = [1, 3, 5][(api.tier || 1) - 1], target = [], mine = [], busy = true, wins = 0;
     async function show(fresh = true) {
       busy = true; mine = [];
       if (fresh) target = shuffle(BRICKS.map(b => b.k)).slice(0, Math.min(level + 1, 6));
@@ -153,7 +154,7 @@ const GAME_MOUNT = {
   // ---------- 2. Count the Cattle home at dusk: one-to-one counting in Maa ----------
   cattle(el, api) {
     const st = stage(el, 'mama', 's-dusk', 'Yeyo (Mama)');
-    let wins = 0, rounds = 0, busy = false;
+    let wins = [0, 3, 6][(api.tier || 1) - 1], rounds = 0, busy = false;
     const max = () => wins < 3 ? 3 : wins < 6 ? 5 : 10;
     const field = () => `<div class="field"><div class="boma-fence"></div><div class="herd" data-h></div></div><div class="choices" data-c></div>`;
     async function walkIn(H, coat, i, label) {
@@ -230,7 +231,7 @@ const GAME_MOUNT = {
     const C = ['#E53935', '#ffffff', '#1E88E5', '#FDD835', '#43A047', '#FB8C00'];
     const NAME = { '#E53935': 'red', '#ffffff': 'white', '#1E88E5': 'blue', '#FDD835': 'yellow', '#43A047': 'green', '#FB8C00': 'orange' };
     const KINDS = ['AB', 'AB', 'AAB', 'ABB', 'ABC', 'ABC'];
-    let wins = 0, busy = false, mode = 'pattern';
+    let wins = [0, 4, 8][(api.tier || 1) - 1], busy = false, mode = 'pattern';
     const pos = (i, n) => { const t = Math.PI * (i + .5) / n; return `left:${50 - 44 * Math.cos(t)}%;top:${8 + 72 * Math.sin(t)}%`; };
     const head = () => `<div class="chips center"><button class="chip ${mode === 'pattern' ? 'on' : ''}" data-m="pattern">📿 Finish Mama's pattern</button><button class="chip ${mode === 'free' ? 'on' : ''}" data-m="free">🎨 Make my own collar</button></div>`;
     const bindHead = () => el.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { mode = b.dataset.m; mode === 'free' ? free() : round(); });
@@ -292,7 +293,7 @@ const GAME_MOUNT = {
     const st = stage(el, 'mama', 's-market', 'Yeyo (Mama)');
     const EXTRA = [{ k: 'w', name: 'White', sw: 'Nyeupe', hex: '#f5f5f5', maa: 'white' }, { k: 'k', name: 'Black', sw: 'Nyeusi', hex: '#222', maa: 'black' }];
     const ALL = [...BRICKS.map(b => ({ ...b, maa: BRICK_MAA[b.k] })), ...EXTRA];
-    let lang = 'en', found = 0, busy = false, last;
+    let lang = 'en', found = [0, 4, 8][(api.tier || 1) - 1], busy = false, last;
     function round() {
       busy = false; st.kerri('think');
       const pool = lang === 'maa' ? ALL.filter(c => c.maa) : ALL.slice(0, 6);
@@ -332,7 +333,7 @@ const GAME_MOUNT = {
     const st = stage(el, 'ruth', 's-stall', 'Ruth');
     const L1 = [['🍬', 'Sweet (pipi)', 2], ['🧅', 'Onion', 5], ['🍅', 'Tomato', 10], ['🍩', 'Mandazi', 10], ['🍌', 'Banana', 5], ['🧂', 'Salt', 10]];
     const L2 = [['🥚', 'Egg', 15], ['🍵', 'Tea leaves', 20], ['🌽', 'Roast maize', 20], ['🥛', 'Cup of milk', 30], ['🍚', 'Cup of sugar', 25]];
-    let wins = 0, busy = false, last;
+    let wins = [0, 2, 3][(api.tier || 1) - 1], busy = false, last;
     function round() {
       busy = false; st.kerri('think');
       const big = wins >= 3, coins = big ? [1, 5, 10, 20] : [1, 5];
@@ -382,7 +383,7 @@ const GAME_MOUNT = {
   code(el, api) {
     const st = stage(el, 'naserian', 's-grass', 'Naserian');
     const DIR = { up: [0, -1, '⬆️'], down: [0, 1, '⬇️'], left: [-1, 0, '⬅️'], right: [1, 0, '➡️'] };
-    let level = 1, wins = 0, busy = false, prog = [], map;
+    let level = [1, 3, 5][(api.tier || 1) - 1], wins = 0, busy = false, prog = [], map;
     const key = (x, y) => x + ',' + y;
     function makeMap() {
       const n = level < 3 ? 4 : 5;
@@ -451,7 +452,7 @@ const GAME_MOUNT = {
   // ---------- 7. Sort the Harvest: tap the right basket for each thing on Mama's tray ----------
   harvest(el, api) {
     const st = stage(el, 'mama', 's-shade', 'Yeyo (Mama)');
-    let level = 1, wins = 0, busy = true;
+    let level = [1, 2, 3][(api.tier || 1) - 1], wins = 0, busy = true;
     function round() {
       busy = true;
       const kinds = level < 2 ? ['bean', 'maize'] : ['bean', 'maize', 'stone'];
@@ -486,7 +487,7 @@ const GAME_MOUNT = {
         el.querySelectorAll('.basket-b').forEach((b, i) => { b.style.animationDelay = i * 80 + 'ms'; restart(b, 'hop'); });
         api.star(1, '⭐ The harvest is sorted!'); api.played(); api.bump('together', 5, 'together');
         const said = kinds.map(k => `${counts[k]} ${HARVEST[k].t}`).join(', ');
-        level = Math.min(3, 1 + Math.floor(wins / 2));
+        level = Math.max(level, Math.min(3, 1 + Math.floor(wins / 2)));
         await st.say(`<b>Sidai oleng!</b> ${said}. Now count them again with Mama!`, [{ maa: 'good' }, { en: said + '. Now count them again with Mama!' }]);
         if (st.live()) { el.querySelector('[data-zone]').innerHTML = '<button class="btn big pop" data-more>More harvest →</button>'; el.querySelector('[data-more]').onclick = round; }
       }
@@ -497,7 +498,7 @@ const GAME_MOUNT = {
   // ---------- 8. Milking Time: fill exactly the cups Mama asks for, then STOP ----------
   milk(el, api) {
     const st = stage(el, 'mama', 's-home', 'Yeyo (Mama)');
-    let wins = 0, busy = false, rounds = 0;
+    let wins = [0, 3, 6][(api.tier || 1) - 1], busy = false, rounds = 0;
     const cupsHTML = (n, fills = []) => Array.from({ length: n }, (_, i) => `<button class="cup" data-i="${i}" aria-label="cup ${i + 1}"><i style="height:${fills[i] || 0}%"></i></button>`).join('');
     function round() {
       rounds++; busy = false; st.kerri('think');
@@ -553,7 +554,7 @@ const GAME_MOUNT = {
   // ---------- 9. Drum Echo: listen to Mama's drum, play it back (no reading at all) ----------
   drum(el, api) {
     const st = stage(el, 'mama', 's-dusk', 'Yeyo (Mama)');
-    let len = 2, wins = 0, busy = true, seq = [], input = [];
+    let len = [2, 4, 6][(api.tier || 1) - 1], wins = 0, busy = true, seq = [], input = [];
     const hit = k => { const d = el.querySelector(`[data-d="${k}"]`); if (!d) return; restart(d, 'squash'); SND.play(k === 'L' ? 'drum' : 'drumHi'); };
     async function playSeq() {
       busy = true; st.kerri('think');
@@ -592,6 +593,174 @@ const GAME_MOUNT = {
     }
     round();
   },
+  // ===== CBE literacy and numeracy games (PP1 to Grade 3) =====
+
+  // ---------- 10. Silabi za Nyumbani: build Kiswahili words from syllables ----------
+  // CBE: Kiswahili Language Activities, Grade 1-2, kusoma silabi na maneno.
+  silabi(el, api) {
+    const st = stage(el, 'mama', 's-home', 'Yeyo (Mama)');
+    let wins = [0, 4, 7][(api.tier || 1) - 1], busy = false, last;
+    function round() {
+      busy = false; st.kerri('think');
+      const pool = WORDS_SW.filter(w => wins < 4 ? w.s.length === 2 : true);
+      const w = pickNew(pool, last); last = w;
+      const extras = shuffle(['ka', 'pi', 'lo', 'ne', 'ru', 'se', 'wa', 'bo'].filter(x => !w.s.includes(x))).slice(0, Math.min(3, 1 + Math.floor(wins / 3)));
+      const tiles = shuffle([...w.s, ...extras]);
+      let built = [];
+      st.hud(w.s.length === 2 ? 1 : 2);
+      st.arena.innerHTML = `<div class="word-pic">${pic(w.pic)}</div>
+        <div class="slots">${w.s.map((_, i) => `<span class="slot" data-i="${i}"></span>`).join('')}</div>
+        <div class="syl-tiles">${tiles.map((s, i) => `<button class="syl" data-s="${s}" data-t="${i}">${s}</button>`).join('')}</div>
+        <div class="row center"><button class="btn alt" data-undo>↩ Rudi</button><button class="listen" data-hear>🔊 Sikiliza tena</button></div>`;
+      const ask = () => talk([{ sw: `Jenga neno: ${w.w}. ${w.s.join(', ')}.` }]);
+      st.say(`Jenga neno! <b>Build the word</b> for this picture. Tap the syllables in order.`, [{ sw: 'Jenga neno.' }, { sw: w.w }]);
+      el.querySelector('[data-hear]').onclick = ask;
+      el.querySelector('[data-undo]').onclick = () => {
+        if (busy || !built.length) return; const b = built.pop(); b.btn.disabled = false; b.btn.classList.remove('used');
+        el.querySelectorAll('.slot')[built.length].textContent = ''; SND.play('tap');
+      };
+      el.querySelectorAll('.syl').forEach(b => b.onclick = async () => {
+        if (busy || b.disabled) return;
+        const slot = el.querySelectorAll('.slot')[built.length]; if (!slot) return;
+        speak(b.dataset.s, 'sw'); SND.play('pop');
+        await flyTo(b, slot, { dur: 320, lift: 40, endScale: 1 }); if (!st.live()) return;
+        slot.textContent = b.dataset.s; restart(slot, 'snap'); b.disabled = true; b.classList.add('used');
+        built.push({ s: b.dataset.s, btn: b });
+        if (built.length === w.s.length) check();
+      });
+      async function check() {
+        busy = true;
+        if (built.map(x => x.s).join('') === w.s.join('')) {
+          el.querySelectorAll('.slot').forEach((s, i) => { s.style.animationDelay = i * 80 + 'ms'; restart(s, 'hop'); });
+          SND.play('cheer'); st.kerri('happy'); burstAt(el.querySelector('.slots')); st.win(++wins);
+          api.star(1, `⭐ ${w.w}!`); api.played(); api.bump('readers', 8, 'reader');
+          await st.say(`<b>Hongera!</b> ${w.s.join(' + ')} = <b>${w.w}</b> (${w.en}).`, [{ sw: `Hongera! ${w.w}.` }]);
+          if (st.live()) round();
+        } else {
+          SND.play('no'); st.kerri('think'); el.querySelectorAll('.slot').forEach(s => restart(s, 'wiggle'));
+          await st.say('Karibu! Sikiliza tena, then try again.', [{ sw: 'Karibu! Sikiliza tena.' }, { sw: w.s.join(', ') }]);
+          built.forEach(x => { x.btn.disabled = false; x.btn.classList.remove('used'); }); built = [];
+          el.querySelectorAll('.slot').forEach(s => s.textContent = ''); busy = false;
+        }
+      }
+    }
+    round();
+  },
+
+  // ---------- 11. Letter Sounds at the Boma: which picture starts with this letter? ----------
+  // CBE: English Language Activities, PP2 to Grade 1, letter-sound recognition.
+  letters(el, api) {
+    const st = stage(el, 'naserian', 's-grass', 'Naserian');
+    let wins = [0, 4, 6][(api.tier || 1) - 1], busy = false, last;
+    function round() {
+      busy = false; st.kerri('think');
+      const target = pickNew(WORDS_EN, last); last = target;
+      const opts = shuffle([target, ...shuffle(WORDS_EN.filter(w => w.w[0] !== target.w[0])).slice(0, wins < 4 ? 1 : 2)]);
+      st.hud(wins < 4 ? 1 : 2);
+      st.arena.innerHTML = `<div class="big-letter">${target.w[0]}<small>${target.w[0].toUpperCase()}</small></div>
+        <div class="pics">${opts.map(o => `<button class="pic-b" data-w="${o.w}" aria-label="${o.w}">${pic(o.pic)}<span>${o.w}</span></button>`).join('')}</div>
+        <div class="row center"><button class="listen" data-hear>🔊 Hear again</button></div>`;
+      const ask = () => talk([{ en: `Find the picture that starts with the letter ${target.w[0].toUpperCase()}.` }]);
+      st.say(`Which picture starts with <b>${target.w[0]}</b>?`, [{ en: `Which picture starts with the letter ${target.w[0].toUpperCase()}?` }]);
+      el.querySelector('[data-hear]').onclick = ask;
+      el.querySelectorAll('.pic-b').forEach(b => b.onclick = async () => {
+        if (busy) return;
+        if (b.dataset.w !== target.w) { restart(b, 'wiggle'); SND.play('no'); talk([{ en: `That is ${b.dataset.w}. ${b.dataset.w} starts with ${b.dataset.w[0].toUpperCase()}.` }]); return; }
+        busy = true; b.classList.add('right'); restart(b, 'hop'); SND.play('cheer'); st.kerri('happy'); burstAt(b); st.win(++wins);
+        api.star(1, `⭐ ${target.w[0]} for ${target.w}!`); api.played(); api.bump('readers', 8, 'reader');
+        await st.say(`Yes! <b>${target.w[0]}</b> is for <b>${target.w}</b>.`, [{ en: `Yes! ${target.w[0].toUpperCase()} is for ${target.w}.` }]);
+        if (st.live()) round();
+      });
+    }
+    round();
+  },
+
+  // ---------- 12. Mama's Firewood: make numbers with bundles of ten and single sticks ----------
+  // CBE: Mathematical Activities, Grade 2-3, place value (tens and ones).
+  firewood(el, api) {
+    const st = stage(el, 'mama', 's-home', 'Yeyo (Mama)');
+    let wins = [0, 3, 6][(api.tier || 1) - 1], busy = false;
+    function round() {
+      busy = false; st.kerri('think');
+      const max = wins < 3 ? 29 : wins < 6 ? 59 : 99, n = rnd(11, max), T = Math.floor(n / 10), O = n % 10;
+      let tens = 0, ones = 0;
+      st.hud(max === 29 ? 1 : max === 59 ? 2 : 3);
+      st.arena.innerHTML = `<div class="target-num">${n}</div>
+        <div class="wood"><div class="wood-col"><b>Tens · Makumi</b><div class="bundles" data-tens></div></div><div class="wood-col"><b>Ones · Mamoja</b><div class="sticks" data-ones></div></div></div>
+        <div class="row center"><button class="btn alt" data-add10>➕ Bundle of 10</button><button class="btn alt" data-add1>➕ 1 stick</button><button class="btn alt" data-clear>↩ Start again</button></div>
+        <h3 class="center">You have: <span data-have>0</span></h3>
+        <div class="row center"><button class="btn big" data-done>✅ Give Mama the firewood</button></div>`;
+      st.say(`Mama needs <b>${n}</b> sticks for the fire. Use bundles of ten and single sticks.`, [{ en: `Mama needs ${n} sticks for the fire.` }, { sw: `Vijiti ${swNum(n)}.` }]);
+      const B = el.querySelector('[data-tens]'), Os = el.querySelector('[data-ones]');
+      const upd = () => { el.querySelector('[data-have]').textContent = `${tens} tens + ${ones} ones = ${tens * 10 + ones}`; };
+      el.querySelector('[data-add10]').onclick = () => { if (busy || tens >= 9) return; tens++; B.insertAdjacentHTML('beforeend', `<span class="bundle drop-in">${BUNDLE}</span>`); SND.play('brick'); upd(); };
+      el.querySelector('[data-add1]').onclick = () => { if (busy || ones >= 9) return; ones++; Os.insertAdjacentHTML('beforeend', `<span class="stick drop-in">${STICK}</span>`); SND.play('tap'); upd(); };
+      el.querySelector('[data-clear]').onclick = () => { if (busy) return; tens = ones = 0; B.innerHTML = Os.innerHTML = ''; upd(); SND.play('whoosh'); };
+      el.querySelector('[data-done]').onclick = async () => {
+        if (busy) return;
+        if (tens === T && ones === O) {
+          busy = true; SND.play('cheer'); st.kerri('happy'); burstAt(el.querySelector('.wood')); st.win(++wins);
+          el.querySelectorAll('.bundle, .stick').forEach((x, i) => { x.style.animationDelay = i * 40 + 'ms'; restart(x, 'hop'); });
+          api.star(1, `⭐ ${T} tens and ${O} ones make ${n}!`); api.played(); api.bump('counters', 8, 'counter');
+          await st.say(`<b>Sidai oleng!</b> ${T} tens and ${O} ones make <b>${n}</b>. ${swNum(n)}!`, [{ maa: 'good' }, { en: `${T} tens and ${O} ones make ${n}.` }, { sw: swNum(n) }]);
+          if (st.live()) round();
+        } else {
+          SND.play('no'); restart(el.querySelector('[data-done]'), 'wiggle');
+          const have = tens * 10 + ones;
+          st.say(have < n ? `Not enough yet. ${n} is <b>${T}</b> tens and <b>${O}</b> ones.` : `Too many sticks! ${n} is <b>${T}</b> tens and <b>${O}</b> ones.`, [{ en: `${n} is ${T} tens and ${O} ones.` }]);
+        }
+      };
+      upd();
+    }
+    round();
+  },
+
+  // ---------- 13. The Herd Comes and Goes: add and take away ----------
+  // CBE: Mathematical Activities, Grade 1-2, addition and subtraction within 10, then 20.
+  herd(el, api) {
+    const st = stage(el, 'naserian', 's-dusk', 'Naserian');
+    let wins = [0, 3, 5][(api.tier || 1) - 1], busy = false;
+    const COWS = ['#8d5524', '#f2efe6', '#2b1d16', '#c1592c', '#9e9e9e'];
+    async function round() {
+      busy = true; st.kerri('think');
+      const max = wins < 5 ? 10 : 20, add = Math.random() < .5;
+      const a = add ? rnd(1, max - 2) : rnd(3, max), b = add ? rnd(1, Math.min(9, max - a)) : rnd(1, Math.min(9, a - 1)), ans = add ? a + b : a - b;
+      st.hud(max === 10 ? 1 : 2);
+      st.arena.innerHTML = `<div class="field"><div class="boma-fence"></div><div class="herd small-herd" data-h></div></div>
+        <div class="sum-line" data-sum></div><div class="choices" data-c></div>`;
+      const H = el.querySelector('[data-h]');
+      const addCow = i => { H.insertAdjacentHTML('beforeend', `<span class="hc drop-in">${cowImg(COWS[i % COWS.length])}</span>`); };
+      for (let i = 0; i < a; i++) addCow(i);
+      st.say(`There are <b>${a}</b> cows in the boma.`, [{ en: `There are ${a} cows in the boma.` }, ...(a <= 10 ? [{ maa: 'n' + a }] : [])]);
+      await wait(2200); if (!st.live()) return;
+      if (add) {
+        st.say(`<b>${b}</b> more cows come home!`, [{ en: `${b} more cows come home!` }]);
+        for (let i = 0; i < b; i++) { if (!st.live()) return; H.insertAdjacentHTML('beforeend', `<span class="hc walk-in-h">${cowImg(COWS[(a + i) % COWS.length])}</span>`); SND.play('bell'); await wait(350); }
+      } else {
+        st.say(`<b>${b}</b> cows go to the river to drink.`, [{ en: `${b} cows go to the river to drink.` }]);
+        const all = [...H.children];
+        for (let i = 0; i < b; i++) { if (!st.live()) return; const c = all[all.length - 1 - i]; c.classList.add('walk-out-h'); SND.play('moo'); await wait(380); }
+        await wait(500); all.slice(-b).forEach(c => c.remove());
+      }
+      if (!st.live()) return;
+      el.querySelector('[data-sum]').innerHTML = `${a} ${add ? '+' : '−'} ${b} = <b>?</b>`;
+      st.say('How many cows are in the boma now?', [{ en: 'How many cows are in the boma now?' }]);
+      const opts = shuffle([ans, ...shuffle([ans - 2, ans - 1, ans + 1, ans + 2].filter(v => v >= 0 && v <= 20)).slice(0, 2)]);
+      const C = el.querySelector('[data-c]');
+      C.innerHTML = opts.map(o => `<button class="pop" data-n="${o}">${o}</button>`).join('');
+      busy = false;
+      C.querySelectorAll('button').forEach(btn => btn.onclick = async () => {
+        if (busy) return;
+        if (+btn.dataset.n !== ans) { restart(btn, 'wiggle'); SND.play('no'); talk([{ en: 'Count the cows again.' }]); return; }
+        busy = true; el.querySelector('[data-sum]').innerHTML = `${a} ${add ? '+' : '−'} ${b} = <b>${ans}</b>`;
+        SND.play('cheer'); st.kerri('happy'); burstAt(btn); st.win(++wins);
+        api.star(1, `⭐ ${a} ${add ? '+' : '-'} ${b} = ${ans}`); api.played(); api.bump('counters', 8, 'counter');
+        await st.say(`<b>Sidai oleng!</b> ${a} ${add ? 'plus' : 'take away'} ${b} is <b>${ans}</b>.`, [{ maa: 'good' }, { en: `${a} ${add ? 'plus' : 'take away'} ${b} is ${ans}.` }]);
+        if (st.live()) round();
+      });
+    }
+    round();
+  },
 };
 
 // ---------- Art for the Mama games (same outlined explainer style) ----------
@@ -607,3 +776,54 @@ const drumSVG = k => `<svg viewBox="-60 -70 120 140" aria-hidden="true"><path d=
   <path d="M-40 -30 L-26 50 M-20 -30 L-10 50 M0 -30 L6 50 M20 -30 L20 50 M40 -30 L32 50" stroke="#f3e2c7" stroke-width="2.5" opacity=".8"/>
   <ellipse cx="0" cy="-40" rx="44" ry="12" fill="#f3e2c7" stroke="${INK}" stroke-width="3"/><ellipse cx="0" cy="56" rx="34" ry="8" fill="rgba(0,0,0,.18)"/></svg>`;
 
+
+// ---------- Words and pictures for the CBE games (things a child in the Maasai Mara sees every day) ----------
+// Kiswahili words split into syllables (silabi), as taught in Grade 1 Kiswahili.
+const WORDS_SW = [
+  { w: 'mama', s: ['ma', 'ma'], en: 'mother', pic: 'mama' }, { w: 'baba', s: ['ba', 'ba'], en: 'father', pic: 'baba' },
+  { w: 'maji', s: ['ma', 'ji'], en: 'water', pic: 'water' }, { w: 'jua', s: ['ju', 'a'], en: 'sun', pic: 'sun' },
+  { w: 'moto', s: ['mo', 'to'], en: 'fire', pic: 'fire' }, { w: 'shuka', s: ['shu', 'ka'], en: 'shuka cloth', pic: 'shuka' },
+  { w: 'ngoma', s: ['ngo', 'ma'], en: 'drum', pic: 'drum' }, { w: 'mbuzi', s: ['mbu', 'zi'], en: 'goat', pic: 'goat' },
+  { w: 'tofali', s: ['to', 'fa', 'li'], en: 'brick', pic: 'brick' }, { w: 'mahindi', s: ['ma', 'hi', 'ndi'], en: 'maize', pic: 'maize' },
+  { w: 'shanga', s: ['sha', 'nga'], en: 'beads', pic: 'beads' }, { w: 'kikombe', s: ['ki', 'ko', 'mbe'], en: 'cup', pic: 'cup' },
+];
+// English words for letter sounds.
+const WORDS_EN = [
+  { w: 'cow', pic: 'cow' }, { w: 'goat', pic: 'goat' }, { w: 'hut', pic: 'hut' }, { w: 'tree', pic: 'tree' },
+  { w: 'drum', pic: 'drum' }, { w: 'maize', pic: 'maize' }, { w: 'beads', pic: 'beads' }, { w: 'sun', pic: 'sun' },
+  { w: 'water', pic: 'water' }, { w: 'fire', pic: 'fire' }, { w: 'cup', pic: 'cup' }, { w: 'lamb', pic: 'lamb' },
+];
+// Swahili number words up to 99, for read-aloud.
+function swNum(n) {
+  const one = ['', 'moja', 'mbili', 'tatu', 'nne', 'tano', 'sita', 'saba', 'nane', 'tisa'];
+  const ten = ['', 'kumi', 'ishirini', 'thelathini', 'arobaini', 'hamsini', 'sitini', 'sabini', 'themanini', 'tisini'];
+  const t = Math.floor(n / 10), o = n % 10;
+  return t ? ten[t] + (o ? ' na ' + one[o] : '') : one[o];
+}
+const box = (vb, inner) => `<svg viewBox="${vb}" aria-hidden="true">${inner}</svg>`;
+function pic(name) {
+  switch (name) {
+    case 'cow': return cowImg('#8d5524');
+    case 'goat': return box('-60 -70 130 80', `<ellipse cx="0" cy="0" rx="44" ry="6" fill="rgba(0,0,0,.14)"/>${[-26, -14, 14, 26].map(x => limb(`M${x} -24 V-4`, '#f2efe6', 6)).join('')}
+      <ellipse cx="0" cy="-34" rx="36" ry="18" fill="#f2efe6" stroke="${INK}" stroke-width="3"/><ellipse cx="-8" cy="-38" rx="12" ry="8" fill="#5d4037"/>
+      <path d="M28 -44 Q46 -58 54 -40 Q58 -28 46 -26 Q36 -30 28 -36Z" fill="#f2efe6" stroke="${INK}" stroke-width="3"/><path d="M50 -28 q2 10 -4 14" stroke="${INK}" stroke-width="3" fill="none"/>
+      ${limb('M40 -52 Q34 -64 24 -64', '#bdb3a4', 3)}<circle cx="44" cy="-42" r="2.5" fill="${INK}"/><path d="M-36 -40 q-8 -8 -4 -16" stroke="${INK}" stroke-width="3" fill="none"/>`);
+    case 'hut': return box('-80 -75 160 85', hut(0, 0, 1));
+    case 'tree': return box('-105 -150 210 158', acacia(0, 0, 1));
+    case 'drum': return drumSVG('L');
+    case 'maize': return HARVEST.maize.svg;
+    case 'beads': return box('-50 -30 100 60', `<path d="M-40 -18 Q0 40 40 -18" stroke="#6d4c41" stroke-width="2" fill="none"/>${Array.from({ length: 7 }, (_, i) => { const a = Math.PI * (i + .5) / 7; return `<circle cx="${(-Math.cos(a) * 36).toFixed(1)}" cy="${(-14 + Math.sin(a) * 30).toFixed(1)}" r="7" fill="${['#E53935', '#fff', '#1E88E5', '#FDD835'][i % 4]}" stroke="${INK}" stroke-width="2"/>`; }).join('')}`);
+    case 'sun': return box('-60 -60 120 120', `${Array.from({ length: 12 }, (_, i) => { const a = i * Math.PI / 6; return `<path d="M${Math.cos(a) * 34} ${Math.sin(a) * 34} L${Math.cos(a) * 50} ${Math.sin(a) * 50}" stroke="#f9a825" stroke-width="6" stroke-linecap="round"/>`; }).join('')}<circle r="28" fill="#ffd54f" stroke="${INK}" stroke-width="3"/><circle cx="-9" cy="-4" r="3" fill="${INK}"/><circle cx="9" cy="-4" r="3" fill="${INK}"/><path d="M-9 8 q9 7 18 0" stroke="${INK}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`);
+    case 'water': return box('-40 -50 80 90', `<path d="M0 -44 Q30 -6 30 14 A30 30 0 0 1 -30 14 Q-30 -6 0 -44Z" fill="#4fc3f7" stroke="${INK}" stroke-width="3"/><path d="M-14 10 q0 12 10 16" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>`);
+    case 'fire': return box('-40 -75 80 82', fire(0, 0));
+    case 'cup': return box('-40 -45 80 80', `<path d="M-24 -30 L-20 26 L20 26 L24 -30Z" fill="#fff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M-23 -16 L-21 24 L21 24 L23 -16Z" fill="#fffdf2"/><path d="M24 -18 q18 2 14 18 q-4 10 -16 8" stroke="${INK}" stroke-width="3" fill="none"/>`);
+    case 'shuka': return box('-50 -40 100 80', `<rect x="-40" y="-32" width="80" height="64" rx="6" fill="#c62828" stroke="${INK}" stroke-width="3"/>${[-20, 0, 20].map(v => `<path d="M${v} -32 V32" stroke="rgba(0,0,0,.3)" stroke-width="6"/><path d="M-40 ${v} H40" stroke="rgba(0,0,0,.3)" stroke-width="6"/>`).join('')}`);
+    case 'brick': return box('0 -8 92 40', brickSVG('r', 6, 6, 20));
+    case 'lamb': return lambSVG();
+    case 'mama': return AV('mama', 'mama', '#ffe9d6');
+    case 'baba': return AV('man', 'baba', '#e3f2fd');
+  }
+  return '';
+}
+const STICK = `<svg viewBox="0 0 14 90" aria-hidden="true"><rect x="3" y="2" width="8" height="86" rx="4" fill="#8d6e63" stroke="${INK}" stroke-width="2"/></svg>`;
+const BUNDLE = `<svg viewBox="0 0 70 90" aria-hidden="true">${Array.from({ length: 10 }, (_, i) => `<rect x="${4 + i * 6}" y="${2 + (i % 3) * 2}" width="8" height="84" rx="4" fill="#8d6e63" stroke="${INK}" stroke-width="2"/>`).join('')}<rect x="0" y="40" width="70" height="10" rx="3" fill="#E53935" stroke="${INK}" stroke-width="2"/></svg>`;

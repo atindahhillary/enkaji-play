@@ -1,0 +1,45 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Version comes from the GitHub Actions run number, so every build can update the last one.
+def run = (System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger()
+
+android {
+    namespace 'ke.enkaji.play'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'ke.enkaji.play'
+        minSdk 24
+        targetSdk 34
+        versionCode run
+        versionName "1.0.${run}"
+    }
+
+    signingConfigs {
+        release {
+            // Set by the workflow from repository secrets (see .github/workflows/android.yml).
+            storeFile file(System.getenv('KEYSTORE_FILE') ?: 'missing.jks')
+            storePassword System.getenv('KEYSTORE_PASS')
+            keyAlias System.getenv('KEY_ALIAS') ?: 'enkaji'
+            keyPassword System.getenv('KEYSTORE_PASS')
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.11.0'
+}

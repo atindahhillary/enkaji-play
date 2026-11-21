@@ -1,7 +1,7 @@
 // Offline support: the Mara has weak signal, so cache the whole site after the first visit.
 // Bump VERSION on every deploy that changes files, so phones pick up the new copy.
-const VERSION = 'enkaji-v9';
-const FILES = ['./', 'index.html', 'styles.css', 'games.css', 'data.js', 'sound.js', 'art.js', 'games.js', 'app.js', 'manifest.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png', 'icon-maskable.png', ...['n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'cow', 'goat', 'sheep', 'red', 'orange', 'green', 'blue', 'sky', 'yellow'].map(k => `voice/${k}.mp3`)];
+const VERSION = 'enkaji-v11';
+const FILES = ['./', 'index.html', 'styles.css', 'games.css', 'data.js', 'sound.js', 'art.js', 'games.js', 'app.js', 'manifest.webmanifest', 'fonts.css', 'fonts/Inter-latin-400.woff2', 'fonts/Inter-latin-ext-400.woff2', 'fonts/PatrickHandSC-latin-400.woff2', 'fonts/PatrickHandSC-latin-ext-400.woff2', 'icon.svg', 'icon-192.png', 'icon-512.png', 'icon-maskable.png', ...['n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'cow', 'goat', 'sheep', 'red', 'orange', 'green', 'blue', 'sky', 'yellow'].map(k => `voice/${k}.mp3`)];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
