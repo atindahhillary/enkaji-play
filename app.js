@@ -27,7 +27,15 @@ function streak() {
 function markDay() { if (!S.days.includes(today())) S.days.push(today()); if (streak() >= 3) badge('streak3'); }
 function star(n = 1, msg) {
   S.stars += n; markDay(); badge('first'); save();
-  toast(msg || `+${n} ⭐ Well done!`); confetti(); updateLamb(); SND.play('yes');
+  toast(msg || `+${n} ⭐ Well done!`); confetti(); winDance(); updateLamb(); SND.play('yes');
+}
+// A 3D child does a short win dance in the corner (a flipbook strip from tools/studio3d.html), taking turns.
+function winDance() {
+  document.querySelector('.win-dance')?.remove();
+  const who = (winDance.n = (winDance.n || 0) + 1) % 2 ? 'girl' : 'boy';
+  const d = document.createElement('div'); d.className = 'win-dance'; d.setAttribute('aria-hidden', 'true');
+  d.innerHTML = `<i style="background-image:url(assets/dance-${who}.webp)"></i>`;
+  document.body.appendChild(d); setTimeout(() => d.classList.add('out'), 3900); setTimeout(() => d.remove(), 4400);
 }
 function badge(id) {
   if (S.badges.includes(id)) return;
@@ -173,10 +181,8 @@ const APK_URL = 'https://github.com/atindahhillary/enkaji-play/releases/download
 const HOOK_EN = 'Supa! Takwenya! Every enkaji is a classroom. Six bricks, five minutes a day, and the best teacher a child will ever have: Mama. Games, stories and activities in Maa, Swahili and English. No reading needed.';
 const HOOK_SW = 'Habari! Kila nyumba ni darasa. Matofali sita, dakika tano kwa siku, na mwalimu bora wa mtoto: Mama. Michezo, hadithi na shughuli kwa Kimaasai, Kiswahili na Kiingereza. Huhitaji kusoma.';
 V.welcome = () => {
-  // Golden hour in the Mara: huts, an acacia, cattle on the plain, and the family playing with bricks on the ground.
-  const hero = scene('golden', hut(90, 318, .8), hut(205, 300, .62), acacia(440, 300, 1.05), cow(660, 300, .42, '#8d5524'), cow(730, 296, .38, '#f2efe6', true), cow(590, 304, .36, '#2b1d16'),
-    person(250, 420, 1.15, { ...MAMA, point: true }), person(500, 422, 1.05, { ...NASERIAN, wave: true }), person(610, 424, .95, LEMAYIAN),
-    `<g transform="translate(330 392)">${['r', 'o', 'g', 'b', 'p', 'y'].map((c, i) => brickSVG(c, i * 34 - 20, (i % 2) * 6, 7)).join('')}</g>`, sparkle(360, 330, 1.1), sparkle(700, 140), sparkle(120, 150, .8));
+  // Golden hour in the Mara, rendered in 3D (tools/studio3d.html): the family playing with bricks by their enkaji.
+  const hero = `<img class="hero3d" src="assets/hero3d.webp" width="880" height="560" alt="Mama, Naserian and Lemayian with six bricks outside their enkaji in the Maasai Mara, cattle grazing behind" decoding="async">`;
   const who = [
     ['girl', '#e1f5fe', 'For children', 'Count cows into the boma, copy Koko\'s tower, find the shuka at Talek market. Every game speaks, so little ones can play alone.', '#/games', '▶ Play now'],
     ['mama', '#ffe9d6', 'For Mama', 'Picture and voice guides, no reading needed. Play while you milk, cook and bead. Record Maa words in your own voice.', '#/mothers', 'Start here, Mama'],

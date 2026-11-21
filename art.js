@@ -197,8 +197,10 @@ function avatarSVG(o = {}) {
   const kind = kindOf(o), child = kind === 'girl' || kind === 'boy', s = child ? 1.08 : .92, y = 46 + (child ? 205 * .68 * 1.08 : 205 * .92);
   return `<svg viewBox="0 0 100 100" class="avatar" role="img" aria-label="${o.label || 'Maasai ' + kind}"><rect width="100" height="100" fill="${o.bg || '#fff3e0'}"/>${person(50, y, s, { ...o, cls: 'still' })}</svg>`;
 }
-const AV = (key, label, bg = '#fff3e0') => avatarSVG({ ...(CAST[key] || MAMA), label, bg });
-const cowImg = (col, alt = '') => `<svg class="cow-svg" viewBox="-96 -176 228 186" role="img" aria-label="${alt || 'cow'}">${cow(0, 0, 1, col)}</svg>`;
+// 3D renders from tools/studio3d.html (assets/av-<key>.webp, assets/cow-<coat>.webp).
+const AV = (key, label, bg = '#fff3e0') => `<img class="avatar av3d" src="assets/av-${CAST[key] ? key : 'mama'}.webp" alt="${label}" style="background:${bg}" decoding="async">`;
+const COW_IMG = { '#8d5524': 'brown', '#f2efe6': 'white', '#2b1d16': 'black', '#c1592c': 'red', '#9e9e9e': 'grey' };
+const cowImg = (col, alt = '') => `<img class="cow-svg cow3d" src="assets/cow-${COW_IMG[col] || 'brown'}.webp" alt="${alt || 'cow'}" decoding="async" draggable="false">`;
 const nums = (list, y) => list.map(([nx, t]) => `<g transform="translate(${nx} ${y})"><circle r="20" fill="#fff" stroke="${INK}" stroke-width="3"/><text class="hand" y="9" text-anchor="middle" font-size="26" fill="${INK}">${t}</text></g>`).join('');
 
 // ---------- Stories ----------

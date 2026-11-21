@@ -389,3 +389,16 @@ svg.avatar { border-radius: 50%; display: block; aspect-ratio: 1; }
 
 /* Kenyan accent tip */
 .vt-x { border: 0; background: none; font-size: 1.1rem; min-width: 44px; min-height: 44px; }
+
+/* 3D renders (tools/studio3d.html) */
+.hero3d { display: block; width: 100%; height: auto; }
+img.cow3d { object-fit: contain; }
+/* Win dance: a 48-frame flipbook strip played with steps(), slides up from the corner on every star */
+.win-dance { position: fixed; right: 14px; bottom: 10px; width: 180px; height: 234px; z-index: 70; pointer-events: none; animation: wdIn .4s var(--back, cubic-bezier(.3,1.6,.5,1)) both; filter: drop-shadow(0 10px 14px rgba(90,45,10,.25)); }
+.win-dance i { display: block; width: 100%; height: 100%; background-size: 4800% 100%; background-repeat: no-repeat; animation: wdPlay 4.29s steps(48, jump-none) infinite; }
+.win-dance.out { animation: wdOut .45s ease-in forwards; }
+@keyframes wdPlay { from { background-position: 0% 0; } to { background-position: 100% 0; } }
+@keyframes wdIn { from { transform: translateY(110%); } }
+@keyframes wdOut { to { transform: translateY(110%); opacity: 0; } }
+@media (max-width: 760px) { .win-dance { width: 120px; height: 156px; right: 6px; bottom: 88px; } }
+@media (prefers-reduced-motion: reduce) { .win-dance, .win-dance i { animation: none; } }

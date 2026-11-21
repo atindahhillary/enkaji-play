@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Enkaji 3D studio</title>
+<style>body { font-family: Inter, system-ui, sans-serif; background: #f4e3c4; margin: 16px; } img { background: #fff3; margin: 4px; vertical-align: top; max-width: 100%; } #log { white-space: pre; }</style></head>
+<body><h1>Enkaji 3D studio</h1><p>Renders the 3D cast into assets/ (run <code>node tools/serve.js</code>, open this page, press Render).</p>
+<button id="go">Render all</button> <span id="log"></span><div id="out"></div>
+<script type="module">
+import { THREE, person, rest, wave, dance, BPM, brick, BRICK_COLS, cow, hut, acacia, ball, matte } from './cast3d.js';
+
+// The same cast as art.js CAST (kind, shuka colour, collar colours), plus a skin tone each.
+const CAST = {
+  girl: { kind: 'girl', wrap: '#1E88E5', collar: ['#FDD835', '#ffffff', '#E53935'] },
+  boy: { kind: 'boy', wrap: '#E53935', collar: ['#1E88E5', '#ffffff'], skin: '#6e381f' },
+  mama: { kind: 'woman', wrap: '#c62828', collar: ['#E53935', '#ffffff', '#1E88E5', '#FDD835'], skin: '#7f4428' },
+  koko: { kind: 'elder', wrap: '#0277BD', collar: ['#ffffff', '#E53935', '#43A047', '#FDD835'] },
+  ruth: { kind: 'woman', wrap: '#E53935', collar: ['#1E88E5', '#ffffff', '#FDD835'], skin: '#8a4b2c' },
+  man: { kind: 'man', wrap: '#1565C0', collar: ['#E53935', '#ffffff'], skin: '#6a361e' },
+  soil: { kind: 'man', wrap: '#6d4c41', collar: ['#E53935', '#ffffff'], skin: '#74401f' },
+  it: { kind: 'man', wrap: '#1E88E5', collar: ['#FDD835', '#ffffff'], skin: '#5f311b' },
+  health: { kind: 'woman', wrap: '#00897B', collar: ['#E53935', '#ffffff', '#43A047'], skin: '#7a4026' },
+  schol: { kind: 'woman', wrap: '#0277BD', collar: ['#FB8C00', '#ffffff', '#E53935'], skin: '#6e3a22' },
+  agri: { kind: 'man', wrap: '#43A047', collar: ['#E53935', '#FDD835'], skin: '#7f4428' },
+};
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.08; renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.setClearColor(0x000000, 0);
+
+function studio({ shadow = true, bg = null, wide = false } = {}) {
+  const scene = new THREE.Scene(); if (bg) scene.background = bg;
+  scene.add(new THREE.HemisphereLight('#fff0dc', '#b8601e', 1.15));
+  const key = new THREE.DirectionalLight('#fff1e0', 2.5); key.position.set(2.5, 6, 5); key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048); Object.assign(key.shadow.camera, wide ? { left: -9, right: 9, top: 7, bottom: -4, far: 40 } : { left: -2, right: 2, top: 3, bottom: -1, far: 20 }); key.shadow.mapSize.set(wide ? 4096 : 2048, wide ? 4096 : 2048); key.shadow.bias = -.0004; key.shadow.normalBias = .03; scene.add(key);
+  const rim = new THREE.DirectionalLight('#cfe6ff', 2.1); rim.position.set(-3, 4, -5); scene.add(rim);
+  const fill = new THREE.DirectionalLight('#ffd2a8', .7); fill.position.set(-5, 2, 3); scene.add(fill);
+  if (shadow) { const sc = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.ShadowMaterial({ opacity: .28 })); sc.rotation.x = -Math.PI / 2; sc.receiveShadow = true; scene.add(sc); }
+  return scene;
+}
+// Render at 2x and scale down for clean edges; returns a 2D canvas.
+function shot(scene, camera, w, h) {
+  renderer.setSize(w * 2, h * 2, false); camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.render(scene, camera);
+  const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); g.imageSmoothingQuality = 'high';
+  g.drawImage(renderer.domElement, 0, 0, w, h); return c;
+}
+const log = m => document.getElementById('log').textContent = m;
+async function save(name, canvas, q = .86) {
+  const url = canvas.toDataURL('image/webp', q);
+  const r = await fetch('/save?name=' + name, { method: 'POST', body: url }); if (!r.ok) throw new Error('save ' + name);
+  const img = new Image(); img.src = url; img.title = name + ' ' + Math.round(url.length * .75 / 1024) + ' KB'; img.style.maxHeight = '180px'; document.getElementById('out').append(img);
+  return Math.round(url.length * .75 / 1024);
+}
+
+// Head-and-shoulders portrait, slightly from the left, friendly head tilt.
+async function portrait(key) {
+  const scene = studio({ shadow: false }); const rig = person(CAST[key]); rest(rig); scene.add(rig.root);
+  rig.root.rotation.y = -.25; rig.root.updateMatrixWorld(true);
+  const hp = new THREE.Vector3(); rig.head.getWorldPosition(hp);
+  const cam = new THREE.PerspectiveCamera(24, 1, .1, 50); cam.position.set(.35, hp.y + .15, 3.9); cam.lookAt(0, hp.y - .12, 0);
+  return save('av-' + key, shot(scene, cam, 256, 256));
+}
+// Dance flipbook: one strip of frames, played on the site with CSS steps().
+const DANCE = { frames: 48, w: 180, h: 234 };
+async function danceStrip(key) {
+  const scene = studio(); const rig = person(CAST[key]); scene.add(rig.root);
+  const bricks = BRICK_COLS.map((c, i) => { const b = brick(c); const a = (i < 3 ? 1.75 : 4.53) + (i % 3) * .5; b.position.set(Math.sin(a) * .95, 0, Math.cos(a) * .6 - .2); b.rotation.y = a * 1.7; scene.add(b); return b; });
+  const cam = new THREE.PerspectiveCamera(28, 1, .1, 50); cam.position.set(0, 1.75, 5.3); cam.lookAt(0, .95, 0);
+  const strip = document.createElement('canvas'); strip.width = DANCE.w * DANCE.frames; strip.height = DANCE.h; const g = strip.getContext('2d');
+  const len = 8 * 60 / BPM;
+  for (let i = 0; i < DANCE.frames; i++) { dance(rig, i / DANCE.frames * len); g.drawImage(shot(scene, cam, DANCE.w, DANCE.h), i * DANCE.w, 0); }
+  return save('dance-' + key, strip, .8);
+}
+// Cow portraits for the games, one per coat colour (same names as art.js COATS).
+const COWS = { brown: ['#a0612c', '#f4efe6'], white: ['#f4efe6', '#3a2a20'], black: ['#2b1d16', '#f4efe6'], red: ['#c1592c', null], grey: ['#9e9e9e', '#f4efe6'] };
+async function cowShot(name) {
+  const scene = studio(); const k = cow(...COWS[name]); k.rotation.y = -.55; scene.add(k);
+  const cam = new THREE.PerspectiveCamera(26, 1, .1, 50); cam.position.set(.3, 1.5, 5.2); cam.lookAt(.1, .78, 0);
+  return save('cow-' + name, shot(scene, cam, 300, 260));
+}
+// Landing hero: golden hour in the Mara, the family playing with bricks in front of their enkaji.
+async function hero() {
+  const c = document.createElement('canvas'); c.width = 4; c.height = 256; const g2 = c.getContext('2d');
+  const gr = g2.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, '#7fb6d6'); gr.addColorStop(.62, '#f7cf8a'); gr.addColorStop(1, '#f2b866');
+  g2.fillStyle = gr; g2.fillRect(0, 0, 4, 256); const sky = new THREE.CanvasTexture(c); sky.colorSpace = THREE.SRGBColorSpace;
+  const scene = studio({ shadow: false, bg: sky, wide: true }); scene.fog = new THREE.Fog('#f3d39a', 30, 95);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), matte('#cf9f52', 1)); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+  for (const [x, z, s] of [[-14, -26, 7], [-2, -30, 9], [12, -27, 7.5], [24, -32, 9]]) scene.add(ball(1, matte('#8b9db0', 1), x, 0, z, s * 1.6, s * .55, s));  // blue-grey hills
+  const sun = ball(1.6, new THREE.MeshBasicMaterial({ color: '#ffd27a' }), 9, 6.5, -34); scene.add(sun);
+  const h1 = hut(); h1.position.set(-4.2, 0, -3.2); h1.scale.setScalar(1.25); scene.add(h1);
+  const h2 = hut(); h2.position.set(-2.4, 0, -5.5); scene.add(h2);
+  const t1 = acacia(); t1.position.set(2.8, 0, -5); t1.scale.setScalar(1.5); scene.add(t1);
+  // golden grass tufts
+  for (const [x, z, col, pt, ry] of [[3.3, -2.6, '#a0612c', '#f4efe6', -.5], [4.5, -4.4, '#f4efe6', '#2b1d16', -.9], [2.2, -5.8, '#3a2a20', '#f4efe6', .6]]) { const k = cow(col, pt); k.position.set(x, 0, z); k.rotation.y = ry; k.scale.setScalar(.9); scene.add(k); }
+  const fam = [['mama', -1.1, .2, .25], ['girl', .35, .9, -.15], ['boy', 1.4, .5, -.4]];
+  fam.forEach(([k, x, z, ry], i) => { const r = person(CAST[k]); rest(r); if (i === 0) wave(r, .12); if (i === 1) dance(r, 1.7); r.root.position.set(x, 0, z); r.root.rotation.y = ry; scene.add(r.root); });
+  BRICK_COLS.forEach((col, i) => { const b = brick(col); b.position.set(-.5 + i * .3, 0, 1.6 + (i % 2) * .15); b.rotation.y = i * .7; scene.add(b); });
+  const cam = new THREE.PerspectiveCamera(34, 1, .1, 120); cam.position.set(.3, 2.4, 7.6); cam.lookAt(.2, 1.25, -.5);
+  return save('hero3d', shot(scene, cam, 880, 560), .84);
+}
+
+document.getElementById('go').onclick = async () => {
+  const sizes = {};
+  for (const k of Object.keys(CAST)) { log('portrait ' + k); sizes['av-' + k] = await portrait(k); }
+  for (const c of Object.keys(COWS)) { log('cow ' + c); sizes['cow-' + c] = await cowShot(c); }
+  for (const k of ['girl', 'boy']) { log('dance ' + k); sizes['dance-' + k] = await danceStrip(k); }
+  log('hero'); sizes.hero3d = await hero();
+  window.DONE = sizes; log('done ' + JSON.stringify(sizes));
+};
+</script>
+</body></html>
