@@ -20,7 +20,8 @@ android {
     signingConfigs {
         release {
             // Set by the workflow from repository secrets (see .github/workflows/android.yml).
-            storeFile file(System.getenv('KEYSTORE_FILE') ?: 'missing.jks')
+            storeFile file(System.getenv('KEYSTORE_FILE') ?: 'missing.p12')
+            storeType 'pkcs12'
             storePassword System.getenv('KEYSTORE_PASS')
             keyAlias System.getenv('KEY_ALIAS') ?: 'enkaji'
             keyPassword System.getenv('KEYSTORE_PASS')

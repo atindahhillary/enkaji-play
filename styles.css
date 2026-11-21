@@ -355,3 +355,30 @@ svg.avatar { border-radius: 50%; display: block; aspect-ratio: 1; }
 
 .apk-chip { text-decoration: none; display: inline-flex; align-items: center; background: #e8f5e9 !important; color: #1B5E20 !important; }
 [data-apk][hidden] { display: none !important; }
+
+/* ===== Impact hook (Mothers Who Teach) ===== */
+.impact { margin: 22px 0; }
+.impact-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 16px; margin-bottom: 14px; }
+.impact-head h2 { flex: 1 1 420px; font-size: clamp(1.3rem, 3vw, 1.9rem); margin: 4px 0 0; }
+.impact-head .l-tag { flex-basis: 100%; }
+.impact-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.stat-big b.count { font-size: clamp(2.6rem, 6vw, 3.6rem); font-weight: 900; letter-spacing: -.04em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.stat-big .unit { font-size: 1.4rem; font-weight: 800; color: var(--mute); margin-left: 4px; }
+.stat-big > p:first-of-type { margin: 4px 0 12px; font-size: 1.02rem; }
+.fig-grid { display: block; width: 100%; height: auto; max-height: 190px; }
+.fig-grid .fig { fill: #e6dccd; transition: fill .4s ease; transition-delay: calc(var(--i) * 8ms); }
+.impact.in .fig-grid .fig.on { fill: var(--r); }
+.fig-grid .fig.on circle, .fig-grid .fig.on path { stroke: #2a1a12; stroke-width: 1.2; }
+.age-bar { position: relative; height: 10px; border-radius: 99px; background: linear-gradient(90deg, #e6dccd, #e6dccd); margin: 34px 4px 14px; }
+.age-bar i { position: absolute; top: -6px; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; background: var(--r); border: 2px solid #2a1a12; }
+.age-bar i.legal { background: #fff; }
+.age-bar em { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); font-style: normal; font-weight: 900; }
+.age-bar i.legal em::after { content: ' legal age'; font-weight: 600; color: var(--mute); white-space: nowrap; }
+.impact-sub { margin: 22px 0 10px; }
+.b-ic { font-size: 2.2rem; display: block; margin-bottom: 6px; }
+.impact-answer { display: flex; gap: 16px; align-items: flex-start; margin-top: 16px; border-left: 8px solid var(--g); background: #f1f8e9; }
+.impact-answer .b-ic { margin: 0; }
+.impact-src { margin-top: 10px; }
+@media (max-width: 900px) { .impact-grid { grid-template-columns: 1fr; } }
+.age-bar i.legal em { bottom: auto; top: 24px; }
+.age-bar { margin-bottom: 40px; }

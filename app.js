@@ -184,6 +184,7 @@ V.welcome = () => {
 
   <section class="l-stats">${[[ACTIVITIES.length, 'brick activities'], [GAMES.length, 'talking games'], [STORIES.length, 'Mara stories'], [3, 'languages'], [6, 'bricks'], ['📶', 'works offline']].map(([n, t]) => `<div><b>${n}</b><span>${t}</span></div>`).join('')}</section>
 
+  ${impactHook(true)}
   <div class="sec"><h2>${dot('r')}Something for everyone at home</h2></div>
   <section class="grid g3">${who.map(([k, bg, t, p, href, cta]) => `<a class="card l-who" href="${href}">${AV(k, t, bg)}<h3>${t}</h3><p class="mute">${p}</p><span class="btn">${cta} →</span></a>`).join('')}</section>
 
@@ -214,6 +215,70 @@ V.welcome.after = () => {
     }
   };
 };
+
+// ---------- Impact hook: why Mothers Who Teach exists ----------
+// Baseline figures reported by the Mothers Who Teach programme (Maasai Mara). Update here as new data arrives.
+const IMPACT = {
+  illiteracy: 96.8,        // % of mothers in the Mara who cannot read or write
+  engagement: 40,          // % of mothers engaged in their children's education (public schools)
+  marriageAge: 17,         // girls are married from as young as this age
+  legalAge: 18,            // Kenya's legal minimum age of marriage (Marriage Act, 2014)
+};
+const IMPACT_SAY = `In the Maasai Mara, ${IMPACT.illiteracy} percent of mothers cannot read. Only ${IMPACT.engagement} percent take part in their children's learning at public schools. Girls are married from as young as ${IMPACT.marriageAge}. Early marriage, the need for a husband's consent, and clan politics keep mothers out of school life. Our play-based programme starts closing the gap, making literacy equitable and accessible, as a first step to empowering indigenous women.`;
+// A grid of small mother figures: `lit` of `n` drawn in the accent colour. Text labels carry the meaning too.
+function figureGrid(n, lit, cols, label) {
+  const fig = (i, on) => `<g class="fig${on ? ' on' : ''}" style="--i:${i}" transform="translate(${(i % cols) * 22 + 11} ${Math.floor(i / cols) * 30 + 12})"><circle r="6.5" cy="-2"/><path d="M-8 22 Q-8 6 0 6 Q8 6 8 22Z"/></g>`;
+  return `<svg class="fig-grid" viewBox="0 0 ${cols * 22} ${Math.ceil(n / cols) * 30 + 2}" role="img" aria-label="${label}"><title>${label}</title>${Array.from({ length: n }, (_, i) => fig(i, i < lit)).join('')}</svg>`;
+}
+function impactHook(compact = false) {
+  const canRead = Math.round(100 - IMPACT.illiteracy); // 96.8% cannot read -> about 3 in 100 can
+  return `<section class="impact" data-impact>
+  <div class="impact-head"><span class="l-tag">THE GAP WE ARE CLOSING</span>
+    <h2>Mothers are their children's first teachers. Most were never given the chance to read.</h2>
+    ${listenBtn(IMPACT_SAY, 'en', '🔊 Listen')}</div>
+  <div class="impact-grid">
+    <div class="card stat-big"><b class="count" data-to="${IMPACT.illiteracy}" data-dec="1">0</b><span class="unit">%</span>
+      <p>of mothers in the Mara <b>cannot read or write</b></p>
+      ${figureGrid(100, canRead, 20, `100 mothers: about ${canRead} can read, ${100 - canRead} cannot`)}
+      <p class="small mute">Lit figures: about <b>${canRead} in every 100</b> mothers can read.</p></div>
+    <div class="card stat-big"><b class="count" data-to="${IMPACT.engagement}">0</b><span class="unit">%</span>
+      <p>of mothers <b>take part in their children's learning</b> at public schools</p>
+      ${figureGrid(10, IMPACT.engagement / 10, 10, `10 mothers: ${IMPACT.engagement / 10} take part, ${10 - IMPACT.engagement / 10} do not`)}
+      <p class="small mute"><b>6 in every 10</b> mothers are left out of school life.</p></div>
+    <div class="card stat-big"><b class="count" data-to="${IMPACT.marriageAge}">0</b><span class="unit">yrs</span>
+      <p>girls are <b>married from as young as ${IMPACT.marriageAge}</b>, below Kenya's legal age of ${IMPACT.legalAge}</p>
+      <div class="age-bar" role="img" aria-label="Marriage from age ${IMPACT.marriageAge}, legal age ${IMPACT.legalAge}"><i style="left:${(IMPACT.marriageAge - 10) / 15 * 100}%"><em>${IMPACT.marriageAge}</em></i><i class="legal" style="left:${(IMPACT.legalAge - 10) / 15 * 100}%"><em>${IMPACT.legalAge}</em></i></div>
+      <p class="small mute">School ends early for many girls who become mothers.</p></div>
+  </div>
+  ${compact ? '' : `<h3 class="impact-sub">What holds mothers back</h3>
+  <div class="grid g3 barriers">
+    <div class="card"><span class="b-ic">💍</span><h3>Early marriage</h3><p class="mute" style="margin:0">Girls marry as young as ${IMPACT.marriageAge} and leave school before learning to read with confidence.</p></div>
+    <div class="card"><span class="b-ic">🤝</span><h3>Spousal consent</h3><p class="mute" style="margin:0">Many mothers need a husband's permission to join school meetings, classes or training.</p></div>
+    <div class="card"><span class="b-ic">🏘️</span><h3>Clan politics</h3><p class="mute" style="margin:0">Clan dynamics shape who is heard, so mothers' voices in school matters are often left out.</p></div>
+  </div>`}
+  <div class="card impact-answer"><span class="b-ic">🧱</span><div><h3>Our answer: learning through play, at home</h3>
+    <p style="margin:0">Mothers Who Teach needs no reading. Six bricks, pictures and a voice in Maa, Swahili and English let every mother teach her child from day one. We start closing the gap and make literacy <b>equitable and accessible</b> in the community, as a first step to <b>empowering indigenous women</b>.</p>
+    ${compact ? '<a class="btn" href="#/mothers" style="margin-top:12px">See Mothers Who Teach →</a>' : ''}</div></div>
+  <p class="small mute impact-src">Baseline figures reported by the Mothers Who Teach programme, Maasai Mara. Kenya's minimum marriage age is 18 under the Marriage Act, 2014.</p>
+</section>`;
+}
+// Count numbers up and fill the figures when the section scrolls into view.
+function animateImpact() {
+  const sec = document.querySelector('[data-impact]'); if (!sec) return;
+  const run = () => {
+    sec.classList.add('in');
+    sec.querySelectorAll('.count').forEach(el => {
+      const to = +el.dataset.to, dec = +(el.dataset.dec || 0);
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = to.toFixed(dec); return; }
+      const t0 = performance.now(), dur = 1400;
+      const tick = now => { const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = (to * e).toFixed(dec); if (k < 1) requestAnimationFrame(tick); };
+      requestAnimationFrame(tick);
+    });
+  };
+  if (!('IntersectionObserver' in window)) return run();
+  const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); run(); } }, { threshold: .25 });
+  io.observe(sec);
+}
 
 V.home = () => {
   const d = today(), pick = ACTIVITIES[new Date().getDate() % ACTIVITIES.length];
@@ -375,6 +440,7 @@ V.mothers = () => {
     <div><div style="font-weight:800;letter-spacing:.06em">TAKWENYA, MAMA! · IKO!</div><h1>Mothers Who Teach</h1>
     <p style="font-size:1.1rem;max-width:560px">You are your child's first and best teacher. You already teach beadwork, songs, cooking and respect. Six bricks add a little play to the day you already have.</p>
     ${listenBtn('Takwenya Mama! You are your child\'s first and best teacher. You do not need to read to teach. Look at the pictures, press the listen button, and play together for five minutes every day.', 'en', '🔊 Listen, Mama')} ${listenBtn('Habari Mama! Wewe ni mwalimu wa kwanza wa mtoto wako. Huhitaji kusoma ili kufundisha. Angalia picha, bonyeza kitufe cha kusikiliza, na mcheze pamoja dakika tano kila siku.', 'sw', '🔊 Sikiliza kwa Kiswahili')}</div></section>
+  ${impactHook()}
   <div class="card install-card"><span style="font-size:2.4rem">📲</span><div style="flex:1"><h3 style="margin:0">Put Enkaji Play on your phone</h3><p class="mute" style="margin:4px 0 0">One tap. It gets its own icon and works without signal.</p></div><button class="btn" data-install>Install</button><a class="btn alt" data-apk href="${APK_URL}">🤖 APK</a></div>
   <div class="sec"><h2>How to use this</h2></div>
   <div class="how4"><div><span>👀</span>Look at the picture</div><div><span>🔊</span>Press Listen</div><div><span>🧱</span>Play 5 minutes</div><div><span>🤗</span>Praise the trying</div></div>
@@ -502,6 +568,7 @@ function render() {
   $('#view').innerHTML = view(arg);
   view.after && view.after(arg);
   if (typeof syncInstall === 'function') syncInstall();
+  animateImpact();
   const navKey = { welcome: 'home', activity: 'activities', game: 'games', story: 'stories', module: 'training', cards: 'training', bricks: 'home' }[r] || r;
   document.querySelectorAll('#nav a').forEach(a => { const on = a.dataset.r === navKey; a.classList.toggle('on', on); on ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'); });
 }
