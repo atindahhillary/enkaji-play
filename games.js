@@ -41,14 +41,18 @@ function flyTo(node, target, { dur = 520, lift = 90, endScale = .7 } = {}) {
 // Talk in sequence: [{maa:'look'}, {en:'...'}, {sw:'...'}]. Maa plays Mama's recording if one exists.
 async function talk(parts) {
   const id = talk.id = (talk.id || 0) + 1;
+  stopSpeech(); // a new line always replaces the old one: never two voices at once
   let saidMaa = false;
   for (const p of parts) {
     if (talk.id !== id) return;
     // In Maa mode, a Kiswahili line right after a line Sanau said in Maa is a repeat of it, so skip it.
     if (window.MAA_MODE && p.sw && saidMaa) { saidMaa = false; continue; }
     saidMaa = !!(window.MAA_MODE && p.en && /_maa$/.test(lineKey(p.en) || ''));
+    if (SND.quietIn) await wait(SND.quietIn + 120); // let a chime or moo finish before speaking
+    if (talk.id !== id) return;
     await new Promise(res => {
-      const t = setTimeout(res, 7000); // some speech engines never fire onend
+      // Safety net only, for engines that never report the end: long enough for the longest line.
+      const t = setTimeout(res, p.maa ? 9000 : Math.max(6000, (p.sw || p.en || '').length * 110 + 2500));
       const done = () => { clearTimeout(t); res(); };
       if (p.maa) {
         REC.play('maa-' + p.maa).then(a => a || playSanau(p.maa)).then(a => { if (a) { a.onended = done; a.onerror = done; } else done(); });
@@ -130,7 +134,7 @@ const GAME_MOUNT = {
       if (busy || mine.length >= target.length) return;
       mine.push(k); SND.play('brick');
       el.querySelector('[data-m]').insertAdjacentHTML('beforeend', brickEl(k, 'drop-in'));
-      speak(BRICK[k].sw, 'sw');
+      talk([{ sw: BRICK[k].sw }]);
       if (mine.length === target.length) check();
     }
     async function check() {
@@ -625,7 +629,7 @@ const GAME_MOUNT = {
       el.querySelectorAll('.syl').forEach(b => b.onclick = async () => {
         if (busy || b.disabled) return;
         const slot = el.querySelectorAll('.slot')[built.length]; if (!slot) return;
-        speak(b.dataset.s, 'sw'); SND.play('pop');
+        SND.play('pop'); talk([{ sw: b.dataset.s }]);
         await flyTo(b, slot, { dur: 320, lift: 40, endScale: 1 }); if (!st.live()) return;
         slot.textContent = b.dataset.s; restart(slot, 'snap'); b.disabled = true; b.classList.add('used');
         built.push({ s: b.dataset.s, btn: b });

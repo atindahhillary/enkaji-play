@@ -121,16 +121,17 @@ function speak(text, lang = 'en', onend) {
   if (!SND.on) { onend && onend(); return; }
   if (playLine(text, onend, () => speak(text, lang, onend))) return; // Sanau's real voice, when this line is recorded
   if (lang === 'en') text = PRON.reduce((t, [re, say]) => t.replace(re, say), text);
+  stopSpeech(); // one voice at a time
+  const silent = () => { if (onend) setTimeout(onend, Math.min(4500, 900 + text.length * 45)); };
   if (window.EnkajiApp) { // Android app: native TextToSpeech (Android WebView has no Web Speech API)
     const id = 'u' + (++speak.n); speak.cb[id] = onend;
-    if (!EnkajiApp.speak(text, lang, id)) { delete speak.cb[id]; onend && onend(); }
+    if (!EnkajiApp.speak(text, lang, id)) { delete speak.cb[id]; silent(); }
     return;
   }
-  if (!('speechSynthesis' in window)) { onend && onend(); return; }
-  window.speechSynthesis.cancel();
+  const v = window.speechSynthesis && VOICE.pick(lang);
+  if (!v) { silent(); return; } // no East African voice on this device: never fall back to a western one
   const u = new SpeechSynthesisUtterance(text);
-  u.voice = VOICE.pick(lang); // Kenyan voice first (en-KE / sw-KE), then the nearest available
-  u.lang = u.voice ? u.voice.lang : (lang === 'sw' ? 'sw-KE' : 'en-KE');
+  u.voice = v; u.lang = v.lang;
   u.rate = .88; u.pitch = 1.05;
   if (onend) { u.onend = onend; u.onerror = onend; }
   speechSynthesis.speak(u);
@@ -139,10 +140,12 @@ speak.n = 0; speak.cb = {};
 window.__ttsDone = id => { const f = speak.cb[id]; delete speak.cb[id]; f && f(); };
 // Speak a Maa word: Mama's own recording if there is one, otherwise the Swahili voice.
 // Maa is only ever spoken by a real voice: Mama's own recording, else Sanau's. Never a computer voice.
-function sayMaa(k) { stopSpeech(); REC.play('maa-' + k).then(a => a || playSanau(k)); }
+// hush(): a tap on any Listen button cancels whatever the game was saying, so the two never overlap.
+const hush = () => { if (typeof talk === 'function') talk.id = (talk.id || 0) + 1; stopSpeech(); };
+function sayMaa(k) { hush(); REC.play('maa-' + k).then(a => a || playSanau(k)); }
 document.addEventListener('click', e => { const b = e.target.closest('[data-maa]'); if (b) sayMaa(b.dataset.maa); });
 const listenBtn = (text, lang = 'en', label = '🔊 Listen') => `<button class="listen" data-say="${esc(text)}" data-lang="${lang}">${label}</button>`;
-document.addEventListener('click', e => { const b = e.target.closest('[data-say]'); if (b) speak(b.dataset.say, b.dataset.lang); });
+document.addEventListener('click', e => { const b = e.target.closest('[data-say]'); if (b) { hush(); speak(b.dataset.say, b.dataset.lang); } });
 
 // ---------- Shared bits ----------
 // Each game wears one brick colour. c = button colour dark enough for white text (AA).
@@ -453,7 +456,7 @@ V.story.after = id => {
   $('#musicB').onclick = e => { music = !music; e.currentTarget.setAttribute('aria-pressed', music); e.currentTarget.textContent = music ? '🎵 Music' : '🔇 Music'; SND.music(music && auto); };
   $('#playS').onclick = () => { if (auto) return stop(); if (i >= s.pages.length) i = 0; auto = true; $('#playS').textContent = '⏸ Pause'; SND.music(music); show(); step(); };
   // The Swahili button always plays Swahili, even in Maa mode.
-  $('#sayW').onclick = () => { const p = s.pages[i], m = window.MAA_MODE; if (!p) return; window.MAA_MODE = false; speak(p.sw, 'sw'); window.MAA_MODE = m; };
+  $('#sayW').onclick = () => { const p = s.pages[i], m = window.MAA_MODE; if (!p) return; stop(); window.MAA_MODE = false; speak(p.sw, 'sw'); window.MAA_MODE = m; };
   show();
 };
 

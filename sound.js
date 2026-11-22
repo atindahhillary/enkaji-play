@@ -61,7 +61,7 @@ const SND = (() => {
     const bass = [146.8, 146.8, 110, 123.5]; // D D A B, one per bar
     const eighth = 60 / 96 / 2; let n = 0, next = a.currentTime + .1;
     bed = { g, iv: setInterval(() => {
-      const duck = (window.EnkajiApp ? EnkajiApp.speaking() : window.speechSynthesis && speechSynthesis.speaking) ? .35 : 1;
+      const duck = voiceBusy() ? .35 : 1; // the music dips under any voice: Sanau, Mama or the phone
       g.gain.setTargetAtTime(duck, a.currentTime, .25);
       while (next < a.currentTime + .25) {
         const bar = Math.floor(n / 8);
@@ -73,9 +73,13 @@ const SND = (() => {
     }, 80) };
   }
   const SND_ON = () => on;
+  const FX_MS = { yes: 520, cheer: 760, moo: 1000, bleat: 380, bell: 700, no: 380, coin: 380, clink: 260, whoosh: 300 };
+  let fxUntil = 0;
   return {
     music: v => { try { music(v); } catch {} },
-    play: k => { try { fx[k] && fx[k](); } catch {} },
+    // Each effect notes how long it rings, so speech can wait for it instead of talking over it.
+    play: k => { try { if (fx[k] && on) { fx[k](); fxUntil = Math.max(fxUntil, performance.now() + (FX_MS[k] || 150)); } } catch {} },
+    get quietIn() { return Math.max(0, fxUntil - performance.now()); },
     get on() { return on; },
     toggle() { on = !on; try { localStorage.setItem('enkaji-sound', on ? 'on' : 'off'); } catch {} if (!on) { stopSpeech(); music(false); } return on; },
   };
@@ -99,7 +103,7 @@ const REC = (() => {
       if (!keys.has(k)) return false;
       try {
         if (!cache[k]) cache[k] = URL.createObjectURL(await tx('readonly', s => s.get(k)));
-        const a = new Audio(cache[k]); await a.play(); return a;
+        return await playVoice(cache[k]);
       } catch { return false; }
     },
     // Records up to `ms` milliseconds from the microphone and saves it under key k.
@@ -118,8 +122,21 @@ const REC = (() => {
   };
 })();
 
+// ---------- One voice channel ----------
+// Only one voice ever speaks: starting any clip or phone speech stops whatever was speaking before.
+let voiceAudio = null;
+function playVoice(src) {
+  stopSpeech();
+  const a = voiceAudio = new Audio(src);
+  return a.play().then(() => a, () => { if (voiceAudio === a) voiceAudio = null; return false; });
+}
+function voiceBusy() {
+  if (voiceAudio && !voiceAudio.paused && !voiceAudio.ended) return true;
+  try { return window.EnkajiApp ? EnkajiApp.speaking() : !!(window.speechSynthesis && speechSynthesis.speaking); } catch { return false; }
+}
+
 // Sanau's recorded script lines: look up a line by its exact text.
-let LINE_BY_TEXT = null, lineAudio = null;
+let LINE_BY_TEXT = null;
 function lineKey(text) {
   if (typeof VOICE_SCRIPT === 'undefined' || typeof SANAU_LINES === 'undefined' || !SANAU_LINES.size) return null;
   if (!LINE_BY_TEXT) {
@@ -140,7 +157,7 @@ function lineKey(text) {
 function playLine(text, onend, retry) {
   const k = lineKey(text); if (!k || !SND.on) return false;
   stopSpeech();
-  const a = lineAudio = new Audio(`voice/${k}.mp3`);
+  const a = voiceAudio = new Audio(`voice/${k}.mp3`);
   let done = false; const fin = () => { if (!done) { done = true; onend && onend(); } };
   // A missing or broken clip falls back to the phone voice (and is not tried again).
   const fail = () => { if (done) return; done = true; SANAU_LINES.delete(k); retry ? retry() : onend && onend(); };
@@ -150,13 +167,12 @@ function playLine(text, onend, retry) {
 
 // Stop any speech: the browser's, or Android's when running inside the app.
 function stopSpeech() {
-  try { if (lineAudio) { lineAudio.onended = lineAudio.onerror = null; lineAudio.pause(); lineAudio = null; } } catch {} try { window.speechSynthesis && speechSynthesis.cancel(); } catch {} try { window.EnkajiApp && EnkajiApp.stop(); } catch {} }
+  try { if (voiceAudio) { voiceAudio.onended = voiceAudio.onerror = null; voiceAudio.pause(); voiceAudio = null; } } catch {} try { window.speechSynthesis && speechSynthesis.cancel(); } catch {} try { window.EnkajiApp && EnkajiApp.stop(); } catch {} }
 
 // Play Sanau's recorded clip for a Maa word, if there is one. Resolves to the Audio, or false.
 function playSanau(k) {
   if (typeof SANAU === 'undefined' || !SANAU.has(k) || !SND.on) return Promise.resolve(false);
-  const a = new Audio(`voice/${k}.mp3`);
-  return a.play().then(() => a, () => false);
+  return playVoice(`voice/${k}.mp3`);
 }
 
 // ---------- Kenyan voices ----------
@@ -174,7 +190,9 @@ const VOICE = (() => {
     return null;
   };
   return {
-    pick: lang => lang === 'sw' ? by(['sw-KE', 'sw-TZ', 'sw']) : by(['en-KE', 'sw-KE', 'sw-TZ', 'sw', 'en-TZ', 'en-NG', 'en-ZA', 'en-GB', 'en']),
+    // East African voices only: never a British, American or other western voice. English falls back to
+    // a Swahili voice, which reads English with an East African accent.
+    pick: lang => lang === 'sw' ? by(['sw-KE', 'sw-TZ', 'sw-UG', 'sw']) : by(['en-KE', 'sw-KE', 'en-TZ', 'en-UG', 'sw-TZ', 'sw']),
     kenyan: lang => { const v = VOICE.pick(lang); return !!v && /(-KE|^sw)/i.test(v.lang.replace('_', '-')); },
     label() {
       const e = VOICE.pick('en'), s = VOICE.pick('sw');

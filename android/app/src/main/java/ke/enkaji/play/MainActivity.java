@@ -107,7 +107,8 @@ public class MainActivity extends Activity {
         public boolean speak(String text, String lang, String id) {
             if (!ttsReady) return false;
             android.speech.tts.Voice v = bestVoice(lang);
-            if (v != null) tts.setVoice(v); else tts.setLanguage(new Locale("en", "KE"));
+            if (v == null) return false; // no East African voice: never fall back to a western one
+            tts.setVoice(v);
             tts.setSpeechRate(0.9f);
             return tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, id) == TextToSpeech.SUCCESS;
         }
@@ -136,8 +137,7 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Kenyan accent first. English: Kenyan English, then Swahili (an East African accent reading English),
-     * then any English. Swahili: Kenyan Swahili, then any Swahili. Voices that work offline win ties.
+     * Kenyan accent first. English: Kenyan English, then Swahili or East African English. Never a western voice. Swahili: Kenyan Swahili, then any Swahili. Voices that work offline win ties.
      */
     private android.speech.tts.Voice bestVoice(String lang) {
         java.util.Set<android.speech.tts.Voice> all;
@@ -145,7 +145,7 @@ public class MainActivity extends Activity {
         if (all == null) return null;
         String[][] order = "sw".equals(lang)
                 ? new String[][]{{"sw", "KE"}, {"sw", ""}}
-                : new String[][]{{"en", "KE"}, {"sw", "KE"}, {"sw", ""}, {"en", "TZ"}, {"en", "NG"}, {"en", "ZA"}, {"en", "GB"}, {"en", ""}};
+                : new String[][]{{"en", "KE"}, {"sw", "KE"}, {"en", "TZ"}, {"en", "UG"}, {"sw", ""}};
         for (String[] want : order) {
             android.speech.tts.Voice best = null;
             for (android.speech.tts.Voice v : all) {
