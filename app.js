@@ -120,6 +120,7 @@ const PRON = [
 function speak(text, lang = 'en', onend) {
   if (!SND.on) { onend && onend(); return; }
   if (playLine(text, onend, () => speak(text, lang, onend))) return; // Sanau's real voice, when this line is recorded
+  const pieces = !window.MAA_MODE && composeKeys(text); if (pieces) { playSeq(pieces, onend); return; } // or joined from her recorded pieces
   if (lang === 'en') text = PRON.reduce((t, [re, say]) => t.replace(re, say), text);
   stopSpeech(); // one voice at a time
   const silent = () => { if (onend) setTimeout(onend, Math.min(4500, 900 + text.length * 45)); };

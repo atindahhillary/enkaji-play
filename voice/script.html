@@ -8,6 +8,8 @@
   ol { padding-left: 2.2em; } li { padding: 7px 0; border-bottom: 1px dashed #e7d9c4; font-size: 1.12rem; }
   li small { color: #8a7a6a; font-size: .8rem; margin-left: 8px; }
   .tag { display: inline-block; font-size: .72rem; font-weight: 800; padding: 1px 7px; border-radius: 6px; background: #e3f2fd; margin-left: 8px; vertical-align: 2px; }
+  ol.cols { columns: 3; column-gap: 28px; } ol.cols li { break-inside: avoid; }
+  .small { font-size: .95rem; color: #5a4a3c; }
   @media print { body { background: #fff; } .how { border-width: 1px; } li { break-inside: avoid; } }
 </style></head>
 <body>
@@ -27,10 +29,23 @@
 <script>
   let n = 0;
   const row = (t, lang) => `<li>${t}<span class="tag">${lang === 'sw' ? 'Kiswahili' : lang === 'en' ? 'English' : 'Maa'}</span></li>`;
+  // Round 2 (script.html?part=2): the remaining game lines. Short words sit in columns to save paper.
+  if (new URLSearchParams(location.search).get('part') === '2') {
+    document.querySelector('h1').textContent = 'Recording script for Sanau: round 2 (games)';
+    document.querySelector('p').innerHTML = 'Thank you for the first recording: children now hear <b>your voice</b> in the stories. These lines finish the games. The games join the short pieces together, so "Mama needs" + "thirty" + "four" + "sticks for the fire" is all your voice.';
+    let h = '';
+    VOICE_SCRIPT2.forEach(p => {
+      const short = !p.maa && p.lines.every(t => t.length < 18);
+      h += `<h2>${p.part}</h2>${p.maa ? '<p class="small"><b>For each line:</b> say it in English, pause, then say it in Maa, like last time.</p>' : ''}<ol start="${n + 1}"${short ? ' class="cols"' : ''}>${p.lines.map(t => (n++, `<li>${t}${p.maa ? '<span class="tag">English, then Maa</span>' : ''}</li>`)).join('')}</ol>`;
+    });
+    h += `<p style="margin-top:20px"><b>${n} lines in total.</b> Most are one word. Ashe oleng, Sanau!</p>`;
+    document.getElementById('script').innerHTML = h;
+  } else {
   let html = VOICE_SCRIPT.map(p => `<h2>${p.part}</h2><ol start="${n + 1}">${p.lines.map(([, t, l]) => (n++, row(t, l))).join('')}</ol>`).join('');
   html += `<h2>Part 3. Stories in English (one line per page)</h2><ol start="${n + 1}">` + STORIES.flatMap(s => s.pages.map(p => (n++, row(p.en, 'en')))).join('') + '</ol>';
   html += `<h2>Part 4. Stories in Kiswahili (one line per page)</h2><ol start="${n + 1}">` + STORIES.flatMap(s => s.pages.map(p => (n++, row(p.sw, 'sw')))).join('') + '</ol>';
   html += `<p style="margin-top:20px"><b>${n} lines in total.</b> Ashe oleng, Sanau!</p>`;
   document.getElementById('script').innerHTML = html;
+  }
 </script>
 </body></html>

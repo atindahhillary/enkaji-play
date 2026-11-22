@@ -165,8 +165,47 @@ function playLine(text, onend, retry) {
   return true;
 }
 
+// ---------- Joined lines: a changing sentence spoken from Sanau's recorded pieces ----------
+// "Mama needs 34 sticks for the fire." -> mama needs | thirty | four | sticks for the fire. Longest recorded piece wins.
+// Returns the clip keys, or null when any part is not recorded yet (the phone voice is used instead).
+let PIECES = null;
+const EN_NUM = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+const EN_TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+function composeKeys(text) {
+  if (typeof VOICE_SCRIPT2 === 'undefined' || typeof SANAU_LINES === 'undefined') return null;
+  if (!PIECES) {
+    PIECES = new Map();
+    const add = (t, k) => { if (SANAU_LINES.has(k) || (typeof SANAU !== 'undefined' && SANAU.has(k))) PIECES.set(VOICE_WORDS(t).join(' '), k); };
+    VOICE_SCRIPT.forEach(p => p.lines.forEach(([k, t]) => add(t, k)));
+    VOICE_SCRIPT2.forEach(p => p.lines.forEach(t => add(t, VOICE_KEY2(t))));
+  }
+  if (!PIECES.size) return null;
+  const w = VOICE_WORDS(text).flatMap(x => /^\d+$/.test(x) ? (+x <= 20 ? [EN_NUM[+x]] : [EN_TENS[Math.floor(x / 10) % 10], +x % 10 ? EN_NUM[+x % 10] : null].filter(Boolean)) : [x]);
+  const keys = [];
+  for (let i = 0; i < w.length;) {
+    let hit = 0;
+    for (let n = Math.min(12, w.length - i); n > 0 && !hit; n--) { const k = PIECES.get(w.slice(i, i + n).join(' ')); if (k) { keys.push(k); hit = n; } }
+    if (!hit) return null;
+    i += hit;
+  }
+  return keys.length ? keys : null;
+}
+// Plays clips one after another on the voice channel. Any new speech (stopSpeech) ends the sequence.
+function playSeq(keys, onend) {
+  stopSpeech(); const gen = ++playSeq.gen; let i = 0;
+  const next = () => {
+    if (gen !== playSeq.gen) return;
+    if (i >= keys.length) { voiceAudio = null; onend && onend(); return; }
+    const a = voiceAudio = new Audio(`voice/${keys[i++]}.mp3`);
+    a.onended = next; a.onerror = next; a.play().catch(next);
+  };
+  next(); return true;
+}
+playSeq.gen = 0;
+
 // Stop any speech: the browser's, or Android's when running inside the app.
 function stopSpeech() {
+  playSeq.gen++;
   try { if (voiceAudio) { voiceAudio.onended = voiceAudio.onerror = null; voiceAudio.pause(); voiceAudio = null; } } catch {} try { window.speechSynthesis && speechSynthesis.cancel(); } catch {} try { window.EnkajiApp && EnkajiApp.stop(); } catch {} }
 
 // Play Sanau's recorded clip for a Maa word, if there is one. Resolves to the Audio, or false.
